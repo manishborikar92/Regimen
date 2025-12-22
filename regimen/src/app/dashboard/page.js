@@ -159,7 +159,7 @@ export default function DashboardPage() {
         {/* Progress */}
         <div className="bg-white rounded-xl p-4 shadow-sm">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">Today's Progress</span>
+            <span className="text-sm font-medium text-gray-700">Today&apos;s Progress</span>
             <span className="text-sm font-bold text-blue-600">
               {completedCount} of {todaysHabits.length} completed
             </span>

@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
 import { auth, googleProvider } from '@/lib/firebase';
 
@@ -13,7 +13,8 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     // If Firebase isn't initialized, stop loading
     if (!auth) {
-      setLoading(false);
+      // Use a microtask to avoid synchronous setState in effect
+      queueMicrotask(() => setLoading(false));
       return;
     }
 
