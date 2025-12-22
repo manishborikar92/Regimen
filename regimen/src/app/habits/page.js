@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -32,13 +32,8 @@ export default function HabitsPage() {
     }
   }, [user, authLoading, router]);
 
-  useEffect(() => {
+  const fetchHabits = useCallback(async () => {
     if (!user) return;
-    console.log('Current User ID:', user.uid); // Debug log
-    fetchHabits();
-  }, [user]);
-
-  const fetchHabits = async () => {
     try {
       const habitsRef = collection(db, 'habits');
       const habitsQuery = query(habitsRef, where('userId', '==', user.uid));
@@ -51,7 +46,13 @@ export default function HabitsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    console.log('Current User ID:', user.uid); // Debug log
+    fetchHabits();
+  }, [user, fetchHabits]);
 
   const handleSave = async (formData) => {
     try {
