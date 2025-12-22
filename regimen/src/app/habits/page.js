@@ -7,6 +7,7 @@ import { db } from '@/lib/firebase';
 import { useAuth } from '@/components/AuthProvider';
 import BottomNav from '@/components/BottomNav';
 import HabitModal from '@/components/HabitModal';
+import { seedHabits as seedData } from '@/lib/seedData';
 
 const categoryColors = {
   Movement: 'bg-blue-100 text-blue-700 border-blue-200',
@@ -33,6 +34,7 @@ export default function HabitsPage() {
 
   useEffect(() => {
     if (!user) return;
+    console.log('Current User ID:', user.uid); // Debug log
     fetchHabits();
   }, [user]);
 
@@ -99,21 +101,44 @@ export default function HabitsPage() {
 
   const handleSeedHabits = async () => {
     setSeeding(true);
+    const habitsRef = collection(db, 'habits');
+
     try {
-      const response = await fetch('/api/seed', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.uid })
-      });
-      const data = await response.json();
-      if (data.success) {
-        await fetchHabits();
-      } else {
-        alert('Failed to load sample habits: ' + data.error);
+      // Step 1: Check existing habits (READ)
+      console.log('Checking for existing habits...');
+      const habitsQuery = query(habitsRef, where('userId', '==', user.uid));
+      const snapshot = await getDocs(habitsQuery);
+      
+      if (!snapshot.empty) {
+        alert('You already have habits! Delete them first if you want to re-seed.');
+        setSeeding(false);
+        return;
       }
     } catch (err) {
-      console.error('Error seeding habits:', err);
-      alert('Failed to load sample habits');
+      console.error('Error reading habits (Permission/Network):', err);
+      alert('Error reading database. Please check your internet or Firebase Rules.');
+      setSeeding(false);
+      return;
+    }
+
+    try {
+      // Step 2: Seed habits (WRITE)
+      console.log('Seeding habits for user:', user.uid);
+      const promises = seedData.map(habit => 
+        addDoc(habitsRef, {
+          ...habit,
+          userId: user.uid,
+          createdAt: serverTimestamp()
+        })
+      );
+
+      await Promise.all(promises);
+      console.log('Seeding complete.');
+      await fetchHabits();
+      alert('Sample routine loaded successfully!');
+    } catch (err) {
+      console.error('Error creating habits (Permission Denied?):', err);
+      alert('Failed to create habits. This is likely a Permissions error. Please update your Firestore Rules in the Firebase Console.');
     } finally {
       setSeeding(false);
     }
