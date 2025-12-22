@@ -7,7 +7,13 @@
 
 ---
 
-Read `Guide.md` (Complete Specification Document for Routine Tracker Web App) and the `client/` folder (Next.js 16 project structure), then implement the application according to the specifications.
+Read `docs/Guide.md` (Complete Specification Document for Routine Tracker Web App) and the `regimen/src/` folder (Next.js 16 project structure). Before starting the implementation, thoroughly review and refer to the official documentation websites for all relevant technologies:
+- Next.js 16 App Router documentation
+- Firebase Authentication and Firestore documentation
+- Tailwind CSS documentation
+- PWA best practices
+
+Then implement the application according to the specifications.
 
 **Project Requirements:**
 
@@ -21,25 +27,25 @@ Read `Guide.md` (Complete Specification Document for Routine Tracker Web App) an
 
 2. **Complete File Implementation:**
 
-   Create and implement ALL files in the `client/src/` directory structure:
+   Create and implement ALL files in the `regimen/src/` directory structure:
 
-   **`client/src/app/layout.js`**
+   **`regimen/src/app/layout.js`**
    - Root layout with AuthProvider wrapper
    - PWA metadata configuration
    - Tailwind CSS imports
    - Inter font from next/font/google
 
-   **`client/src/app/page.js`**
+   **`regimen/src/app/page.js`**
    - Root page that redirects authenticated users to /dashboard
    - Redirects unauthenticated users to /login
 
-   **`client/src/app/login/page.js`**
+   **`regimen/src/app/login/page.js`**
    - Clean, centered login interface
    - Google Sign-In button using Firebase Auth
    - Loading states and error handling
    - Redirect to /dashboard on successful authentication
 
-   **`client/src/app/dashboard/page.js`**
+   **`regimen/src/app/dashboard/page.js`**
    - Protected route (redirect to /login if not authenticated)
    - Display current date prominently
    - StreakCounter component at top
@@ -52,19 +58,19 @@ Read `Guide.md` (Complete Specification Document for Routine Tracker Web App) an
    - For each habit: render HabitCard or HabitAccordion based on whether `checklistItems` exists
    - Toggle function that updates Firestore dailyLog document
 
-   **`client/src/app/api/seed/route.js`**
+   **`regimen/src/app/api/seed/route.js`**
    - POST endpoint to seed Firestore with all 11 habits
    - Use the complete seedHabits array from Guide.md
    - Check if habits already exist before seeding (idempotent)
    - Return success/error JSON response
 
-   **`client/src/components/AuthProvider.js`**
+   **`regimen/src/components/AuthProvider.js`**
    - React Context for authentication state
    - Firebase `onAuthStateChanged` listener
    - Provide: `user`, `loading`, `signInWithGoogle()`, `logout()`
    - Loading state while checking auth
 
-   **`client/src/components/HabitCard.js`**
+   **`regimen/src/components/HabitCard.js`**
    - Display single habit with checkbox
    - Props: `habit` (object), `isCompleted` (boolean), `onToggle` (function)
    - Color-coded left border based on category:
@@ -76,7 +82,7 @@ Read `Guide.md` (Complete Specification Document for Routine Tracker Web App) an
    - Checkbox at right side
    - Smooth hover effects
 
-   **`client/src/components/HabitAccordion.js`**
+   **`regimen/src/components/HabitAccordion.js`**
    - Extends HabitCard for habits with `checklistItems`
    - Main checkbox at top for marking entire routine complete
    - Expandable section (click to expand/collapse)
@@ -84,7 +90,7 @@ Read `Guide.md` (Complete Specification Document for Routine Tracker Web App) an
    - Smooth transition animation (max-height transition)
    - Checklist items are read-only (for reference during workout)
 
-   **`client/src/components/StreakCounter.js`**
+   **`regimen/src/components/StreakCounter.js`**
    - Fetch last 30 days of dailyLogs for current user
    - Calculate consecutive days from today backward
    - Day counts as "complete" if: `completedHabitIds.length / totalHabitsForThatDay >= 0.5`
@@ -92,45 +98,45 @@ Read `Guide.md` (Complete Specification Document for Routine Tracker Web App) an
    - Show "0 Day Streak" if no consecutive days
    - Handle loading state
 
-   **`client/src/lib/firebase.js`**
+   **`regimen/src/lib/firebase.js`**
    - Initialize Firebase app with environment variables
    - Initialize Firebase Auth
    - Initialize Firestore
    - Enable offline persistence: `enableIndexedDbPersistence(db)`
    - Export: `auth`, `db`, `googleProvider`
 
-   **`client/src/lib/seedData.js`**
+   **`regimen/src/lib/seedData.js`**
    - Export the complete `seedHabits` array with all 11 habits
    - Match exactly the structure from Guide.md
    - Include all fields: title, time, category, instructions, checklistItems, frequency, order
 
-   **`client/src/utils/dateHelpers.js`**
+   **`regimen/src/utils/dateHelpers.js`**
    - Export `getTodayString()` - returns "YYYY-MM-DD" format
    - Export `getDayOfWeek()` - returns "Mon", "Tue", etc.
    - Export `formatDate()` - returns human-readable date like "Monday, December 22, 2025"
 
-3. **Root Configuration Files:**
+3. **Root Configuration Files (in `regimen/` directory):**
 
-   **`package.json`**
+   **`regimen/package.json`**
    - Include dependencies: next (latest), react, react-dom, firebase (v10+), tailwindcss, autoprefixer, postcss
    - Scripts: dev, build, start, lint
 
-   **`next.config.js`**
+   **`regimen/next.config.mjs`**
    - Enable PWA support
    - Any necessary configuration for Firebase
 
-   **`tailwind.config.js`**
+   **`regimen/tailwind.config.js`**
    - Standard Tailwind configuration
-   - Content paths for client/src
+   - Content paths for src directory
 
-   **`jsconfig.json`**
-   - Path aliases: "@/*" maps to "./client/src/*"
+   **`regimen/jsconfig.json`**
+   - Path aliases: "@/*" maps to "./src/*"
 
-   **`.env.local` (template with placeholder values)**
+   **`regimen/.env.local` (template with placeholder values)**
    - All required Firebase environment variables
    - Include comments explaining where to get values
 
-   **`public/manifest.json`**
+   **`regimen/public/manifest.json`**
    - PWA manifest with:
      - name: "Routine Tracker"
      - short_name: "Routine"
@@ -143,7 +149,7 @@ Read `Guide.md` (Complete Specification Document for Routine Tracker Web App) an
 
 4. **Additional Files:**
 
-   **`README.md`**
+   **`regimen/README.md`**
    - Project overview
    - Setup instructions:
      - Create Firebase project
@@ -156,7 +162,7 @@ Read `Guide.md` (Complete Specification Document for Routine Tracker Web App) an
      - Run development server
    - Deployment instructions for Vercel
 
-   **`firestore.rules` (separate file)**
+   **`firestore.rules` (in `regimen/` directory)**
    - Complete security rules from Guide.md
    - Instructions to copy-paste into Firebase Console
 
@@ -187,6 +193,6 @@ Read `Guide.md` (Complete Specification Document for Routine Tracker Web App) an
 
 **Deliverable:**
 
-A complete, working Next.js 16 application with all files implemented, ready to run with `npm install && npm run dev` after adding Firebase credentials to `.env.local`.
+A complete, working Next.js 16 application in the `regimen/` directory with all files implemented, ready to run with `npm install && npm run dev` (from the `regimen/` directory) after adding Firebase credentials to `regimen/.env.local`.
 
 ---

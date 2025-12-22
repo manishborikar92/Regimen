@@ -216,40 +216,57 @@ Document ID: {uid}_{YYYY-MM-DD} // e.g., "abc123_2025-12-22"
 ## File Structure
 
 ```
-routine-tracker/
-├── .env.local
-├── next.config.js
-├── tailwind.config.js
-├── jsconfig.json
-├── package.json
-├── Guide.md (this document)
-├── public/
-│   ├── manifest.json
-│   └── icons/
-│       ├── icon-192x192.png
-│       └── icon-512x512.png
-└── client/
-    └── src/
-        ├── app/
-        │   ├── layout.js
-        │   ├── page.js
-        │   ├── login/
-        │   │   └── page.js
-        │   ├── dashboard/
-        │   │   └── page.js
-        │   └── api/
-        │       └── seed/
-        │           └── route.js
-        ├── components/
-        │   ├── AuthProvider.js
-        │   ├── HabitCard.js
-        │   ├── HabitAccordion.js
-        │   └── StreakCounter.js
-        ├── lib/
-        │   ├── firebase.js
-        │   └── seedData.js
-        └── utils/
-            └── dateHelpers.js
+Regimen/
+├── docs/
+│   ├── Guide.md (this document)
+│   ├── Prompt.md (AI implementation prompt)
+│   ├── project.md
+│   └── update.md
+├── regimen/
+│   ├── .env.local
+│   ├── .gitignore
+│   ├── next.config.mjs
+│   ├── jsconfig.json
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── eslint.config.mjs
+│   ├── postcss.config.mjs
+│   ├── README.md
+│   ├── public/
+│   │   ├── manifest.json
+│   │   ├── icons/
+│   │   │   ├── icon-192x192.png
+│   │   │   └── icon-512x512.png
+│   │   ├── file.svg
+│   │   ├── globe.svg
+│   │   ├── next.svg
+│   │   ├── vercel.svg
+│   │   └── window.svg
+│   └── src/
+│       ├── app/
+│       │   ├── layout.js
+│       │   ├── page.js
+│       │   ├── globals.css
+│       │   ├── favicon.ico
+│       │   ├── login/
+│       │   │   └── page.js
+│       │   ├── dashboard/
+│       │   │   └── page.js
+│       │   └── api/
+│       │       └── seed/
+│       │           └── route.js
+│       ├── components/
+│       │   ├── AuthProvider.js
+│       │   ├── HabitCard.js
+│       │   ├── HabitAccordion.js
+│       │   └── StreakCounter.js
+│       ├── lib/
+│       │   ├── firebase.js
+│       │   └── seedData.js
+│       └── utils/
+│           └── dateHelpers.js
+├── LICENSE
+└── README.md
 ```
 
 ---
