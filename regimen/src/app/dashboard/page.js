@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, doc, getDocs, onSnapshot, setDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { collection, doc, getDocs, onSnapshot, setDoc, updateDoc, arrayUnion, arrayRemove, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/components/AuthProvider';
 import HabitCard from '@/components/HabitCard';
 import HabitAccordion from '@/components/HabitAccordion';
 import StreakCounter from '@/components/StreakCounter';
+import BottomNav from '@/components/BottomNav';
 import { getTodayString, getDayOfWeek, formatDate } from '@/utils/dateHelpers';
 
 export default function DashboardPage() {
@@ -36,7 +37,8 @@ export default function DashboardPage() {
     const fetchHabits = async () => {
       try {
         const habitsRef = collection(db, 'habits');
-        const snapshot = await getDocs(habitsRef);
+        const habitsQuery = query(habitsRef, where('userId', '==', user.uid));
+        const snapshot = await getDocs(habitsQuery);
         const habitsData = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
@@ -133,7 +135,7 @@ export default function DashboardPage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -207,6 +209,8 @@ export default function DashboardPage() {
           )}
         </div>
       </main>
+
+      <BottomNav />
     </div>
   );
 }
