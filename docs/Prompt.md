@@ -1,97 +1,192 @@
+
+---
+
 # AI IDE Prompt
 
-Copy and paste this prompt into your AI IDE (e.g., Cursor, Windsurf, etc.):
+**Copy and paste this prompt into your AI IDE (Cursor, Windsurf, Bolt.new, v0, etc.):**
 
 ---
 
-**PROMPT START:**
+Read `Guide.md` (Complete Specification Document for Routine Tracker Web App) and the `client/` folder (Next.js 16 project structure), then implement the application according to the specifications.
 
-You are building a complete, production-ready Progressive Web App (PWA) using Next.js 16 (App Router) with TypeScript. Read the attached specification document carefully.
+**Project Requirements:**
 
-**Project:** Routine Tracker - A daily habit tracking app with a pre-defined health routine.
+1. **Technology Stack (JavaScript Only):**
+   - Next.js 16 with App Router (all `.js` files, NOT TypeScript)
+   - Tailwind CSS for styling
+   - Firebase Authentication (Google Sign-In)
+   - Firebase Firestore database
+   - Progressive Web App (PWA) configuration
+   - All services must use 100% FREE tiers
 
-**Your tasks:**
+2. **Complete File Implementation:**
 
-1. **Generate the complete file structure** including:
-   - All Next.js 16 App Router files (layout.tsx, page.tsx for login and dashboard)
-   - Component files (AuthProvider, HabitCard, HabitAccordion, StreakCounter)
-   - API routes (/api/habits, /api/daily-log, /api/daily-log/toggle, /api/seed)
-   - Mongoose models (User, Habit, DailyLog)
-   - Firebase configuration and MongoDB connection files
-   - PWA manifest.json and metadata configuration
-   - All configuration files (.env.local template, next.config.js, tailwind.config.js, tsconfig.json, package.json)
+   Create and implement ALL files in the `client/src/` directory structure:
 
-2. **Implement the complete authentication flow:**
-   - Firebase Google Sign-In
-   - AuthProvider context that wraps the entire app
-   - Protected dashboard route (redirect to /login if not authenticated)
-   - Login page with Google Sign-In button
-   - Logout functionality
+   **`client/src/app/layout.js`**
+   - Root layout with AuthProvider wrapper
+   - PWA metadata configuration
+   - Tailwind CSS imports
+   - Inter font from next/font/google
 
-3. **Build the database layer:**
-   - MongoDB connection utility with proper error handling
-   - Complete Mongoose schemas exactly as specified in the document
-   - Seed script with the full routine data provided (all habits from 08:00 AM to 12:00 AM)
-   - API endpoint to run the seed script once
+   **`client/src/app/page.js`**
+   - Root page that redirects authenticated users to /dashboard
+   - Redirects unauthenticated users to /login
 
-4. **Create the Dashboard:**
-   - Display current date prominently at the top
-   - Fetch habits for today (filtered by frequency - exclude Sunday-only items if today is Saturday, etc.)
-   - Fetch or initialize today's DailyLog
-   - Render habits as cards sorted by time
-   - Color-code by category (Movement: blue, Nutrition: green, Recovery: purple, Schedule: gray)
-   - For simple habits: show checkbox only
-   - For Movement routines (habits with checklistItems): show checkbox + accordion that expands to reveal the exercise list
-   - Implement checkbox toggle that calls the API to update DailyLog
-   - Show completion progress (e.g., "7 of 11 completed")
-   - Add a streak counter component at the top showing consecutive days with >50% completion
+   **`client/src/app/login/page.js`**
+   - Clean, centered login interface
+   - Google Sign-In button using Firebase Auth
+   - Loading states and error handling
+   - Redirect to /dashboard on successful authentication
 
-5. **API Implementation:**
-   - GET /api/habits - returns all habits, accepts optional ?day=Mon query param to filter by frequency
-   - GET /api/daily-log?date=2025-12-22 - returns DailyLog for the specified date (or null if doesn't exist)
-   - POST /api/daily-log/toggle - accepts { habitId, date } and toggles the habit in completedHabitIds array (creates DailyLog if doesn't exist)
-   - All API routes must verify Firebase auth token
+   **`client/src/app/dashboard/page.js`**
+   - Protected route (redirect to /login if not authenticated)
+   - Display current date prominently
+   - StreakCounter component at top
+   - Fetch all habits from Firestore `habits` collection
+   - Filter habits by today's day of week (check `frequency` array)
+   - Fetch today's dailyLog from Firestore (document ID: `{uid}_{YYYY-MM-DD}`)
+   - Real-time listener using `onSnapshot()` for live updates
+   - Render habits sorted by `order` field
+   - Show completion progress: "X of Y habits completed"
+   - For each habit: render HabitCard or HabitAccordion based on whether `checklistItems` exists
+   - Toggle function that updates Firestore dailyLog document
 
-6. **PWA Configuration:**
-   - Generate manifest.json with proper app name, colors, and icons specifications
-   - Configure Next.js 16 metadata for PWA support
-   - Ensure the app can be installed on iOS and Android
+   **`client/src/app/api/seed/route.js`**
+   - POST endpoint to seed Firestore with all 11 habits
+   - Use the complete seedHabits array from Guide.md
+   - Check if habits already exist before seeding (idempotent)
+   - Return success/error JSON response
 
-7. **Styling:**
-   - Use Tailwind CSS exclusively
-   - Mobile-first responsive design
-   - Clean, minimal interface with high contrast
-   - Smooth animations for accordions
-   - Loading and error states
+   **`client/src/components/AuthProvider.js`**
+   - React Context for authentication state
+   - Firebase `onAuthStateChanged` listener
+   - Provide: `user`, `loading`, `signInWithGoogle()`, `logout()`
+   - Loading state while checking auth
 
-**Important implementation details:**
+   **`client/src/components/HabitCard.js`**
+   - Display single habit with checkbox
+   - Props: `habit` (object), `isCompleted` (boolean), `onToggle` (function)
+   - Color-coded left border based on category:
+     - Movement: blue-500
+     - Nutrition: green-500
+     - Recovery: purple-500
+     - Schedule: gray-500
+   - Show time (large), title (bold), instructions (smaller text)
+   - Checkbox at right side
+   - Smooth hover effects
 
-- The app must work with Next.js 16's App Router (not Pages Router)
-- Use TypeScript for all files
-- Implement proper error handling throughout
-- Add loading states for all async operations
-- The seed data contains the EXACT routine from the specification document - do not modify the habits, times, or exercise lists
-- DailyLog documents are created on-demand (when user checks first item of the day), not pre-created
-- Habits with `checklistItems` render as accordions; the items are for display reference only
-- The streak counter logic: fetch last 30 days of DailyLogs, count consecutive days from today backward where completion rate >= 50%
+   **`client/src/components/HabitAccordion.js`**
+   - Extends HabitCard for habits with `checklistItems`
+   - Main checkbox at top for marking entire routine complete
+   - Expandable section (click to expand/collapse)
+   - When expanded, show all checklist items as bullet list
+   - Smooth transition animation (max-height transition)
+   - Checklist items are read-only (for reference during workout)
 
-**Deliverables:**
+   **`client/src/components/StreakCounter.js`**
+   - Fetch last 30 days of dailyLogs for current user
+   - Calculate consecutive days from today backward
+   - Day counts as "complete" if: `completedHabitIds.length / totalHabitsForThatDay >= 0.5`
+   - Display: "🔥 {streakCount} Day Streak" in large, bold text
+   - Show "0 Day Streak" if no consecutive days
+   - Handle loading state
 
-- Complete, working codebase with all files
-- Inline comments explaining key logic
-- README.md with setup instructions (how to add Firebase keys, MongoDB URI, run seed script)
-- Package.json with all necessary dependencies
+   **`client/src/lib/firebase.js`**
+   - Initialize Firebase app with environment variables
+   - Initialize Firebase Auth
+   - Initialize Firestore
+   - Enable offline persistence: `enableIndexedDbPersistence(db)`
+   - Export: `auth`, `db`, `googleProvider`
 
-**Reference the attached specification document for:**
-- Complete seed data (all 11 habits with times, categories, and checklists)
-- Exact schema structures
-- API endpoint specifications
-- File structure requirements
+   **`client/src/lib/seedData.js`**
+   - Export the complete `seedHabits` array with all 11 habits
+   - Match exactly the structure from Guide.md
+   - Include all fields: title, time, category, instructions, checklistItems, frequency, order
 
-Begin by creating the complete file structure, then implement each file with full, production-ready code. Do not use placeholder comments like "// Add logic here" - implement everything completely.
+   **`client/src/utils/dateHelpers.js`**
+   - Export `getTodayString()` - returns "YYYY-MM-DD" format
+   - Export `getDayOfWeek()` - returns "Mon", "Tue", etc.
+   - Export `formatDate()` - returns human-readable date like "Monday, December 22, 2025"
 
-**PROMPT END**
+3. **Root Configuration Files:**
+
+   **`package.json`**
+   - Include dependencies: next (latest), react, react-dom, firebase (v10+), tailwindcss, autoprefixer, postcss
+   - Scripts: dev, build, start, lint
+
+   **`next.config.js`**
+   - Enable PWA support
+   - Any necessary configuration for Firebase
+
+   **`tailwind.config.js`**
+   - Standard Tailwind configuration
+   - Content paths for client/src
+
+   **`jsconfig.json`**
+   - Path aliases: "@/*" maps to "./client/src/*"
+
+   **`.env.local` (template with placeholder values)**
+   - All required Firebase environment variables
+   - Include comments explaining where to get values
+
+   **`public/manifest.json`**
+   - PWA manifest with:
+     - name: "Routine Tracker"
+     - short_name: "Routine"
+     - description: "Daily health routine tracker"
+     - start_url: "/"
+     - display: "standalone"
+     - theme_color: "#3B82F6"
+     - background_color: "#FFFFFF"
+     - icons: references to 192x192 and 512x512 PNG icons
+
+4. **Additional Files:**
+
+   **`README.md`**
+   - Project overview
+   - Setup instructions:
+     - Create Firebase project
+     - Enable Google Authentication
+     - Create Firestore database
+     - Copy environment variables
+     - Install dependencies
+     - Run seed script (POST to /api/seed)
+     - Deploy Firestore security rules
+     - Run development server
+   - Deployment instructions for Vercel
+
+   **`firestore.rules` (separate file)**
+   - Complete security rules from Guide.md
+   - Instructions to copy-paste into Firebase Console
+
+5. **Implementation Requirements:**
+
+   - Use JavaScript (.js), NOT TypeScript
+   - Use Firebase v10+ modular syntax: `import { collection, getDocs } from 'firebase/firestore'`
+   - All Firestore operations must include proper error handling
+   - DailyLog document IDs must use format: `${userId}_${YYYY-MM-DD}`
+   - Implement real-time updates with `onSnapshot()` on dashboard
+   - Enable Firestore offline persistence
+   - Mobile-first responsive design with Tailwind
+   - Smooth animations for accordions (transition-all duration-300)
+   - Loading spinners during async operations
+   - Empty states when no habits or logs exist
+   - Proper React key props in all lists
+
+6. **Exact Seed Data:**
+
+   Include ALL 11 habits in `seedData.js` exactly as specified in the Guide.md seed data section, with complete instructions and checklist items for Movement routines.
+
+7. **DO NOT:**
+   - Use placeholder comments like "// Add logic here"
+   - Skip any files or functions
+   - Use TypeScript syntax or type annotations
+   - Hardcode Firebase credentials (use env variables)
+   - Create habits CRUD UI (out of scope for v1)
+
+**Deliverable:**
+
+A complete, working Next.js 16 application with all files implemented, ready to run with `npm install && npm run dev` after adding Firebase credentials to `.env.local`.
 
 ---
-
-You can now paste this prompt directly into your AI IDE along with this specification document to generate the complete application.
