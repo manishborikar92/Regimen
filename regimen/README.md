@@ -10,6 +10,8 @@ A Progressive Web App for tracking daily health routines, built with Next.js 16,
 - ✅ Daily habit checklist
 - 🔄 Real-time sync across devices
 - 📊 Progress tracking
+- ➕ Add, edit, and delete habits
+- 📈 Analytics with calendar view and statistics
 
 ## Setup Instructions
 
@@ -59,17 +61,18 @@ npm install
 npm run dev
 ```
 
-### 8. Seed the Database
+### 8. Seed the Database (Optional)
 
-After starting the dev server, make a POST request to seed the habits:
+New users can load sample habits directly from the app:
+1. Sign in with Google
+2. Go to the Habits page
+3. Click "Load Sample Routine" to populate with the default health routine
 
+Or use the API (requires userId):
 ```bash
-curl -X POST http://localhost:3000/api/seed
-```
-
-Or open your browser console and run:
-```javascript
-fetch('/api/seed', { method: 'POST' }).then(r => r.json()).then(console.log)
+curl -X POST http://localhost:3000/api/seed \
+  -H "Content-Type: application/json" \
+  -d '{"userId": "your-firebase-uid"}'
 ```
 
 ## Deployment (Vercel)
@@ -93,14 +96,18 @@ regimen/
 ├── src/
 │   ├── app/
 │   │   ├── api/seed/route.js    # Seed endpoint
+│   │   ├── analytics/page.js    # Analytics & history
 │   │   ├── dashboard/page.js    # Main dashboard
+│   │   ├── habits/page.js       # Habit management (CRUD)
 │   │   ├── login/page.js        # Login page
 │   │   ├── layout.js            # Root layout
 │   │   └── page.js              # Home redirect
 │   ├── components/
 │   │   ├── AuthProvider.js      # Auth context
+│   │   ├── BottomNav.js         # Bottom navigation
 │   │   ├── HabitCard.js         # Simple habit card
 │   │   ├── HabitAccordion.js    # Expandable habit card
+│   │   ├── HabitModal.js        # Add/Edit habit form
 │   │   └── StreakCounter.js     # Streak display
 │   ├── lib/
 │   │   ├── firebase.js          # Firebase config

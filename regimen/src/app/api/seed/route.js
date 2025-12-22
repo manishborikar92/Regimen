@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
-import { collection, getDocs, addDoc, getFirestore, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, addDoc, getFirestore, serverTimestamp, query, where } from 'firebase/firestore';
 import { seedHabits } from '@/lib/seedData';
 
 // Server-side Firebase initialization
@@ -17,25 +17,37 @@ function getDb() {
   return getFirestore(app);
 }
 
-export async function POST() {
+export async function POST(request) {
   try {
+    const { userId } = await request.json();
+    
+    if (!userId) {
+      return Response.json({ 
+        success: false, 
+        error: 'userId is required' 
+      }, { status: 400 });
+    }
+
     const db = getDb();
     const habitsRef = collection(db, 'habits');
     
-    // Check if habits already exist
-    const existingHabits = await getDocs(habitsRef);
+    // Check if user already has habits
+    const userHabitsQuery = query(habitsRef, where('userId', '==', userId));
+    const existingHabits = await getDocs(userHabitsQuery);
+    
     if (!existingHabits.empty) {
       return Response.json({ 
         success: true, 
-        message: 'Habits already seeded',
+        message: 'User already has habits',
         count: existingHabits.size 
       });
     }
 
-    // Seed all habits
+    // Seed all habits for this user
     const promises = seedHabits.map((habit) => 
       addDoc(habitsRef, {
         ...habit,
+        userId: userId,
         createdAt: serverTimestamp()
       })
     );
@@ -44,7 +56,7 @@ export async function POST() {
 
     return Response.json({ 
       success: true, 
-      message: 'Successfully seeded habits',
+      message: 'Successfully seeded habits for user',
       count: seedHabits.length 
     });
   } catch (error) {
