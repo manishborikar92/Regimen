@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useData } from '@/contexts/DataContext';
-import { BottomNav } from '@/components/ui';
+import { BottomNav, TopNav } from '@/components/ui';
 import { HabitModal } from '@/components/habits';
 import { seedHabits as seedData } from '@/lib/seedData';
 
@@ -26,7 +26,7 @@ export default function HabitsPage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/login');
+      router.push('/');
     }
   }, [user, authLoading, router]);
 
@@ -83,20 +83,17 @@ export default function HabitsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-900">Manage Habits</h1>
-          <button
-            onClick={() => { setEditingHabit(null); setShowModal(true); }}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Add
-          </button>
-        </div>
-      </header>
+      <TopNav title="Manage Habits">
+        <button
+          onClick={() => { setEditingHabit(null); setShowModal(true); }}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Add
+        </button>
+      </TopNav>
 
       <main className="max-w-2xl mx-auto px-4 py-6">
         {habits.length === 0 ? (

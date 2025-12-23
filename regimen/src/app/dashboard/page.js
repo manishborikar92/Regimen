@@ -5,17 +5,17 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useData } from '@/contexts/DataContext';
 import { HabitCard, HabitAccordion, StreakCounter } from '@/components/habits';
-import { BottomNav } from '@/components/ui';
+import { BottomNav, TopNav } from '@/components/ui';
 import { formatDate } from '@/utils/dateHelpers';
 
 export default function DashboardPage() {
-  const { user, loading: authLoading, logout } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { todaysHabits, todayLog, todayStats, loading: dataLoading, error, toggleHabit } = useData();
   const router = useRouter();
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/login');
+      router.push('/');
     }
   }, [user, authLoading, router]);
 
@@ -33,20 +33,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">Routine Tracker</h1>
-            <p className="text-sm text-gray-500">{formatDate()}</p>
-          </div>
-          <button
-            onClick={logout}
-            className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
-          >
-            Sign out
-          </button>
-        </div>
-      </header>
+      <TopNav title="Routine Tracker" subtitle={formatDate()} />
 
       <main className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         <StreakCounter />
