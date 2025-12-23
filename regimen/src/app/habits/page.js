@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useData } from '@/contexts/DataContext';
-import { BottomNav, TopNav } from '@/components/ui';
+import { BottomNav, TopNav, LoadingSpinner } from '@/components/ui';
 import { HabitModal } from '@/components/habits';
 import { seedHabits as seedData } from '@/lib/seedData';
 
@@ -72,11 +72,7 @@ export default function HabitsPage() {
   const loading = authLoading || dataLoading;
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!user) return null;
@@ -86,9 +82,9 @@ export default function HabitsPage() {
       <TopNav title="Manage Habits">
         <button
           onClick={() => { setEditingHabit(null); setShowModal(true); }}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-blue-500 text-white rounded-md sm:rounded-lg hover:bg-blue-600 transition-colors text-[10px] sm:text-base"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-3 h-3 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           Add
