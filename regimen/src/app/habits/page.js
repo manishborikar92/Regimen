@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, where } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { useAuth } from '@/components/AuthProvider';
-import BottomNav from '@/components/BottomNav';
-import HabitModal from '@/components/HabitModal';
+import { useAuth } from '@/contexts/AuthContext';
+import { useData } from '@/contexts/DataContext';
+import { BottomNav } from '@/components/ui';
+import { HabitModal } from '@/components/habits';
 import { seedHabits as seedData } from '@/lib/seedData';
 
 const categoryColors = {
@@ -18,9 +17,8 @@ const categoryColors = {
 
 export default function HabitsPage() {
   const { user, loading: authLoading } = useAuth();
+  const { habits, loading: dataLoading, addHabit, updateHabit, deleteHabit, seedHabits } = useData();
   const router = useRouter();
-  const [habits, setHabits] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingHabit, setEditingHabit] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -32,43 +30,13 @@ export default function HabitsPage() {
     }
   }, [user, authLoading, router]);
 
-  const fetchHabits = useCallback(async () => {
-    if (!user) return;
-    try {
-      const habitsRef = collection(db, 'habits');
-      const habitsQuery = query(habitsRef, where('userId', '==', user.uid));
-      const snapshot = await getDocs(habitsQuery);
-      const habitsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      habitsData.sort((a, b) => a.order - b.order);
-      setHabits(habitsData);
-    } catch (err) {
-      console.error('Error fetching habits:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (!user) return;
-    console.log('Current User ID:', user.uid); // Debug log
-    fetchHabits();
-  }, [user, fetchHabits]);
-
   const handleSave = async (formData) => {
     try {
       if (editingHabit) {
-        await updateDoc(doc(db, 'habits', editingHabit.id), {
-          ...formData,
-          updatedAt: serverTimestamp()
-        });
+        await updateHabit(editingHabit.id, formData);
       } else {
-        await addDoc(collection(db, 'habits'), {
-          ...formData,
-          userId: user.uid,
-          createdAt: serverTimestamp()
-        });
+        await addHabit(formData);
       }
-      await fetchHabits();
       setShowModal(false);
       setEditingHabit(null);
     } catch (err) {
@@ -79,8 +47,7 @@ export default function HabitsPage() {
 
   const handleDelete = async (habitId) => {
     try {
-      await deleteDoc(doc(db, 'habits', habitId));
-      await fetchHabits();
+      await deleteHabit(habitId);
       setShowModal(false);
       setEditingHabit(null);
       setDeleteConfirm(null);
@@ -90,80 +57,37 @@ export default function HabitsPage() {
     }
   };
 
-  const openEdit = (habit) => {
-    setEditingHabit(habit);
-    setShowModal(true);
-  };
-
-  const openAdd = () => {
-    setEditingHabit(null);
-    setShowModal(true);
-  };
-
   const handleSeedHabits = async () => {
     setSeeding(true);
-    const habitsRef = collection(db, 'habits');
-
     try {
-      // Step 1: Check existing habits (READ)
-      console.log('Checking for existing habits...');
-      const habitsQuery = query(habitsRef, where('userId', '==', user.uid));
-      const snapshot = await getDocs(habitsQuery);
-      
-      if (!snapshot.empty) {
-        alert('You already have habits! Delete them first if you want to re-seed.');
-        setSeeding(false);
-        return;
-      }
-    } catch (err) {
-      console.error('Error reading habits (Permission/Network):', err);
-      alert('Error reading database. Please check your internet or Firebase Rules.');
-      setSeeding(false);
-      return;
-    }
-
-    try {
-      // Step 2: Seed habits (WRITE)
-      console.log('Seeding habits for user:', user.uid);
-      const promises = seedData.map(habit => 
-        addDoc(habitsRef, {
-          ...habit,
-          userId: user.uid,
-          createdAt: serverTimestamp()
-        })
-      );
-
-      await Promise.all(promises);
-      console.log('Seeding complete.');
-      await fetchHabits();
+      await seedHabits(seedData);
       alert('Sample routine loaded successfully!');
     } catch (err) {
-      console.error('Error creating habits (Permission Denied?):', err);
-      alert('Failed to create habits. This is likely a Permissions error. Please update your Firestore Rules in the Firebase Console.');
+      alert(err.message || 'Failed to load sample routine.');
     } finally {
       setSeeding(false);
     }
   };
 
-  if (authLoading || loading) {
+  const loading = authLoading || dataLoading;
+
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
       </div>
     );
   }
 
   if (!user) return null;
 
-
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-xl font-bold text-gray-900">Manage Habits</h1>
           <button
-            onClick={openAdd}
+            onClick={() => { setEditingHabit(null); setShowModal(true); }}
             className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -181,7 +105,7 @@ export default function HabitsPage() {
             <p className="text-gray-500 mb-4">No habits yet. Create your first one!</p>
             <div className="flex flex-col gap-3 items-center">
               <button
-                onClick={openAdd}
+                onClick={() => { setEditingHabit(null); setShowModal(true); }}
                 className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
               >
                 Add Habit
@@ -231,7 +155,7 @@ export default function HabitsPage() {
                   </div>
                   <div className="flex gap-2 ml-4">
                     <button
-                      onClick={() => openEdit(habit)}
+                      onClick={() => { setEditingHabit(habit); setShowModal(true); }}
                       className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
                       title="Edit"
                     >
@@ -256,7 +180,6 @@ export default function HabitsPage() {
         )}
       </main>
 
-      {/* Delete Confirmation Modal */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl p-6 max-w-sm w-full">
@@ -280,7 +203,6 @@ export default function HabitsPage() {
         </div>
       )}
 
-      {/* Add/Edit Modal */}
       {showModal && (
         <HabitModal
           habit={editingHabit}

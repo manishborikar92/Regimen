@@ -2,18 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { useAuth } from '@/components/AuthProvider';
-import BottomNav from '@/components/BottomNav';
+import { useAuth } from '@/contexts';
+import { useData } from '@/contexts';
+import { BottomNav } from '@/components/ui';
 import { getDateString, getDaysAgo, getDayOfWeek, formatDate } from '@/utils/dateHelpers';
 
 export default function AnalyticsPage() {
   const { user, loading: authLoading } = useAuth();
+  const { habits, dailyLogs, loading: dataLoading, fetchDailyLogs } = useData();
   const router = useRouter();
-  const [habits, setHabits] = useState([]);
-  const [dailyLogs, setDailyLogs] = useState({});
-  const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(null);
   const [viewMode, setViewMode] = useState('calendar'); // 'calendar' or 'stats'
 
@@ -23,43 +20,14 @@ export default function AnalyticsPage() {
     }
   }, [user, authLoading, router]);
 
+  // Fetch historical logs for analytics
   useEffect(() => {
-    if (!user) return;
+    if (user) {
+      fetchDailyLogs(90);
+    }
+  }, [user, fetchDailyLogs]);
 
-    const fetchData = async () => {
-      try {
-        // Fetch user's habits
-        const habitsRef = collection(db, 'habits');
-        const habitsQuery = query(habitsRef, where('userId', '==', user.uid));
-        const habitsSnapshot = await getDocs(habitsQuery);
-        const habitsData = habitsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        habitsData.sort((a, b) => a.order - b.order);
-        setHabits(habitsData);
-
-        // Fetch last 90 days of logs
-        const logsRef = collection(db, 'dailyLogs');
-        const logsQuery = query(
-          logsRef,
-          where('userId', '==', user.uid),
-          orderBy('date', 'desc')
-        );
-        const logsSnapshot = await getDocs(logsQuery);
-        
-        const logsMap = {};
-        logsSnapshot.forEach(doc => {
-          const data = doc.data();
-          logsMap[data.date] = data.completedHabitIds || [];
-        });
-        setDailyLogs(logsMap);
-      } catch (err) {
-        console.error('Error fetching data:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [user]);
+  const loading = authLoading || dataLoading;
 
   // Generate last 30 days for calendar view
   const last30Days = Array.from({ length: 30 }, (_, i) => {

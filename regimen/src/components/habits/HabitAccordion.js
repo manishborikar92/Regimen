@@ -37,9 +37,11 @@ export default function HabitAccordion({ habit, isCompleted, onToggle }) {
           <h3 className={`font-bold text-gray-900 ${isCompleted ? 'line-through' : ''}`}>
             {habit.title}
           </h3>
-          <p className="text-sm text-gray-600 mt-1 whitespace-pre-line">
-            {habit.instructions}
-          </p>
+          {habit.instructions && (
+            <p className="text-sm text-gray-600 mt-1 whitespace-pre-line">
+              {habit.instructions}
+            </p>
+          )}
         </div>
         <button
           onClick={() => onToggle(habit.id)}
@@ -59,42 +61,44 @@ export default function HabitAccordion({ habit, isCompleted, onToggle }) {
         </button>
       </div>
 
-      {/* Expandable section toggle */}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-4 pb-2 flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 transition-colors"
-      >
-        <svg
-          className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-        {isExpanded ? 'Hide exercises' : `Show ${habit.checklistItems.length} exercises`}
-      </button>
-
-      {/* Expandable checklist */}
-      <div
-        className={`overflow-hidden transition-all duration-300 ease-in-out ${
-          isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-        }`}
-      >
-        <ul className="px-4 pb-4 space-y-2">
-          {habit.checklistItems.map((item, index) => (
-            <li
-              key={index}
-              className="flex items-center gap-3 text-sm text-gray-700 bg-white/50 rounded-md p-2"
+      {habit.checklistItems?.length > 0 && (
+        <>
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="w-full px-4 pb-2 flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+          >
+            <svg
+              className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-medium">
-                {index + 1}
-              </span>
-              {item.label}
-            </li>
-          ))}
-        </ul>
-      </div>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+            {isExpanded ? 'Hide exercises' : `Show ${habit.checklistItems.length} exercises`}
+          </button>
+
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-in-out ${
+              isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+            }`}
+          >
+            <ul className="px-4 pb-4 space-y-2">
+              {habit.checklistItems.map((item, index) => (
+                <li
+                  key={index}
+                  className="flex items-center gap-3 text-sm text-gray-700 bg-white/50 rounded-md p-2"
+                >
+                  <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-medium">
+                    {index + 1}
+                  </span>
+                  {item.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
+      )}
     </div>
   );
 }

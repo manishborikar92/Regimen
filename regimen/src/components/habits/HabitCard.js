@@ -1,6 +1,5 @@
 'use client';
 
-// Category color mapping
 const categoryColors = {
   Movement: 'border-l-blue-500',
   Nutrition: 'border-l-green-500',
@@ -15,9 +14,17 @@ const categoryBgColors = {
   Schedule: 'bg-gray-50',
 };
 
+const categoryBadgeColors = {
+  Movement: 'bg-blue-100 text-blue-700',
+  Nutrition: 'bg-green-100 text-green-700',
+  Recovery: 'bg-purple-100 text-purple-700',
+  Schedule: 'bg-gray-100 text-gray-700',
+};
+
 export default function HabitCard({ habit, isCompleted, onToggle }) {
   const borderColor = categoryColors[habit.category] || 'border-l-gray-500';
   const bgColor = categoryBgColors[habit.category] || 'bg-gray-50';
+  const badgeColor = categoryBadgeColors[habit.category] || 'bg-gray-100 text-gray-700';
 
   return (
     <div
@@ -27,21 +34,18 @@ export default function HabitCard({ habit, isCompleted, onToggle }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-sm font-semibold text-gray-600">{habit.time}</span>
-          <span className={`text-xs px-2 py-0.5 rounded-full ${
-            habit.category === 'Movement' ? 'bg-blue-100 text-blue-700' :
-            habit.category === 'Nutrition' ? 'bg-green-100 text-green-700' :
-            habit.category === 'Recovery' ? 'bg-purple-100 text-purple-700' :
-            'bg-gray-100 text-gray-700'
-          }`}>
+          <span className={`text-xs px-2 py-0.5 rounded-full ${badgeColor}`}>
             {habit.category}
           </span>
         </div>
         <h3 className={`font-bold text-gray-900 ${isCompleted ? 'line-through' : ''}`}>
           {habit.title}
         </h3>
-        <p className="text-sm text-gray-600 mt-1 whitespace-pre-line">
-          {habit.instructions}
-        </p>
+        {habit.instructions && (
+          <p className="text-sm text-gray-600 mt-1 whitespace-pre-line">
+            {habit.instructions}
+          </p>
+        )}
       </div>
       <button
         onClick={() => onToggle(habit.id)}

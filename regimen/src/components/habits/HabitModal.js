@@ -84,8 +84,6 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
-
-          {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
             <input
@@ -98,7 +96,6 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
             />
           </div>
 
-          {/* Time & Category */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
@@ -124,7 +121,6 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
             </div>
           </div>
 
-          {/* Instructions */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Instructions</label>
             <textarea
@@ -136,7 +132,6 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
             />
           </div>
 
-          {/* Frequency */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Active Days</label>
             <div className="flex flex-wrap gap-2">
@@ -157,7 +152,7 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
             </div>
           </div>
 
-          {/* Checklist Items (for Movement habits) */}
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Checklist Items (optional)
@@ -197,7 +192,6 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
             </div>
           </div>
 
-          {/* Order */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Display Order</label>
             <input
@@ -209,7 +203,6 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
             />
           </div>
 
-          {/* Actions */}
           <div className="flex gap-3 pt-4">
             {habit && onDelete && (
               <button

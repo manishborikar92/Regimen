@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/components/AuthProvider';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const { user, loading, signInWithGoogle } = useAuth();
@@ -32,7 +32,7 @@ export default function LoginPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
       </div>
     );
   }
@@ -59,7 +59,7 @@ export default function LoginPage() {
             transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {signingIn ? (
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600"></div>
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600" />
           ) : (
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
