@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import LogoutModal from './LogoutModal';
 
-export default function TopNav({ title, subtitle, children }) {
+export default function TopNav({ title, subtitle }) {
   const { user, signInWithGoogle } = useAuth();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -31,7 +31,6 @@ export default function TopNav({ title, subtitle, children }) {
           </div>
 
           <div className="flex items-center gap-3">
-            {children}
             
             {user ? (
             <div className="relative">
@@ -39,11 +38,14 @@ export default function TopNav({ title, subtitle, children }) {
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
                 className="flex items-center gap-2 hover:bg-gray-50 rounded-lg p-2 transition-colors"
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={user.photoURL || '/icons/icon-192x192.svg'}
                   alt={user.displayName || 'User'}
                   className="w-8 h-8 rounded-full"
                   referrerPolicy="no-referrer"
+                  width={32}
+                  height={32}
                 />
                 <div className="hidden sm:block text-left">
                   <p className="text-sm font-medium text-gray-900">{user.displayName}</p>

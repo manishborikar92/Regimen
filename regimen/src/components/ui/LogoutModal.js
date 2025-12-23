@@ -41,7 +41,7 @@ export default function LogoutModal({ isOpen, onClose }) {
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">Sign Out?</h3>
           <p className="text-sm text-gray-600">
-            Are you sure you want to sign out? You'll need to sign in again to access your habits.
+            Are you sure you want to sign out? You&apos;ll need to sign in again to access your habits.
           </p>
         </div>
 
