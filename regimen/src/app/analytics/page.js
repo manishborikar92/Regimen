@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts';
 import { useData } from '@/contexts';
-import { BottomNav } from '@/components/ui';
+import { BottomNav, TopNav } from '@/components/ui';
 import { getDateString, getDaysAgo, getDayOfWeek, formatDate } from '@/utils/dateHelpers';
 
 export default function AnalyticsPage() {
@@ -16,7 +16,7 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/login');
+      router.push('/');
     }
   }, [user, authLoading, router]);
 
@@ -124,30 +124,26 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <h1 className="text-xl font-bold text-gray-900">Analytics</h1>
-          <div className="flex gap-2 mt-3">
-            <button
-              onClick={() => setViewMode('calendar')}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                viewMode === 'calendar' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'
-              }`}
-            >
-              Calendar
-            </button>
-            <button
-              onClick={() => setViewMode('stats')}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                viewMode === 'stats' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'
-              }`}
-            >
-              Statistics
-            </button>
-          </div>
+      <TopNav title="Analytics">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setViewMode('calendar')}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              viewMode === 'calendar' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'
+            }`}
+          >
+            Calendar
+          </button>
+          <button
+            onClick={() => setViewMode('stats')}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              viewMode === 'stats' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'
+            }`}
+          >
+            Statistics
+          </button>
         </div>
-      </header>
+      </TopNav>
 
       <main className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         {viewMode === 'stats' && stats && (
