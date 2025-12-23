@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { 
   collection, 
   doc, 
@@ -30,6 +30,7 @@ export function DataProvider({ children }) {
   const [todayLog, setTodayLog] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const isInitialMount = useRef(true);
 
   const today = getTodayString();
   const dayOfWeek = getDayOfWeek();
@@ -37,11 +38,16 @@ export function DataProvider({ children }) {
   // Fetch all habits for the user (one-time fetch with real-time updates)
   useEffect(() => {
     if (!user || !db) {
-      setLoading(false);
+      // Only set loading false after initial mount
+      if (isInitialMount.current) {
+        isInitialMount.current = false;
+        Promise.resolve().then(() => setLoading(false));
+      }
       return;
     }
 
-    setLoading(true);
+    isInitialMount.current = false;
+    
     const habitsRef = collection(db, 'habits');
     const habitsQuery = query(habitsRef, where('userId', '==', user.uid));
 

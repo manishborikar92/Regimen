@@ -120,26 +120,37 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      <TopNav title="Analytics">
-        <div className="flex gap-1 sm:gap-2">
-          <button
-            onClick={() => setViewMode('calendar')}
-            className={`px-2 sm:px-4 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-sm font-medium transition-colors ${
-              viewMode === 'calendar' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'
-            }`}
-          >
-            Calendar
-          </button>
-          <button
-            onClick={() => setViewMode('stats')}
-            className={`px-2 sm:px-4 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-sm font-medium transition-colors ${
-              viewMode === 'stats' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'
-            }`}
-          >
-            Statistics
-          </button>
+      <TopNav title="Analytics" />
+
+      {/* View Mode Toggle */}
+      <div className="bg-transparent">
+        <div className="max-w-2xl mx-auto px-4 pt-6">
+          <div className="flex justify-between gap-3">
+            <button
+              onClick={() => setViewMode('calendar')}
+              className={`flex-1 px-6 py-2.5 text-sm font-medium transition-all ${
+                viewMode === 'calendar' 
+                  ? 'bg-blue-500 text-white shadow-md' 
+                  : 'bg-white/50 text-gray-600 hover:bg-white/80 border border-gray-200'
+              }`}
+              style={{ borderRadius: '50px' }}
+            >
+              Calendar
+            </button>
+            <button
+              onClick={() => setViewMode('stats')}
+              className={`flex-1 px-6 py-2.5 text-sm font-medium transition-all ${
+                viewMode === 'stats' 
+                  ? 'bg-blue-500 text-white shadow-md' 
+                  : 'bg-white/50 text-gray-600 hover:bg-white/80 border border-gray-200'
+              }`}
+              style={{ borderRadius: '50px' }}
+            >
+              Statistics
+            </button>
+          </div>
         </div>
-      </TopNav>
+      </div>
 
       <main className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         {viewMode === 'stats' && stats && (

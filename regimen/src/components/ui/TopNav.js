@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import LogoutModal from './LogoutModal';
 
-export default function TopNav({ title, subtitle, children }) {
+export default function TopNav({ title, subtitle }) {
   const { user, signInWithGoogle } = useAuth();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -31,7 +31,6 @@ export default function TopNav({ title, subtitle, children }) {
           </div>
 
           <div className="flex items-center gap-3">
-            {children}
             
             {user ? (
             <div className="relative">

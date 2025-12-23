@@ -79,17 +79,7 @@ export default function HabitsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      <TopNav title="Manage Habits">
-        <button
-          onClick={() => { setEditingHabit(null); setShowModal(true); }}
-          className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-blue-500 text-white rounded-md sm:rounded-lg hover:bg-blue-600 transition-colors text-[10px] sm:text-base"
-        >
-          <svg className="w-3 h-3 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Add
-        </button>
-      </TopNav>
+      <TopNav title="Manage Habits" />
 
       <main className="max-w-2xl mx-auto px-4 py-6">
         {habits.length === 0 ? (
@@ -204,6 +194,21 @@ export default function HabitsPage() {
           onDelete={editingHabit ? handleDelete : null}
         />
       )}
+
+      {/* Floating Add Button - Positioned within max-w-2xl container */}
+      <div className="fixed bottom-22 left-0 right-3 pointer-events-none z-40">
+        <div className="max-w-2xl mx-auto px-4 flex justify-end">
+          <button
+            onClick={() => { setEditingHabit(null); setShowModal(true); }}
+            className="w-14 h-14 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all hover:scale-110 flex items-center justify-center pointer-events-auto"
+            aria-label="Add Habit"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+        </div>
+      </div>
 
       <BottomNav />
     </div>
