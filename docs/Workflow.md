@@ -91,18 +91,37 @@ npm run dev
 
 ```
 src/
-├── app/           # Pages (App Router)
-├── components/    # Reusable components
-├── lib/           # Firebase, utilities
-└── utils/         # Helper functions
+├── app/              # Pages (App Router)
+│   ├── analytics/    # Analytics page
+│   ├── dashboard/    # Dashboard page
+│   ├── habits/       # Habits management page
+│   └── login/        # Login page
+├── components/       # Reusable components
+│   ├── habits/       # Habit-related components
+│   │   ├── HabitAccordion.js
+│   │   ├── HabitCard.js
+│   │   ├── HabitModal.js
+│   │   ├── StreakCounter.js
+│   │   └── index.js
+│   └── ui/           # UI components
+│       ├── BottomNav.js
+│       ├── LoadingSpinner.js
+│       └── index.js
+├── contexts/         # React Context providers
+│   ├── AuthContext.js    # Authentication state
+│   ├── DataContext.js    # Centralized data management
+│   └── index.js
+├── lib/              # Firebase configuration
+└── utils/            # Helper functions
 ```
 
 ### Making Changes
 
 1. **Pages:** Edit files in `src/app/`
-2. **Components:** Edit files in `src/components/`
+2. **Components:** Edit files in `src/components/habits/` or `src/components/ui/`
 3. **Styles:** Use Tailwind classes inline
-4. **Firebase:** Edit `src/lib/firebase.js`
+4. **Data Logic:** Edit `src/contexts/DataContext.js`
+5. **Auth Logic:** Edit `src/contexts/AuthContext.js`
 
 ### Hot Reload
 - Changes auto-reload in browser
@@ -203,11 +222,12 @@ touch src/app/newpage/page.js
 // src/app/newpage/page.js
 'use client';
 
-import { useAuth } from '@/components/AuthProvider';
-import BottomNav from '@/components/BottomNav';
+import { useAuth, useData } from '@/contexts';
+import { BottomNav } from '@/components/ui';
 
 export default function NewPage() {
   const { user } = useAuth();
+  const { habits, loading } = useData();
   
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -221,14 +241,22 @@ export default function NewPage() {
 ### Add a New Component
 
 ```bash
-touch src/components/NewComponent.js
+# For habit-related components
+touch src/components/habits/NewComponent.js
+
+# For UI components
+touch src/components/ui/NewComponent.js
 ```
 
 ```javascript
-// src/components/NewComponent.js
+// src/components/habits/NewComponent.js
 'use client';
 
+import { useData } from '@/contexts';
+
 export default function NewComponent({ prop1, prop2 }) {
+  const { habits, toggleHabit } = useData();
+  
   return (
     <div className="...">
       {/* Component content */}
@@ -237,24 +265,34 @@ export default function NewComponent({ prop1, prop2 }) {
 }
 ```
 
-### Add Firestore Query
+### Using the Data Context
 
 ```javascript
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { useData } from '@/contexts';
 
-// In your component
-const fetchData = async () => {
-  const q = query(
-    collection(db, 'collectionName'),
-    where('userId', '==', user.uid)
-  );
-  const snapshot = await getDocs(q);
-  const data = snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }));
-};
+function MyComponent() {
+  const {
+    // State
+    habits,           // All user habits
+    dailyLogs,        // Historical completion logs
+    todayLog,         // Today's completed habit IDs
+    loading,          // Loading state
+    error,            // Error state
+    
+    // Computed
+    todaysHabits,     // Habits filtered for today
+    todayStats,       // { total, completed, percentage }
+    streak,           // Current streak count
+    
+    // Actions
+    toggleHabit,      // Toggle habit completion
+    addHabit,         // Add new habit
+    updateHabit,      // Update existing habit
+    deleteHabit,      // Delete habit
+    seedHabits,       // Seed sample habits
+    fetchDailyLogs,   // Fetch historical logs
+  } = useData();
+}
 ```
 
 ### Update Security Rules
@@ -279,11 +317,11 @@ const fetchData = async () => {
 
 ### Habits not showing
 - Check browser console for errors
-- Verify `userId` filter in query
+- Verify DataContext is providing data
 - Check if habits exist in Firestore
 
 ### Real-time updates not working
-- Verify `onSnapshot()` is set up
+- DataContext uses `onSnapshot()` for real-time updates
 - Check for errors in console
 - Ensure Firestore rules allow read
 
