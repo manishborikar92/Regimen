@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { TopNav } from '@/components/ui';
+import { TopNav, LoadingSpinner } from '@/components/ui';
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -16,19 +16,11 @@ export default function Home() {
   }, [user, loading, router]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useData } from '@/contexts/DataContext';
 import { HabitCard, HabitAccordion, StreakCounter } from '@/components/habits';
-import { BottomNav, TopNav } from '@/components/ui';
+import { BottomNav, TopNav, LoadingSpinner } from '@/components/ui';
 import { formatDate } from '@/utils/dateHelpers';
 
 export default function DashboardPage() {
@@ -22,11 +22,7 @@ export default function DashboardPage() {
   const loading = authLoading || dataLoading;
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!user) return null;

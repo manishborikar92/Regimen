@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts';
 import { useData } from '@/contexts';
-import { BottomNav, TopNav } from '@/components/ui';
+import { BottomNav, TopNav, LoadingSpinner } from '@/components/ui';
 import { getDateString, getDaysAgo, getDayOfWeek, formatDate } from '@/utils/dateHelpers';
 
 export default function AnalyticsPage() {
@@ -113,11 +113,7 @@ export default function AnalyticsPage() {
   };
 
   if (authLoading || loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!user) return null;
@@ -125,10 +121,10 @@ export default function AnalyticsPage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <TopNav title="Analytics">
-        <div className="flex gap-2">
+        <div className="flex gap-1 sm:gap-2">
           <button
             onClick={() => setViewMode('calendar')}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+            className={`px-2 sm:px-4 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-sm font-medium transition-colors ${
               viewMode === 'calendar' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'
             }`}
           >
@@ -136,7 +132,7 @@ export default function AnalyticsPage() {
           </button>
           <button
             onClick={() => setViewMode('stats')}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+            className={`px-2 sm:px-4 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-sm font-medium transition-colors ${
               viewMode === 'stats' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'
             }`}
           >
