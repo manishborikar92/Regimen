@@ -80,7 +80,7 @@ export default function HabitAccordion({ habit, isCompleted, onToggle }) {
 
           <div
             className={`overflow-hidden transition-all duration-300 ease-in-out ${
-              isExpanded ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+              isExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
             }`}
           >
             <ul className="px-4 pb-4 space-y-2">
@@ -101,4 +101,4 @@ export default function HabitAccordion({ habit, isCompleted, onToggle }) {
       )}
     </div>
   );
-    }
+}
