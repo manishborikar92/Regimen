@@ -12,14 +12,12 @@ const inter = Inter({
 export const metadata = {
   title: "Regimen",
   description: "Daily health routine tracker PWA",
+  applicationName: "Regimen",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Regimen",
-  },
-  other: {
-    "apple-mobile-web-app-title": "Regimen",
   },
 };
 
@@ -33,8 +31,6 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <head>
-      </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <AuthProvider>
           <DataProvider>
