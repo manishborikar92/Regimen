@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =============================================
+    // Habits: Users can R/W their own habits only
+    // =============================================
+    match /habits/{habitId} {
+
+      // CREATE: Must be authenticated, must own the data, must have required fields
+      allow create: if request.auth != null
+                    && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.title is string
+                    && request.resource.data.title.size() > 0
+                    && request.resource.data.title.size() <= 200
+                    && request.resource.data.category in ['Schedule', 'Movement', 'Nutrition', 'Recovery'];
+
+      // READ/DELETE: Must own the existing document
+      allow read, delete: if request.auth != null
+                         && resource.data.userId == request.auth.uid;
+
+      // UPDATE: Must own existing doc AND cannot change ownership
+      allow update: if request.auth != null
+                    && resource.data.userId == request.auth.uid
+                    && request.resource.data.userId == request.auth.uid;
+    }
+
+    // =============================================
+    // DailyLogs: Users can R/W their own logs only
+    // =============================================
+    match /dailyLogs/{logId} {
+
+      // READ: Must be authenticated, doc must belong to user
+      allow read: if request.auth != null
+                  && (resource.data.userId == request.auth.uid
+                      || logId.matches('^' + request.auth.uid + '_.*'));
+
+      // WRITE: Must be authenticated, logId must start with user's UID
+      allow write: if request.auth != null
+                   && logId.matches('^' + request.auth.uid + '_.*');
+    }
+
+    // =============================================
+    // Users: Users can R/W their own profile only
+    // =============================================
+    match /users/{userId} {
+      allow read, write: if request.auth != null
+                         && request.auth.uid == userId;
+    }
+
+    // Deny all other access by default
+  }
+}
