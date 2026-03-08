@@ -10,13 +10,16 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Routine Tracker",
+  title: "Regimen",
   description: "Daily health routine tracker PWA",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Routine Tracker",
+    title: "Regimen",
+  },
+  other: {
+    "apple-mobile-web-app-title": "Regimen",
   },
 };
 

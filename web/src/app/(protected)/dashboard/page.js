@@ -10,7 +10,7 @@ export default function DashboardPage() {
 
     return (
         <>
-            <TopNav title="Routine Tracker" subtitle={formatDate()} />
+            <TopNav title="Regimen" subtitle={formatDate()} />
 
             <main className="max-w-2xl mx-auto px-4 py-6 space-y-6">
                 <StreakCounter />

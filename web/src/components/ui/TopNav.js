@@ -42,9 +42,16 @@ export default function TopNav({ title, subtitle }) {
     <>
       <header className="bg-white shadow-sm sticky top-0 z-40">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">{title || 'Routine Tracker'}</h1>
-            {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white shadow-md">
+              <img src="/logo.svg" alt="Regimen Logo" className="w-[18px] h-[18px]" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 tracking-tight">
+                {title || 'Regimen'}
+              </h1>
+              {subtitle && <p className="text-xs text-gray-500 font-medium tracking-wide uppercase">{subtitle}</p>}
+            </div>
           </div>
 
           <div className="flex items-center gap-3">

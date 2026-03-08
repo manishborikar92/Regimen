@@ -68,20 +68,20 @@ export default function LoginPage() {
             {/* Hero Section */}
             <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
                 <div className="max-w-md w-full text-center mb-10">
-                    <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-1.5 rounded-full text-sm font-medium mb-6">
-                        <Flame className="w-4 h-4" />
-                        Build better habits
+                    <div className="flex justify-center mb-8 relative">
+                        {/* Glow effect */}
+                        <div className="absolute inset-0 bg-blue-400 blur-2xl opacity-20 rounded-full w-24 h-24 mx-auto animate-pulse"></div>
+                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white shadow-xl rotate-3 hover:rotate-0 transition-transform duration-300 relative z-10">
+                            <img src="/logo.svg" alt="Regimen Logo" className="w-10 h-10" />
+                        </div>
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
-                        Your Daily
-                        <span className="text-blue-500"> Routine</span>,
-                        <br />
-                        Simplified
+                    <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-600 mb-4 tracking-tight leading-tight">
+                        Regimen
                     </h1>
 
-                    <p className="text-lg text-gray-600 mb-8">
-                        Track habits, build streaks, and see your progress — all in one place.
+                    <p className="text-lg text-gray-500 font-medium tracking-wide mb-10 max-w-[280px] mx-auto">
+                        Track habits, build streaks, and reclaim your routine.
                     </p>
 
                     {/* Sign In Button */}
