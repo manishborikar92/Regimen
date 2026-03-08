@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Routine Tracker is a Progressive Web App (PWA) built with a modern serverless architecture. It uses Firebase for authentication and database, Next.js for the frontend, and Vercel for hosting.
+The Routine Tracker is a Progressive Web App (PWA) built with a modern serverless architecture. It uses Firebase for authentication and database operations, Next.js for the frontend, and is designed to run seamlessly on hosting platforms like Vercel.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -14,14 +14,18 @@ The Routine Tracker is a Progressive Web App (PWA) built with a modern serverles
 │  │  │ Page    │  │  Page   │  │  Page   │  │     Page        │ ││
 │  │  └─────────┘  └─────────┘  └─────────┘  └─────────────────┘ ││
 │  │                         │                                   ││
+│  │                         ▼                                   ││
 │  │  ┌─────────────────────────────────────────────────────────┐││
 │  │  │                  Context Providers                      │││
 │  │  │  AuthContext (auth state) │ DataContext (habits, logs)  │││
+│  │  │                     ToastContext                        │││
 │  │  └─────────────────────────────────────────────────────────┘││
+│  │                         │                                   ││
+│  │                         ▼                                   ││
 │  │  ┌─────────────────────────────────────────────────────────┐││
-│  │  │              Shared Components                          │││
+│  │  │              Shared UI Components                       │││
 │  │  │  habits/: HabitCard, HabitAccordion, HabitModal, Streak │││
-│  │  │  ui/: BottomNav, LoadingSpinner                         │││
+│  │  │  ui/: BottomNav, TopNav, ConfirmDialog, LoadingSpinner  │││
 │  │  └─────────────────────────────────────────────────────────┘││
 │  └─────────────────────────────────────────────────────────────┘│
 └─────────────────────────────────────────────────────────────────┘
@@ -46,28 +50,28 @@ The Routine Tracker is a Progressive Web App (PWA) built with a modern serverles
 ### Frontend
 | Technology | Purpose | Version |
 |------------|---------|---------|
-| Next.js | React Framework | 16.x |
+| Next.js | React Framework | 16.1.x |
 | React | UI Library | 19.x |
 | Tailwind CSS | Styling | 4.x |
+| Lucide React | Iconography | 0.x |
 
 ### Backend Services
 | Service | Purpose | Tier |
 |---------|---------|------|
 | Firebase Auth | Authentication | Free |
-| Firestore | Database | Free |
-| Vercel | Hosting | Free |
+| Firestore | Real-time Database | Free |
 
 ### Key Libraries
 | Library | Purpose |
 |---------|---------|
 | firebase | Firebase SDK (v10+ modular) |
-| next/font | Font optimization |
+| clsx | Class list merging utility |
 
 ---
 
 ## Centralized State Management
 
-The application uses React Context for centralized state management, eliminating redundant Firebase API calls across pages.
+The application uses React Context to prevent redundant Firebase API calls and provide immediate optimistic UI updates.
 
 ### Context Architecture
 
@@ -75,145 +79,74 @@ The application uses React Context for centralized state management, eliminating
 layout.js
 └── AuthProvider (Authentication State)
     └── DataProvider (Habits & Logs State)
-        └── {children} (All Pages)
+        └── ToastProvider (Notification State)
+            └── {children} (All Pages)
 ```
 
 ### AuthContext (`contexts/AuthContext.js`)
-Manages authentication state:
+Manages authentication state via Firebase hooks:
 - `user` - Current Firebase user object
-- `loading` - Auth loading state
-- `signInWithGoogle()` - Google sign-in
-- `signOut()` - Sign out
+- `loading` - Initialization state
+- `signInWithGoogle()` - Trigger Google OAuth flow
+- `logout()` - Sign out and clear sessions
 
 ### DataContext (`contexts/DataContext.js`)
-Centralized data management with real-time updates:
+Delegates complex operations to specialized sub-hooks (`useHabits`, `useDailyLogs`, `useStreak`, `useAnalytics`) and provides a unified interface:
 
 **State:**
-- `habits` - All user habits (real-time listener)
+- `habits` - All user habits via `onSnapshot` listener
 - `dailyLogs` - Historical completion logs
-- `todayLog` - Today's completed habit IDs (real-time listener)
-- `loading` / `error` - Loading and error states
+- `todayLog` - Today's completed habit IDs via `onSnapshot`
+- Loading and error states
 
 **Computed Values:**
 - `todaysHabits` - Habits filtered by today's day of week
 - `todayStats` - `{ total, completed, percentage }`
-- `streak` - Current streak count
+- `streak` - Current globally computed streak
 
 **Actions:**
 - `toggleHabit(habitId)` - Toggle habit completion (optimistic update)
 - `addHabit(habitData)` - Create new habit
 - `updateHabit(habitId, habitData)` - Update existing habit
 - `deleteHabit(habitId)` - Delete habit
-- `seedHabits(seedData)` - Seed sample habits
-- `fetchDailyLogs(days)` - Fetch historical logs for analytics
+- `seedHabits(seedData)` - Populate sample habits for new users
+- `fetchDailyLogs(days)` - Fetch historical records
 
-### Benefits of Centralized State
-1. **Single Firebase Connection** - One real-time listener for habits, shared across all pages
-2. **No Redundant Fetches** - Data loaded once, available everywhere
-3. **Optimistic Updates** - UI updates immediately, syncs in background
-4. **Consistent State** - All components see the same data
-5. **Simplified Components** - Pages just consume data via hooks
+### ToastContext (`contexts/ToastContext.js`)
+Provides accessible, unified toast notifications:
+- Eliminates native `alert()` blocking calls.
+- `addToast(message, type)` triggers auto-dismissing visual alerts.
 
 ---
 
 ## Data Flow
 
-### Authentication Flow
-```
-User clicks "Sign in with Google"
-         │
-         ▼
-┌─────────────────────┐
-│  Firebase Auth      │
-│  (Google Provider)  │
-└─────────────────────┘
-         │
-         ▼
-┌─────────────────────┐
-│  AuthContext        │
-│  - user state       │
-│  - loading state    │
-└─────────────────────┘
-         │
-         ▼
-┌─────────────────────┐
-│  DataContext        │
-│  (initializes when  │
-│   user available)   │
-└─────────────────────┘
-         │
-         ▼
-┌─────────────────────┐
-│  Protected Routes   │
-│  - /dashboard       │
-│  - /habits          │
-│  - /analytics       │
-└─────────────────────┘
-```
+### Authentication & Routing Flow
+Next.js server-side `middleware.js` checks for Firebase auth session cookies:
+1. Validates unauthenticated requests to protected groups (`/dashboard`, `/habits`, `/analytics`) bouncing them to `/login`.
+2. Roots `/` direct to either `/dashboard` or `/login` respectively.
+3. Client-side AuthContext confirms layout rendering.
 
-### Habit Data Flow (Centralized)
+### Write Flow (Centralized)
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                   INITIALIZATION                            │
+│                      WRITE SEQUENCE                         │
 │                                                             │
-│  DataProvider mounts (user authenticated)                   │
+│  User checks habit box on Dashboard                         │
 │         │                                                   │
 │         ▼                                                   │
-│  onSnapshot() listener on habits collection                 │
+│  toggleHabit() fires from DataContext                       │
 │         │                                                   │
 │         ▼                                                   │
-│  Habits stored in context state                             │
+│  Optimistic ArrayUnion pushes ID locally                    │
+│  ProgressBar fills immediately (No latency)                 │
 │         │                                                   │
 │         ▼                                                   │
-│  All pages receive habits via useData() hook                │
+│  Firestore process pushes updateDoc request                 │
+│         │                                                   │
+│         ▼                                                   │
+│  onSnapshot triggers success and revalidates state          │
 └─────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────┐
-│                      WRITE FLOW                             │
-│                                                             │
-│  User creates/edits habit via HabitModal                    │
-│         │                                                   │
-│         ▼                                                   │
-│  Call addHabit/updateHabit from useData()                   │
-│         │                                                   │
-│         ▼                                                   │
-│  Firestore write with userId attached                       │
-│         │                                                   │
-│         ▼                                                   │
-│  onSnapshot() triggers → context state updates              │
-│         │                                                   │
-│         ▼                                                   │
-│  All consuming components re-render automatically           │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### Daily Log Flow
-```
-User checks habit checkbox
-         │
-         ▼
-┌─────────────────────────────────────────┐
-│  toggleHabit(habitId) called            │
-│  from DataContext                       │
-└─────────────────────────────────────────┘
-         │
-         ▼
-┌─────────────────────────────────────────┐
-│  Optimistic update: todayLog state      │
-│  updates immediately                    │
-└─────────────────────────────────────────┘
-         │
-         ▼
-┌─────────────────────────────────────────┐
-│  Firestore write (setDoc/updateDoc)     │
-│  Document ID: {userId}_{YYYY-MM-DD}     │
-└─────────────────────────────────────────┘
-         │
-         ▼
-┌─────────────────────────────────────────┐
-│  onSnapshot() confirms update           │
-│  (or reverts on error)                  │
-└─────────────────────────────────────────┘
 ```
 
 ---
@@ -221,87 +154,65 @@ User checks habit checkbox
 ## Component Architecture
 
 ```
-layout.js
-└── AuthProvider
-    └── DataProvider
-        └── {children}
-            ├── page.js (redirect logic)
-            ├── login/page.js
-            │   └── Google Sign-In Button
-            ├── dashboard/page.js
-            │   ├── StreakCounter (uses useData)
-            │   ├── Progress Bar (uses todayStats)
-            │   ├── HabitCard (uses toggleHabit)
-            │   ├── HabitAccordion (uses toggleHabit)
-            │   └── BottomNav
-            ├── habits/page.js
-            │   ├── Habit List (uses habits)
-            │   ├── HabitModal (uses addHabit/updateHabit)
-            │   ├── Delete (uses deleteHabit)
-            │   └── BottomNav
-            └── analytics/page.js
-                ├── Calendar Grid (uses dailyLogs)
-                ├── Stats Cards (uses habits, dailyLogs)
-                └── BottomNav
+app/
+├── (auth)/                             # Unauthenticated Route Group
+│   ├── layout.js                       # Empty minimalist layout
+│   └── login/page.js                   # Google SSO & Benefits
+├── (protected)/                        # Authenticated Route Group
+│   ├── layout.js                       # Secure Guard + BottomNav
+│   ├── dashboard/page.js
+│   │   ├── StreakCounter
+│   │   ├── HabitCard / HabitAccordion
+│   │   └── loading.js                  # Next.js Streaming Fallbacks
+│   ├── habits/page.js
+│   │   ├── HabitModal                  # CRUD Modal with strict validation
+│   │   ├── ConfirmDialog
+│   │   └── loading.js
+│   └── analytics/page.js
+│       ├── Calendar Grid (Spaced automatically)
+│       └── loading.js
+├── error.js                            # Root React Error Boundary
+├── not-found.js                        # App-styled 404 page
+├── layout.js                           # Master Providers Wrapper
+└── page.js                             # Root Redirector
 ```
 
 ### Folder Structure
 
 ```
 src/
-├── app/                    # Next.js App Router pages
-│   ├── analytics/page.js
-│   ├── dashboard/page.js
-│   ├── habits/page.js
-│   ├── login/page.js
-│   ├── layout.js           # Root layout with providers
-│   └── page.js             # Landing/redirect
-├── components/
-│   ├── habits/             # Habit-specific components
-│   │   ├── HabitAccordion.js
-│   │   ├── HabitCard.js
-│   │   ├── HabitModal.js
-│   │   ├── StreakCounter.js
-│   │   └── index.js
-│   └── ui/                 # Generic UI components
-│       ├── BottomNav.js
-│       ├── LoadingSpinner.js
-│       └── index.js
-├── contexts/               # React Context providers
-│   ├── AuthContext.js
-│   ├── DataContext.js
-│   └── index.js
-├── lib/
-│   └── firebase.js         # Firebase initialization
-└── utils/
-    └── dateHelpers.js      # Date utility functions
+├── app/                  # Next.js 16 App Router
+├── components/           
+│   ├── habits/           # Domain-specific components
+│   └── ui/               # Reusable primitives (Nav, Dialogs, Spinners)
+├── contexts/             # Global React Contexts
+├── hooks/                # Separated Domain Logic (useStreak, etc)
+├── lib/                  
+│   ├── constants/        # Centralized categories & styling configs
+│   ├── firebase/         # Firebase initialization & operations
+│   └── seed-data.js      # Onboarding initialization template
+└── utils/                # Pure functions (date formatting)
 ```
 
 ---
 
 ## Security Architecture
 
-### Client-Side Security
-- Firebase Auth manages user sessions
-- Auth state checked before rendering protected content
-- Redirect to `/login` if not authenticated
-
-### Database Security (Firestore Rules)
+### Rules Validation
+Firestore rules strictly validate inbound data to prevent malformed writes:
 ```
-habits/{habitId}
-├── READ:   userId == auth.uid
-├── CREATE: request.data.userId == auth.uid
-├── UPDATE: resource.data.userId == auth.uid
-└── DELETE: resource.data.userId == auth.uid
-
-dailyLogs/{logId}
-└── READ/WRITE: logId starts with auth.uid
+match /habits/{habitId} {
+  allow create: if request.auth != null
+    && request.resource.data.userId == request.auth.uid
+    && request.resource.data.title is string
+    && request.resource.data.title.size() > 0
+    && request.resource.data.title.size() <= 200
+    && request.resource.data.category in ['Schedule', 'Movement', 'Nutrition', 'Recovery'];
+}
 ```
 
-### Data Isolation
-- Each user's data is completely isolated
-- Queries always filter by `userId`
-- Security rules enforce at database level
+### Route Groups
+The `(protected)` directory enforces client-side layout guards via Layout cascading, backed by `middleware.js` executing edge-level cookie validation to prevent flashing of unauthorized content.
 
 ---
 
@@ -311,7 +222,7 @@ dailyLogs/{logId}
 ┌─────────────────────────────────────────────────────────────┐
 │                    Firestore SDK                            │
 │  ┌─────────────────────────────────────────────────────────┐│
-│  │              IndexedDB Persistence                      ││
+│  │          persistentLocalCache (Modern Config)           ││
 │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐  ││
 │  │  │   habits    │  │  dailyLogs  │  │  Pending Writes │  ││
 │  │  │   (cached)  │  │   (cached)  │  │    (queue)      │  ││
@@ -319,39 +230,12 @@ dailyLogs/{logId}
 │  └─────────────────────────────────────────────────────────┘│
 └─────────────────────────────────────────────────────────────┘
 ```
+The App is configured to use the modern `persistentLocalCache` API, ensuring users can open the app, check off their habits on a subway, and have it sync completely when connection is restored.
 
 ---
 
-## Performance Optimizations
+## Design System
 
-1. **Centralized Data Fetching** - Single Firebase listener shared across pages
-2. **Real-time Listeners** - `onSnapshot()` for habits and today's log
-3. **Optimistic Updates** - UI updates before Firestore confirms
-4. **Memoized Computed Values** - `useMemo` for filtered habits and stats
-5. **Callback Memoization** - `useCallback` for action functions
-6. **Offline Persistence** - Firestore SDK handles caching automatically
+The application uses custom CSS variables within `globals.css` combined with Tailwind CSS v4 to enforce strict design token consistency, eliminating rogue inline colors.
 
----
-
-## Deployment Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        Vercel                               │
-│  ┌─────────────────────────────────────────────────────────┐│
-│  │                   Edge Network (CDN)                    ││
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐  ││
-│  │  │   Static    │  │   API       │  │    Next.js      │  ││
-│  │  │   Assets    │  │   Routes    │  │    Runtime      │  ││
-│  │  └─────────────┘  └─────────────┘  └─────────────────┘  ││
-│  └─────────────────────────────────────────────────────────┘│
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Firebase (Google Cloud)                  │
-│  ┌─────────────────────┐    ┌─────────────────────────────┐ │
-│  │   Authentication    │    │         Firestore           │ │
-│  └─────────────────────┘    └─────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-```
+Specifically, **Category Styles** are statically defined in `lib/constants/categories.js` ensuring that when a habit changes to 'Movement', its icon, border, and badge color instantly match globally across the HabitCard, Analytics, and Edit interfaces without logic duplication.

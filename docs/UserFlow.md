@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the complete user journey through the Routine Tracker application, from first visit to daily usage.
+This document describes the complete user journey through the Routine Tracker application, from modern Next.js 16 Edge middleware redirection to seamless Toast notifications in daily operation.
 
 ---
 
@@ -34,41 +34,43 @@ This document describes the complete user journey through the Routine Tracker ap
 
 ## Flow 1: First-Time User
 
-### Step 1: Landing Page
+### Step 1: Landing Redirect Layer
 ```
 User visits app
        │
        ▼
 ┌─────────────────────────────────────┐
-│           / (Home Page)             │
+│           / (Root page.js)          │
 │                                     │
-│  Check auth state:                  │
+│  Client Auth Context Checks:        │
 │  - Not logged in → Redirect /login  │
 │  - Logged in → Redirect /dashboard  │
 └─────────────────────────────────────┘
 ```
 
-### Step 2: Login
+### Step 2: Bespoke Login Page (`(auth)/login/page.js`)
 ```
 ┌─────────────────────────────────────┐
 │           /login                    │
-│  ┌─────────────────────────────┐    │
-│  │     Routine Tracker         │    │
-│  │                             │    │
-│  │  Track your daily health    │    │
-│  │        routine              │    │
-│  │                             │    │
-│  │  ┌───────────────────────┐  │    │
-│  │  │ Continue with Google  │  │    │
-│  │  └───────────────────────┘  │    │
-│  └─────────────────────────────┘    │
+│                                     │
+│  Track your daily health            │
+│  routine                            │
+│                                     │
+│  ┌───────────────────────┐          │
+│  │ Continue with Google  │          │
+│  └───────────────────────┘          │
+│                                     │
+│    ✓ Track Habits                   │
+│    ✓ Build Streaks                  │
+│    ✓ View Analytics                 │
+│    ✓ Private & Secure               │
 └─────────────────────────────────────┘
        │
        ▼
   Google OAuth Popup
        │
        ▼
-  Success → Redirect to /dashboard
+  Success (Cookie Generated) → Redirect to /dashboard
 ```
 
 ### Step 3: Empty Dashboard (First Visit)
@@ -83,7 +85,7 @@ User visits app
 │  └─────────────────────────────┘    │
 │                                     │
 │  No habits scheduled for today.     │
-│  Go to Habits to add some! 🎉       │
+│  Enjoy your rest day! 🎉            │
 │                                     │
 │  ┌─────────┬─────────┬──────────┐   │
 │  │  Today  │ Habits  │Analytics │   │
@@ -91,12 +93,12 @@ User visits app
 └─────────────────────────────────────┘
 ```
 
-### Step 4: Habits Page (Empty State)
+### Step 4: Empty Habits Screen
 ```
 ┌─────────────────────────────────────┐
 │           /habits                   │
 │  ┌─────────────────────────────┐    │
-│  │  Manage Habits    [+ Add]   │    │
+│  │  Manage Habits              │    │
 │  └─────────────────────────────┘    │
 │                                     │
 │            📝                       │
@@ -104,12 +106,10 @@ User visits app
 │  No habits yet. Create your first!  │
 │                                     │
 │  ┌─────────────────────────────┐    │
-│  │        Add Habit            │    │
-│  └─────────────────────────────┘    │
-│              or                     │
-│  ┌─────────────────────────────┐    │
 │  │   Load Sample Routine       │    │
 │  └─────────────────────────────┘    │
+│                                     │
+│              [Floating ＋ Add]      │
 └─────────────────────────────────────┘
 ```
 
@@ -119,20 +119,20 @@ User clicks "Load Sample Routine"
        │
        ▼
 ┌─────────────────────────────────────┐
-│  POST /api/seed                     │
-│  { userId: "user_firebase_uid" }    │
+│  src/lib/seed-data.js triggers      │
+│  addHabit() sequentially            │
 └─────────────────────────────────────┘
        │
        ▼
-  10 habits created with userId
+  Batch write executes across 10 items
        │
        ▼
-  Page refreshes with habits list
+  Toast Notification: "Sample routine loaded successfully!"
 ```
 
-### Step 5b: Create Custom Habit
+### Step 5b: Modular Create Habit
 ```
-User clicks "Add Habit"
+User clicks Floating "＋" Button
        │
        ▼
 ┌─────────────────────────────────────┐
@@ -141,16 +141,17 @@ User clicks "Add Habit"
 │  │  Add New Habit              │    │
 │  │                             │    │
 │  │  Title: [____________]      │    │
+│  │  [Error text if needed]     │    │
+│  │                             │    │
 │  │  Time:  [08:00 AM   ]       │    │
 │  │  Category: [Schedule ▼]     │    │
-│  │  Instructions:              │    │
-│  │  [____________________]     │    │
+│  │  Instructions: [________]   │    │
 │  │                             │    │
 │  │  Active Days:               │    │
 │  │  [M][T][W][T][F][S][S]      │    │
 │  │                             │    │
 │  │  Checklist Items:           │    │
-│  │  [Add item...        ][+]   │    │
+│  │  [Add item...        ][Add] │    │
 │  │                             │    │
 │  │  Order: [1]                 │    │
 │  │                             │    │
@@ -168,7 +169,7 @@ User clicks "Add Habit"
 ┌─────────────────────────────────────┐
 │           /dashboard                │
 │  ┌─────────────────────────────┐    │
-│  │  Routine Tracker   [Sign out]│   │
+│  │  Routine Tracker   [ Profile]│   │
 │  │  Monday, December 22, 2025   │   │
 │  └─────────────────────────────┘    │
 │                                     │
@@ -188,22 +189,6 @@ User clicks "Add Habit"
 │  │ Drink 500ml water...        │    │
 │  └─────────────────────────────┘    │
 │                                     │
-│  ┌─────────────────────────────┐    │
-│  │ 08:15 AM  Movement          │    │
-│  │ Morning Posture Routine [✓] │    │
-│  │ ▼ Show 4 exercises          │    │
-│  │   • Chin Tucks (10 Reps)    │    │
-│  │   • Doorway Stretch         │    │
-│  │   • Wall Angels             │    │
-│  │   • Scapular Squeezes       │    │
-│  └─────────────────────────────┘    │
-│                                     │
-│  ┌─────────────────────────────┐    │
-│  │ 08:45 AM  Nutrition         │    │
-│  │ Breakfast Shake         [ ] │    │
-│  │ Blend: 2 Bananas...         │    │
-│  └─────────────────────────────┘    │
-│                                     │
 │  ... more habits ...                │
 │                                     │
 │  ┌─────────┬─────────┬──────────┐   │
@@ -212,102 +197,52 @@ User clicks "Add Habit"
 └─────────────────────────────────────┘
 ```
 
-### Checking a Habit
+### Interacting with a Habit
 ```
 User taps checkbox
        │
        ▼
 ┌─────────────────────────────────────┐
-│  Optimistic UI Update               │
-│  - Checkbox fills immediately       │
-│  - Progress bar updates             │
-│  - Card fades slightly              │
+│  Optimistic DataContext Update      │
+│  - Checkbox Lucide icon fills       │
+│  - Progress bar % jumps upward      │
+│  - Background dims gracefully       │
 └─────────────────────────────────────┘
        │
        ▼
 ┌─────────────────────────────────────┐
-│  Firestore Update                   │
-│  - If first check today:            │
-│    setDoc() creates dailyLog        │
-│  - Otherwise:                       │
-│    updateDoc() with arrayUnion      │
-└─────────────────────────────────────┘
-       │
-       ▼
-┌─────────────────────────────────────┐
-│  onSnapshot() triggers              │
-│  - Syncs across all devices         │
-│  - Confirms UI state                │
+│  Firestore Offline Persistence SDK  │
+│  - Processes operation atomically   │
+│  - Syncs to Cloud instantly         │
 └─────────────────────────────────────┘
 ```
 
 ---
 
-## Flow 3: Habit Management
+## Flow 3: Habit Maintenance
 
-### Viewing All Habits
+### Updating an Item
 ```
-┌─────────────────────────────────────┐
-│           /habits                   │
-│  ┌─────────────────────────────┐    │
-│  │  Manage Habits    [+ Add]   │    │
-│  └─────────────────────────────┘    │
-│                                     │
-│  ┌─────────────────────────────┐    │
-│  │ 08:00 AM  Schedule  #1      │    │
-│  │ Wake Up & Hydrate           │    │
-│  │ M T W T F S S               │    │
-│  │                    [✏️][🗑️] │    │
-│  └─────────────────────────────┘    │
-│                                     │
-│  ┌─────────────────────────────┐    │
-│  │ 08:15 AM  Movement  #2      │    │
-│  │ Morning Posture Routine     │    │
-│  │ M T W T F S                 │    │
-│  │ 4 checklist items           │    │
-│  │                    [✏️][🗑️] │    │
-│  └─────────────────────────────┘    │
-│                                     │
-│  ... more habits ...                │
-└─────────────────────────────────────┘
-```
-
-### Editing a Habit
-```
-User taps edit icon (✏️)
+User taps Edit icon (Pencil)
        │
        ▼
 ┌─────────────────────────────────────┐
-│         HabitModal                  │
-│  ┌─────────────────────────────┐    │
-│  │  Edit Habit                 │    │
-│  │                             │    │
-│  │  Title: [Wake Up & Hydrate] │    │
-│  │  Time:  [08:00 AM        ]  │    │
-│  │  Category: [Schedule ▼]     │    │
-│  │  Instructions:              │    │
-│  │  [Drink 500ml water...]     │    │
-│  │                             │    │
-│  │  Active Days:               │    │
-│  │  [●][●][●][●][●][●][●]      │    │
-│  │                             │    │
-│  │  Order: [1]                 │    │
-│  │                             │    │
-│  │  [Delete] [Cancel] [Update] │    │
-│  └─────────────────────────────┘    │
+│  Form populated with Firestore Doc  │
+│  Validation blocks invalid states   │
+│  Save → "Habit Updated" Toast       │
 └─────────────────────────────────────┘
 ```
 
-### Deleting a Habit
+### Safe Deletion Process
 ```
-User taps delete icon (🗑️)
+User taps Delete icon (Trash)
        │
        ▼
 ┌─────────────────────────────────────┐
-│      Delete Confirmation            │
+│      Secure ConfirmDialog           │
 │  ┌─────────────────────────────┐    │
+│  │  [Warning Icon]             │    │
 │  │  Delete Habit?              │    │
-│  │                             │    │
 │  │  This action cannot be      │    │
 │  │  undone.                    │    │
 │  │                             │    │
@@ -316,36 +251,32 @@ User taps delete icon (🗑️)
 └─────────────────────────────────────┘
        │
        ▼ (if confirmed)
-  deleteDoc() removes habit
+  deleteDoc() process triggers spinner
        │
        ▼
-  Page refreshes without habit
+  Success Toast Notification slides in
 ```
 
 ---
 
-## Flow 4: Analytics
+## Flow 4: Analytical Reporting
 
-### Calendar View
+### Component Interactions
 ```
 ┌─────────────────────────────────────┐
 │           /analytics                │
-│  ┌─────────────────────────────┐    │
-│  │  Analytics                  │    │
-│  │  [●Calendar] [Statistics]   │    │
-│  └─────────────────────────────┘    │
+│                                     │
+│  [●Calendar] [Statistics]           │
 │                                     │
 │  ┌─────────────────────────────┐    │
 │  │  Last 30 Days               │    │
 │  │                             │    │
 │  │  M  T  W  T  F  S  S        │    │
-│  │ [🟢][🟢][🟡][🟢][🟢][🔴][⚪] │    │
+│  │    [🟢][🟡][🟢][🟢][🔴][⚪] │    │
 │  │ [🟢][🟢][🟢][🟡][🟢][🟢][⚪] │    │
 │  │ [🟢][🟢][🟢][🟢][🟡][🟢][⚪] │    │
 │  │ [🟢][🟢][🟢][🟢][🟢][🟢][⚪] │    │
 │  │ [22]                        │    │
-│  │                             │    │
-│  │  🔴 0%  🟡 50%+  🟢 100%    │    │
 │  └─────────────────────────────┘    │
 │                                     │
 │  (User taps on date 22)            │
@@ -357,114 +288,38 @@ User taps delete icon (🗑️)
 │  │  [✓] Morning Posture        │    │
 │  │  [✓] Breakfast Shake        │    │
 │  │  [ ] Sunlight Exposure      │    │
-│  │  ...                        │    │
-│  └─────────────────────────────┘    │
-└─────────────────────────────────────┘
-```
-
-### Statistics View
-```
-┌─────────────────────────────────────┐
-│           /analytics                │
-│  ┌─────────────────────────────┐    │
-│  │  Analytics                  │    │
-│  │  [Calendar] [●Statistics]   │    │
-│  └─────────────────────────────┘    │
-│                                     │
-│  ┌────────────┬────────────────┐    │
-│  │ 🔥 5       │ 12             │    │
-│  │ Current    │ Longest        │    │
-│  │ Streak     │ Streak         │    │
-│  ├────────────┼────────────────┤    │
-│  │ 78%        │ 8              │    │
-│  │ Avg        │ Perfect        │    │
-│  │ Completion │ Days           │    │
-│  └────────────┴────────────────┘    │
-│                                     │
-│  ┌─────────────────────────────┐    │
-│  │  Last 30 Days Summary       │    │
-│  │                             │    │
-│  │  Days with 50%+: 25/30      │    │
-│  │  Total completed: 245       │    │
-│  └─────────────────────────────┘    │
-│                                     │
-│  ┌─────────────────────────────┐    │
-│  │  Habit Performance          │    │
-│  │                             │    │
-│  │  Wake Up & Hydrate          │    │
-│  │  [████████████████] 100%    │    │
-│  │                             │    │
-│  │  Morning Posture            │    │
-│  │  [██████████████░░] 85%     │    │
-│  │                             │    │
-│  │  Breakfast Shake            │    │
-│  │  [████████████░░░░] 73%     │    │
 │  └─────────────────────────────┘    │
 └─────────────────────────────────────┘
 ```
 
 ---
 
-## Error States
+## Application Notifications
 
-### Network Error
+### The Toast Stack
 ```
 ┌─────────────────────────────────────┐
-│  ┌─────────────────────────────┐    │
-│  │  ⚠️ Failed to load habits   │    │
-│  │  Please check your          │    │
-│  │  connection and try again.  │    │
-│  └─────────────────────────────┘    │
+│                                     │
+│  (Screen Content)                   │
+│                                     │
+│  ┌──────────────────────────────┐   │
+│  │ Habit updated successfully X │   │
+│  └──────────────────────────────┘   │
 └─────────────────────────────────────┘
 ```
-
-### Auth Error
-```
-┌─────────────────────────────────────┐
-│  ┌─────────────────────────────┐    │
-│  │  ❌ Failed to sign in       │    │
-│  │  Please try again.          │    │
-│  └─────────────────────────────┘    │
-└─────────────────────────────────────┘
-```
+Toasts arrive dynamically pinned to the bottom of the viewport under the nav via `ToastContext`, clearing native interference from Edge and Chrome system alerts.
 
 ---
 
-## Loading States
+## Responsive Breakdowns
 
-### Page Loading
-```
-┌─────────────────────────────────────┐
-│                                     │
-│                                     │
-│              ⟳                     │
-│         (spinner)                   │
-│                                     │
-│                                     │
-└─────────────────────────────────────┘
-```
-
-### Streak Loading
-```
-┌─────────────────────────────────────┐
-│  ┌─────────────────────────────┐    │
-│  │  Loading streak...          │    │
-│  └─────────────────────────────┘    │
-└─────────────────────────────────────┘
-```
-
----
-
-## Responsive Behavior
-
-### Mobile (< 640px)
-- Full-width cards
-- Bottom navigation fixed
-- Modal takes full screen
-- Touch-friendly tap targets
+### Mobile First (< 640px)
+- Max-width restricted elements
+- Floating Action Buttons scale appropriately
+- Modals consume near full-screen space safely inside notches
+- Navigation persists tightly glued to bottom frame
 
 ### Tablet/Desktop (≥ 640px)
-- Max-width container (672px)
-- Centered content
-- Modal centered with backdrop
-- Hover states on buttons
+- Hard center layout width cap (672px max-width)
+- Navigation icons receive textual hovering tooltips if available
+- TopNav profile drops down an actual menu segment

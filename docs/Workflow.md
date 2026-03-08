@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the development workflow for the Routine Tracker application, including setup, development, testing, and deployment processes.
+This document describes the development workflow for the Routine Tracker application, including setup, development, testing, and deployment processes based on Next.js App Router and Firebase.
 
 ---
 
@@ -21,8 +21,8 @@ This document describes the development workflow for the Routine Tracker applica
 git clone <repo-url>
 cd Regimen
 
-# 2. Navigate to the app directory
-cd regimen
+# 2. Navigate to the web directory
+cd web
 
 # 3. Install dependencies
 npm install
@@ -68,11 +68,19 @@ npm run dev
 4. Register app
 5. Copy config values to `.env.local`
 
-### 5. Deploy Security Rules
-1. Go to Firestore > Rules
-2. Copy contents of `regimen/firestore.rules`
-3. Paste and Publish
-
+### 5. Deploy Security Rules & Indexes via CLI
+Run the following from the **`web/` directory**:
+1. Install the Firebase CLI tools globally (if you haven't already) and login:
+   ```bash
+   npm install -g firebase-tools
+   firebase login
+   ```
+2. Initialize Firebase to link your default project, then deploy the predefined Firestore Rules and composite Indexes:
+   ```bash
+   firebase init firestore
+   firebase deploy --only firestore
+   ```
+   *Note: During `init`, do NOT overwrite the existing local `firestore.rules` and `firestore.indexes.json` files if it prompts you.*
 ---
 
 ## Development Workflow
@@ -87,45 +95,34 @@ npm run dev
 # http://localhost:3000
 ```
 
-### Code Structure
+### Code Structure Configuration
 
 ```
-src/
-├── app/              # Pages (App Router)
-│   ├── analytics/    # Analytics page
-│   ├── dashboard/    # Dashboard page
-│   ├── habits/       # Habits management page
-│   └── login/        # Login page
-├── components/       # Reusable components
-│   ├── habits/       # Habit-related components
-│   │   ├── HabitAccordion.js
-│   │   ├── HabitCard.js
-│   │   ├── HabitModal.js
-│   │   ├── StreakCounter.js
-│   │   └── index.js
-│   └── ui/           # UI components
-│       ├── BottomNav.js
-│       ├── LoadingSpinner.js
-│       └── index.js
-├── contexts/         # React Context providers
-│   ├── AuthContext.js    # Authentication state
-│   ├── DataContext.js    # Centralized data management
-│   └── index.js
-├── lib/              # Firebase configuration
-└── utils/            # Helper functions
+web/
+├── src/
+│   ├── app/                    # Next.js 16 App Router
+│   ├── components/             # Presentation UI
+│   ├── contexts/               # React Providers
+│   ├── hooks/                  # Specialized logical segments
+│   ├── lib/                    # Firebase / Constants / Seeding
+│   └── utils/                  # Pure math / formatting
+├── public/                     # Icons & Manifest
+├── firestore.rules
+├── firestore.indexes.json
+├── package.json
+└── tailwind.config.mjs         # Tailwind configuration
 ```
 
 ### Making Changes
-
-1. **Pages:** Edit files in `src/app/`
+1. **Pages:** Edit files inside route groups `src/app/(protected)` or `src/app/(auth)`.
 2. **Components:** Edit files in `src/components/habits/` or `src/components/ui/`
-3. **Styles:** Use Tailwind classes inline
-4. **Data Logic:** Edit `src/contexts/DataContext.js`
-5. **Auth Logic:** Edit `src/contexts/AuthContext.js`
+3. **Styles:** Update `globals.css` custom variables or standard Tailwind classes.
+4. **Data Logic:** Modify custom hooks in `src/hooks/` (e.g. `use-habits.js`).
+5. **Constants:** Edit central definitions like `src/lib/constants/categories.js`.
 
 ### Hot Reload
-- Changes auto-reload in browser
-- No need to restart server
+- Changes auto-reload in browser via Turbopack.
+- No need to restart the development server.
 
 ---
 
@@ -135,38 +132,25 @@ src/
 
 #### Authentication
 - [ ] Google Sign-In works
-- [ ] Sign out works
-- [ ] Protected routes redirect to login
-- [ ] Auth state persists on refresh
+- [ ] Landing page intelligently redirects to `/dashboard` or `/login`
+- [ ] Sign out works triggers `/login`
+- [ ] Direct linking to `/habits` while signed out redirects correctly
 
-#### Dashboard
-- [ ] Habits load for current user
-- [ ] Only today's habits shown (frequency filter)
-- [ ] Checkbox toggles work
-- [ ] Progress bar updates
-- [ ] Streak counter displays
-
-#### Habits Management
-- [ ] Add new habit works
-- [ ] Edit habit works
-- [ ] Delete habit works (with confirmation)
-- [ ] "Load Sample Routine" works for new users
+#### Dashboard & Habits
+- [ ] Add new habit validates (require title, valid frequency)
+- [ ] Add new habit displays gracefully
+- [ ] Checkboxes animate cleanly and immediately update progress bars
+- [ ] "Delete" opens a `<ConfirmDialog/>` popup 
+- [ ] Toast notifications slide up sequentially on saves and fails
 
 #### Analytics
-- [ ] Calendar view shows 30 days
-- [ ] Colors reflect completion rates
-- [ ] Click date shows details
-- [ ] Statistics calculate correctly
+- [ ] Calendar grid aligns spaces before the 1st of the month
+- [ ] Colors accurately reflect the daily completion percentage
+- [ ] Tapping a calendar day loads precise habit history
 
 #### Cross-Device
-- [ ] Changes sync in real-time
-- [ ] Works on mobile browser
-- [ ] PWA installs correctly
-
-### Testing Different Users
-1. Sign out
-2. Sign in with different Google account
-3. Verify habits are separate
+- [ ] Tested offline: toggling checkboxes buffers changes to sync when restored
+- [ ] Checked mobile dimensions (nav sticks to bottom, grid remains legible)
 
 ---
 
@@ -175,6 +159,9 @@ src/
 ### Local Build Test
 
 ```bash
+# Lint source code
+npm run lint
+
 # Build for production
 npm run build
 
@@ -182,218 +169,65 @@ npm run build
 npm start
 ```
 
-### Deploy to Vercel
+### Vercel Deployment
 
-#### First Time
-1. Push code to GitHub
-2. Go to [Vercel](https://vercel.com)
-3. Import repository
-4. Add environment variables:
+1. Make sure to commit changes to GitHub
+2. Connect the repository in the Vercel Dashboard
+3. Set the Root Directory to `web`
+4. Add the massive array of Environment Variables matching your local `.env.local`:
    - `NEXT_PUBLIC_FIREBASE_API_KEY`
-   - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
-   - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
-   - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
-   - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
-   - `NEXT_PUBLIC_FIREBASE_APP_ID`
-5. Deploy
-
-#### Subsequent Deploys
-- Push to main branch
-- Vercel auto-deploys
-
-### Post-Deployment
-1. Add Vercel domain to Firebase Auth authorized domains
-2. Test production site
-3. Verify PWA installation works
+   - etc...
+5. Ensure `middleware.js` appropriately blocks restricted paths during Edge rendering.
 
 ---
 
-## Common Tasks
+## Adding New Features
 
-### Add a New Page
+### Appending Pages
 
 ```bash
-# Create page file
-mkdir -p src/app/newpage
-touch src/app/newpage/page.js
+mkdir -p src/app/\(protected\)/settings
+touch src/app/\(protected\)/settings/page.js
 ```
 
 ```javascript
-// src/app/newpage/page.js
 'use client';
 
 import { useAuth, useData } from '@/contexts';
-import { BottomNav } from '@/components/ui';
+import { TopNav } from '@/components/ui';
 
-export default function NewPage() {
+export default function SettingsPage() {
   const { user } = useAuth();
-  const { habits, loading } = useData();
   
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Content */}
-      <BottomNav />
-    </div>
+    <>
+      <TopNav title="Settings" />
+      <main className="max-w-2xl mx-auto px-4 py-6">
+        <p>Config options for {user.displayName}</p>
+      </main>
+    </>
   );
 }
 ```
 
-### Add a New Component
+### Expanding the Design System
 
-```bash
-# For habit-related components
-touch src/components/habits/NewComponent.js
-
-# For UI components
-touch src/components/ui/NewComponent.js
-```
-
-```javascript
-// src/components/habits/NewComponent.js
-'use client';
-
-import { useData } from '@/contexts';
-
-export default function NewComponent({ prop1, prop2 }) {
-  const { habits, toggleHabit } = useData();
-  
-  return (
-    <div className="...">
-      {/* Component content */}
-    </div>
-  );
-}
-```
-
-### Using the Data Context
-
-```javascript
-import { useData } from '@/contexts';
-
-function MyComponent() {
-  const {
-    // State
-    habits,           // All user habits
-    dailyLogs,        // Historical completion logs
-    todayLog,         // Today's completed habit IDs
-    loading,          // Loading state
-    error,            // Error state
-    
-    // Computed
-    todaysHabits,     // Habits filtered for today
-    todayStats,       // { total, completed, percentage }
-    streak,           // Current streak count
-    
-    // Actions
-    toggleHabit,      // Toggle habit completion
-    addHabit,         // Add new habit
-    updateHabit,      // Update existing habit
-    deleteHabit,      // Delete habit
-    seedHabits,       // Seed sample habits
-    fetchDailyLogs,   // Fetch historical logs
-  } = useData();
-}
-```
-
-### Update Security Rules
-
-1. Edit `regimen/firestore.rules`
-2. Copy to Firebase Console > Firestore > Rules
-3. Publish
+To add a new Category:
+1. Update `src/lib/constants/categories.js` to define styling and the Lucide Icon mappings.
+2. Update `firestore.rules` to permit the new category string.
+3. Update `globals.css` if necessary to allocate matching semantic colors.
 
 ---
 
 ## Troubleshooting
 
 ### "Missing or insufficient permissions"
-- Check Firestore security rules
-- Ensure `userId` field matches `auth.uid`
-- Verify user is authenticated
+- Confirm the habit's `userId` payload rigidly matches `request.auth.uid`.
+- Ensure rules are fully deployed via the Firebase Dashboard.
 
-### "Firebase not initialized"
-- Check `.env.local` has all variables
-- Restart dev server after changing env
-- Verify Firebase project exists
+### "Null Document Error / Firebase SDK"
+- Restart dev server to clear broken cached initialization variables.
+- Ensure `persistentLocalCache` initialized without Tab Conflicts.
 
-### Habits not showing
-- Check browser console for errors
-- Verify DataContext is providing data
-- Check if habits exist in Firestore
-
-### Real-time updates not working
-- DataContext uses `onSnapshot()` for real-time updates
-- Check for errors in console
-- Ensure Firestore rules allow read
-
-### PWA not installing
-- Must be served over HTTPS (or localhost)
-- Check `manifest.json` is valid
-- Verify icons exist
-
----
-
-## Git Workflow
-
-### Branching Strategy
-
-```
-main (production)
-  └── feature/new-feature
-  └── fix/bug-fix
-```
-
-### Commit Messages
-
-```bash
-# Features
-git commit -m "feat: add analytics page"
-
-# Fixes
-git commit -m "fix: habit toggle not updating"
-
-# Docs
-git commit -m "docs: update README"
-
-# Refactor
-git commit -m "refactor: extract HabitCard component"
-```
-
-### Pull Request Process
-1. Create feature branch
-2. Make changes
-3. Test locally
-4. Push branch
-5. Create PR
-6. Review & merge
-7. Vercel auto-deploys
-
----
-
-## Environment Variables
-
-### Required Variables
-
-| Variable | Description |
-|----------|-------------|
-| `NEXT_PUBLIC_FIREBASE_API_KEY` | Firebase API key |
-| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | Firebase auth domain |
-| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Firebase project ID |
-| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | Firebase storage bucket |
-| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Firebase sender ID |
-| `NEXT_PUBLIC_FIREBASE_APP_ID` | Firebase app ID |
-
-### Where to Set
-
-| Environment | Location |
-|-------------|----------|
-| Local | `.env.local` file |
-| Vercel | Project Settings > Environment Variables |
-
----
-
-## Resources
-
-- [Next.js Docs](https://nextjs.org/docs)
-- [Firebase Docs](https://firebase.google.com/docs)
-- [Tailwind CSS Docs](https://tailwindcss.com/docs)
-- [Vercel Docs](https://vercel.com/docs)
+### Route Loops
+- Verify `middleware.js` is filtering URLs correctly without matching static assets like `.svg` files or Next.js `_next` system routes.

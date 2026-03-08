@@ -1,121 +1,77 @@
-# Routine Tracker PWA
+# Regimen — Daily Routine Tracker
 
-A Progressive Web App for tracking daily health routines, built with Next.js 16, Firebase, and Tailwind CSS.
+Regimen is a modern Progressive Web Application (PWA) designed to help you track your daily habits, build streaks, and visualize your progress over time. Built with Next.js, React, and Firebase, it features a clean, responsive UI with robust offline support.
 
 ## Features
 
-- 🔐 Google Sign-In authentication
-- 📱 Installable PWA (works offline)
-- 🔥 Streak tracking
-- ✅ Daily habit checklist
-- 🔄 Real-time sync across devices
-- 📊 Progress tracking
-- ➕ Add, edit, and delete habits
-- 📈 Analytics with calendar view and statistics
-
-## Setup Instructions
-
-### 1. Create Firebase Project
-
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Click "Create a project"
-3. Enter project name and follow the setup wizard
-
-### 2. Enable Google Authentication
-
-1. In Firebase Console, go to **Authentication** > **Sign-in method**
-2. Enable **Google** provider
-3. Add your authorized domains (localhost for dev, your Vercel domain for prod)
-
-### 3. Create Firestore Database
-
-1. Go to **Firestore Database** > **Create database**
-2. Start in **test mode** (we'll add security rules later)
-3. Choose a region close to your users
-
-### 4. Get Firebase Configuration
-
-1. Go to **Project Settings** > **General**
-2. Scroll to "Your apps" and click the web icon (`</>`)
-3. Register your app and copy the config values
-
-### 5. Configure Environment Variables
-
-1. Copy `.env.local.example` to `.env.local`:
-   ```bash
-   cp .env.local.example .env.local
-   ```
-
-2. Fill in your Firebase config values in `.env.local`
-
-### 6. Deploy Firestore Security Rules
-
-1. Go to **Firestore Database** > **Rules**
-2. Copy the contents of `firestore.rules` and paste into the editor
-3. Click **Publish**
-
-### 7. Install Dependencies & Run
-
-```bash
-npm install
-npm run dev
-```
-
-### 8. Seed the Database (Optional)
-
-New users can load sample habits directly from the app:
-1. Sign in with Google
-2. Go to the Habits page
-3. Click "Load Sample Routine" to populate with the default health routine
-
-Or use the API (requires userId):
-```bash
-curl -X POST http://localhost:3000/api/seed \
-  -H "Content-Type: application/json" \
-  -d '{"userId": "your-firebase-uid"}'
-```
-
-## Deployment (Vercel)
-
-1. Push your code to GitHub
-2. Import the project in [Vercel](https://vercel.com)
-3. Add environment variables in Vercel project settings
-4. Deploy!
+- **Habit Tracking**: Create, edit, and delete daily habits with customizable categories and schedules.
+- **Streak Counters**: See your consistency with real-time streak calculations.
+- **Analytics Dashboard**: Visualize your performance over the last 30 days with a calendar heatmap and detailed statistics.
+- **Offline Support**: Log your habits even without an internet connection. Your data syncs automatically with Firebase when you're back online.
+- **Google Authentication**: Quick and secure sign-in process.
+- **Accessibility**: Thoughtfully designed with proper ARIA attributes and keyboard navigability.
+- **Responsive UI**: Looks great and functions flawlessly on both desktop and mobile devices.
 
 ## Tech Stack
 
-- Next.js 16 (App Router)
-- Firebase Auth + Firestore
-- Tailwind CSS
-- PWA with offline support
+- **Framework**: [Next.js](https://nextjs.org/) (App Router, React 19)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Database & Auth**: [Firebase](https://firebase.google.com/) (Firestore, Authentication)
+- **Icons**: [Lucide React](https://lucide.dev/)
 
-## Project Structure
+## Architecture Overview
 
-```
-regimen/
-├── src/
-│   ├── app/
-│   │   ├── api/seed/route.js    # Seed endpoint
-│   │   ├── analytics/page.js    # Analytics & history
-│   │   ├── dashboard/page.js    # Main dashboard
-│   │   ├── habits/page.js       # Habit management (CRUD)
-│   │   ├── login/page.js        # Login page
-│   │   ├── layout.js            # Root layout
-│   │   └── page.js              # Home redirect
-│   ├── components/
-│   │   ├── AuthProvider.js      # Auth context
-│   │   ├── BottomNav.js         # Bottom navigation
-│   │   ├── HabitCard.js         # Simple habit card
-│   │   ├── HabitAccordion.js    # Expandable habit card
-│   │   ├── HabitModal.js        # Add/Edit habit form
-│   │   └── StreakCounter.js     # Streak display
-│   ├── lib/
-│   │   ├── firebase.js          # Firebase config
-│   │   └── seedData.js          # Habit seed data
-│   └── utils/
-│       └── dateHelpers.js       # Date utilities
-├── public/
-│   └── manifest.json            # PWA manifest
-├── firestore.rules              # Security rules
-└── .env.local.example           # Env template
-```
+Regimen uses a modular, professional-grade architectural structure:
+- **`src/app`**: Next.js App Router for all application routing, including separate route groups for `(auth)` and `(protected)` areas. Server middleware protects routes appropriately.
+- **`src/hooks`**: Domain-specific logic encapsulated safely out of the UI. Hook boundaries exist for `useHabits`, `useDailyLogs`, `useStreak`, and `useAnalytics`.
+- **`src/components/ui`**: Base presentation components and centralized reusable layout pieces (e.g. `TopNav`, `ConfirmDialog`, `LoadingSpinner`).
+- **`src/lib/firebase`**: All remote data source access and setup is cleanly isolated away from component logic.
+- **`src/contexts`**: Standard React Contexts for application-wide scoped state, like authentication and toast notifications.
+
+## Local Development Setup
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/manishborikar92/Regimen.git
+   ```
+
+2. **Navigate to the web directory:**
+   ```bash
+   cd Regimen/web
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+4. **Environment Configuration:**
+   Create a `.env.local` file in `Regimen/web/` and add your Firebase configuration:
+   ```env
+   NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+   NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+   ```
+
+5. **Deploy Security Rules:**
+   Use the Firebase CLI from the **`web/` directory** to initialize your project link and deploy local security rules and index files:
+   ```bash
+   npm install -g firebase-tools
+   firebase login
+   firebase init firestore
+   firebase deploy --only firestore
+   ```
+
+6. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+   The app will be accessible at [http://localhost:3000](http://localhost:3000).
+
+## License
+
+This project is proprietary and confidential. Ensure proper credentials before deploying.

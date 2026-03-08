@@ -56,7 +56,16 @@ Regimen uses a modular, professional-grade architectural structure:
    NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
    ```
 
-5. **Run the development server:**
+5. **Deploy Security Rules:**
+   Use the Firebase CLI from the **`web/` directory** to initialize your project link and deploy local security rules and index files:
+   ```bash
+   npm install -g firebase-tools
+   firebase login
+   firebase init firestore
+   firebase deploy --only firestore
+   ```
+
+6. **Run the development server:**
    ```bash
    npm run dev
    ```

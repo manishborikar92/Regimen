@@ -1,33 +1,43 @@
 {
-    "indexes": [
+  "indexes": [
+    {
+      "collectionGroup": "dailyLogs",
+      "queryScope": "COLLECTION",
+      "fields": [
         {
-            "collectionGroup": "dailyLogs",
-            "queryScope": "COLLECTION",
-            "fields": [
-                {
-                    "fieldPath": "userId",
-                    "order": "ASCENDING"
-                },
-                {
-                    "fieldPath": "date",
-                    "order": "DESCENDING"
-                }
-            ]
+          "fieldPath": "userId",
+          "order": "ASCENDING"
         },
         {
-            "collectionGroup": "habits",
-            "queryScope": "COLLECTION",
-            "fields": [
-                {
-                    "fieldPath": "userId",
-                    "order": "ASCENDING"
-                },
-                {
-                    "fieldPath": "order",
-                    "order": "ASCENDING"
-                }
-            ]
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
         }
-    ],
-    "fieldOverrides": []
+      ],
+      "density": "SPARSE_ALL"
+    },
+    {
+      "collectionGroup": "habits",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "userId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "order",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "ASCENDING"
+        }
+      ],
+      "density": "SPARSE_ALL"
+    }
+  ],
+  "fieldOverrides": []
 }
