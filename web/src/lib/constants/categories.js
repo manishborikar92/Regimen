@@ -1,35 +1,12 @@
 /**
- * Centralized category configuration for Vritta.
- * Supports the 6 canonical life-area categories defined in the product specification,
- * while safely preserving legacy categories for existing user data.
+ * Centralized Category Configuration for Vritta.
+ * Single source of truth for all habit categories, styling tokens, and display labels.
+ *
+ * All supported category keys and form options derive directly from CATEGORY_CONFIG.
+ * Aligns 1:1 with Cloud Firestore security rules (isValidCategory).
  */
 
-export const CANONICAL_CATEGORIES = [
-  'English Learning',
-  'Movement & Strength',
-  'Listening & Awareness',
-  'Reading',
-  'Communication',
-  'Reflection',
-];
-
-export const LEGACY_CATEGORIES = [
-  'Schedule',
-  'Movement',
-  'Nutrition',
-  'Recovery',
-];
-
-export const ALL_CATEGORIES = [
-  ...CANONICAL_CATEGORIES,
-  ...LEGACY_CATEGORIES,
-];
-
-// Default export list for dropdowns and pickers
-export const CATEGORIES = ALL_CATEGORIES;
-
 export const CATEGORY_CONFIG = {
-  // Canonical Categories
   'English Learning': {
     label: 'English Learning',
     borderColor: 'border-l-indigo-500',
@@ -39,7 +16,7 @@ export const CATEGORY_CONFIG = {
     textColor: 'text-indigo-700',
     dotColor: 'bg-indigo-500',
     iconName: 'BookOpen',
-    description: 'Vocabulary acquisition and workbook exercises',
+    description: 'Vocabulary acquisition, reading practice, and workbook study',
   },
   'Movement & Strength': {
     label: 'Movement & Strength',
@@ -50,7 +27,7 @@ export const CATEGORY_CONFIG = {
     textColor: 'text-teal-700',
     dotColor: 'bg-teal-500',
     iconName: 'Activity',
-    description: 'Bodyweight conditioning, posture correction, and active recovery',
+    description: 'Bodyweight conditioning, posture correction, and physical routines',
   },
   'Listening & Awareness': {
     label: 'Listening & Awareness',
@@ -61,7 +38,7 @@ export const CATEGORY_CONFIG = {
     textColor: 'text-amber-700',
     dotColor: 'bg-amber-500',
     iconName: 'Headphones',
-    description: 'Daily discourse listening and contemplative inquiry',
+    description: 'Contemplative listening, awareness exercises, and audio exploration',
   },
   'Reading': {
     label: 'Reading',
@@ -72,7 +49,7 @@ export const CATEGORY_CONFIG = {
     textColor: 'text-emerald-700',
     dotColor: 'bg-emerald-500',
     iconName: 'BookMarked',
-    description: 'Bedtime reading for calm transition to sleep',
+    description: 'Focused reading, study sessions, and bedtime transition',
   },
   'Communication': {
     label: 'Communication',
@@ -83,7 +60,7 @@ export const CATEGORY_CONFIG = {
     textColor: 'text-sky-700',
     dotColor: 'bg-sky-500',
     iconName: 'MessageSquare',
-    description: 'Spoken English practice and conversational confidence',
+    description: 'Conversational practice, writing, and expressive clarity',
   },
   'Reflection': {
     label: 'Reflection',
@@ -94,23 +71,10 @@ export const CATEGORY_CONFIG = {
     textColor: 'text-rose-700',
     dotColor: 'bg-rose-400',
     iconName: 'PenTool',
-    description: 'Private journaling, learning notes, and personal thoughts',
-  },
-
-  // Legacy Categories (preserved for backward compatibility)
-  'Schedule': {
-    label: 'Schedule (Legacy)',
-    borderColor: 'border-l-gray-400',
-    bgColor: 'bg-gray-50',
-    bgColorDone: 'bg-gray-100',
-    badgeClasses: 'bg-gray-100 text-gray-700 border-gray-200',
-    textColor: 'text-gray-700',
-    dotColor: 'bg-gray-400',
-    iconName: 'Clock',
-    description: 'Legacy timing category',
+    description: 'Private journaling, learning notes, and daily introspection',
   },
   'Movement': {
-    label: 'Movement (Legacy)',
+    label: 'Movement',
     borderColor: 'border-l-blue-500',
     bgColor: 'bg-blue-50',
     bgColorDone: 'bg-blue-100',
@@ -118,10 +82,10 @@ export const CATEGORY_CONFIG = {
     textColor: 'text-blue-700',
     dotColor: 'bg-blue-500',
     iconName: 'Activity',
-    description: 'Legacy movement category',
+    description: 'General physical movement, daily walking, and mobility',
   },
   'Nutrition': {
-    label: 'Nutrition (Legacy)',
+    label: 'Nutrition',
     borderColor: 'border-l-green-500',
     bgColor: 'bg-green-50',
     bgColorDone: 'bg-green-100',
@@ -129,10 +93,10 @@ export const CATEGORY_CONFIG = {
     textColor: 'text-green-700',
     dotColor: 'bg-green-500',
     iconName: 'Coffee',
-    description: 'Legacy nutrition category',
+    description: 'Hydration, balanced meals, and mindful eating habits',
   },
   'Recovery': {
-    label: 'Recovery (Legacy)',
+    label: 'Recovery',
     borderColor: 'border-l-purple-500',
     bgColor: 'bg-purple-50',
     bgColorDone: 'bg-purple-100',
@@ -140,12 +104,29 @@ export const CATEGORY_CONFIG = {
     textColor: 'text-purple-700',
     dotColor: 'bg-purple-500',
     iconName: 'Moon',
-    description: 'Legacy recovery category',
+    description: 'Rest, sleep hygiene, and evening wind-down',
+  },
+  'Schedule': {
+    label: 'Schedule',
+    borderColor: 'border-l-gray-400',
+    bgColor: 'bg-gray-50',
+    bgColorDone: 'bg-gray-100',
+    badgeClasses: 'bg-gray-100 text-gray-700 border-gray-200',
+    textColor: 'text-gray-700',
+    dotColor: 'bg-gray-400',
+    iconName: 'Clock',
+    description: 'Daily planning, focus blocks, and time management',
   },
 };
 
 /**
- * Get category config safely, falling back to English Learning or neutral styling.
+ * Authoritative array of all supported category keys.
+ * Derived directly from CATEGORY_CONFIG (single source of truth).
+ */
+export const CATEGORIES = Object.keys(CATEGORY_CONFIG);
+
+/**
+ * Retrieve styling and label configuration for a category with safe fallback.
  * @param {string} category
  * @returns {Object}
  */

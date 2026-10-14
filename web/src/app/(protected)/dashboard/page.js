@@ -220,7 +220,7 @@ export default function DashboardPage() {
             <div className="max-w-sm mx-auto space-y-1.5">
               <h3 className="text-base font-bold text-gray-900">Welcome to {BRAND.name}</h3>
               <p className="text-xs text-gray-500 leading-relaxed">
-                Start with your canonical 6 daily routines (English Workbook, Movement Plan, Osho Listening, Bedtime Reading, Speaking, and Diary).
+                Build your daily rhythm by exploring recommended foundation routines or creating custom habits.
               </p>
             </div>
             <button
@@ -228,7 +228,7 @@ export default function DashboardPage() {
               onClick={() => seedHabits()}
               className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-xs sm:text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-sm"
             >
-              Load Canonical Routines
+              Load Routines
             </button>
           </div>
         ) : todaysHabits.length === 0 ? (

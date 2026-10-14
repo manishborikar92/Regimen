@@ -75,7 +75,7 @@ export default function HabitsPage() {
               Scheduling Philosophy
             </h3>
             <p className="text-2xs sm:text-xs text-gray-600 leading-relaxed max-w-lg">
-              Preferred times are soft guidance, never hard deadlines. Categorize by life purpose (English, Movement, Awareness, Reading, Reflection) rather than rigid hours.
+              Preferred times are soft guidance, never hard deadlines. Categorize by life purpose and priority rather than rigid hours.
             </p>
           </div>
 
@@ -84,10 +84,10 @@ export default function HabitsPage() {
             onClick={handleSeedHabits}
             disabled={seeding}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-50 rounded-xl text-xs font-semibold transition-colors disabled:opacity-50 shadow-2xs flex-shrink-0"
-            title="Idempotently load or update canonical routines without deleting custom routines"
+            title="Idempotently load or update routines without deleting custom routines"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${seeding ? 'animate-spin' : ''}`} />
-            <span>{seeding ? 'Syncing...' : 'Sync Canonical Routines'}</span>
+            <span>{seeding ? 'Syncing...' : 'Sync Routines'}</span>
           </button>
         </div>
 
@@ -99,7 +99,7 @@ export default function HabitsPage() {
             <div className="max-w-sm mx-auto space-y-1.5">
               <h3 className="text-base font-bold text-gray-900">No routines found</h3>
               <p className="text-xs text-gray-500">
-                Load the six canonical personal routines or create your own custom habit.
+                Load recommended foundation routines or create your own custom habit.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-2.5 justify-center items-center">
@@ -108,7 +108,7 @@ export default function HabitsPage() {
                 disabled={seeding}
                 className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-xs sm:text-sm font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 shadow-2xs"
               >
-                {seeding ? 'Loading Canonical Routines...' : 'Load Canonical 6 Routines'}
+                {seeding ? 'Loading Routines...' : 'Load Recommended Routines'}
               </button>
               <button
                 onClick={() => { setEditingHabit(null); setShowModal(true); }}

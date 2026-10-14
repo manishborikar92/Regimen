@@ -96,7 +96,7 @@ export default function TopNav({ title, subtitle }) {
                   </div>
                   <div className="hidden sm:block text-left">
                     <p className="text-xs font-semibold text-gray-900 leading-tight">
-                      {user.displayName || 'Manish'}
+                      {user.displayName || 'User'}
                     </p>
                     <p className="text-2xs text-gray-400 truncate max-w-[120px]">{user.email}</p>
                   </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Trash2, Clock, CheckCircle2, ListChecks, Info } from 'lucide-react';
-import { CATEGORIES, CANONICAL_CATEGORIES } from '@/lib/constants/categories';
+import { CATEGORIES } from '@/lib/constants/categories';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -180,16 +180,9 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
               onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
               className="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
             >
-              <optgroup label="Canonical Life Areas">
-                {CANONICAL_CATEGORIES.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </optgroup>
-              <optgroup label="Legacy Categories">
-                {CATEGORIES.filter(c => !CANONICAL_CATEGORIES.includes(c)).map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </optgroup>
+              {CATEGORIES.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
             </select>
           </div>
 
