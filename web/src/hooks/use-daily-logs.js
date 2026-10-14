@@ -2,34 +2,59 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { onSnapshot } from 'firebase/firestore';
-import { getDailyLogRef, toggleHabitCompletion, fetchHistoricalLogs } from '@/lib/firebase/firestore';
-import { getTodayString } from '@/utils/date-helpers';
+import {
+    getDailyLogRef,
+    toggleHabitCompletion,
+    updateDailyHabitProgress,
+    fetchHistoricalLogs,
+} from '@/lib/firebase/firestore';
+import { getTodayString, getDayOfWeek } from '@/utils/date-helpers';
 
 /**
- * Hook for managing daily logs — toggle completion, fetch history, today's stats.
+ * Hook for managing daily logs — binary toggles, granular progress updates,
+ * and completion statistics that respect planned rest days.
+ * 
  * @param {import('firebase/auth').User | null} user
  * @param {Array} todaysHabits - Today's filtered habits (from useHabits)
  * @returns {Object} Daily log state and actions
  */
-export function useDailyLogs(user, todaysHabits) {
+export function useDailyLogs(user, todaysHabits = []) {
     const [dailyLogs, setDailyLogs] = useState({});
     const [todayLog, setTodayLog] = useState([]);
+    const [todayProgress, setTodayProgress] = useState({});
 
     const today = getTodayString();
+    const currentDow = getDayOfWeek();
 
     // Real-time listener for today's daily log
     useEffect(() => {
-        if (!user) return;
+        if (!user) {
+            queueMicrotask(() => {
+                setTodayLog([]);
+                setTodayProgress({});
+            });
+            return;
+        }
 
         const dailyLogRef = getDailyLogRef(user.uid, today);
 
         const unsubscribe = onSnapshot(dailyLogRef, (docSnap) => {
             if (docSnap.exists()) {
-                const completedIds = docSnap.data().completedHabitIds || [];
+                const data = docSnap.data();
+                const completedIds = data.completedHabitIds || [];
+                const habitProgress = data.habitProgress || {};
                 setTodayLog(completedIds);
-                setDailyLogs(prev => ({ ...prev, [today]: completedIds }));
+                setTodayProgress(habitProgress);
+                setDailyLogs(prev => ({
+                    ...prev,
+                    [today]: {
+                        completedHabitIds: completedIds,
+                        habitProgress,
+                    },
+                }));
             } else {
                 setTodayLog([]);
+                setTodayProgress({});
             }
         }, (err) => {
             console.error('Error listening to daily log:', err);
@@ -58,6 +83,38 @@ export function useDailyLogs(user, todaysHabits) {
         }
     }, [user, today, todayLog]);
 
+    // Update granular progress (workbook sessions, review status, exercise checklists, reading, diary)
+    const updateProgress = useCallback(async (habitId, progressData, isFullyCompleted) => {
+        if (!user) return;
+
+        // Optimistic update
+        setTodayProgress(prev => ({
+            ...prev,
+            [habitId]: {
+                ...(prev[habitId] || {}),
+                ...progressData,
+            },
+        }));
+
+        if (typeof isFullyCompleted === 'boolean') {
+            setTodayLog(prev => {
+                if (isFullyCompleted && !prev.includes(habitId)) {
+                    return [...prev, habitId];
+                }
+                if (!isFullyCompleted && prev.includes(habitId)) {
+                    return prev.filter(id => id !== habitId);
+                }
+                return prev;
+            });
+        }
+
+        try {
+            await updateDailyHabitProgress(user.uid, today, habitId, progressData, isFullyCompleted);
+        } catch (err) {
+            console.error('Error updating habit progress:', err);
+        }
+    }, [user, today]);
+
     // Fetch historical daily logs (for analytics)
     const fetchDailyLogs = useCallback(async () => {
         if (!user) return {};
@@ -72,19 +129,34 @@ export function useDailyLogs(user, todaysHabits) {
         }
     }, [user]);
 
-    // Today's completion stats
+    // Today's completion stats:
+    // Important: Sunday exercise is a planned rest day, so it is excluded from the denominator!
     const todayStats = (() => {
-        const total = todaysHabits.length;
-        const completed = todaysHabits.filter(h => todayLog.includes(h.id)).length;
-        const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-        return { total, completed, percentage };
+        // Exclude planned rest days from the completion denominator
+        const activeRequiredHabits = todaysHabits.filter(h => {
+            const isSundayRest = currentDow === 'Sun' && (h.completionMethod === 'exercise_plan' || h.category === 'Movement & Strength');
+            return !isSundayRest;
+        });
+
+        const total = activeRequiredHabits.length;
+        const completed = activeRequiredHabits.filter(h => todayLog.includes(h.id)).length;
+        const percentage = total > 0 ? Math.round((completed / total) * 100) : 100;
+
+        return {
+            total,
+            completed,
+            percentage,
+            isSunday: currentDow === 'Sun',
+        };
     })();
 
     return {
         dailyLogs,
         todayLog,
+        todayProgress,
         todayStats,
         toggleHabit,
+        updateProgress,
         fetchDailyLogs,
     };
 }

@@ -1,7 +1,14 @@
 {
-  "name": "Regimen - Daily health routine tracker PWA",
-  "short_name": "Regimen",
+  "name": "Vritta — Personal Routine Companion",
+  "short_name": "Vritta",
+  "description": "A calm, flexible personal routine companion for mindful consistency.",
   "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
     {
       "src": "/web-app-manifest-192x192.png",
       "sizes": "192x192",
@@ -15,7 +22,7 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#4A5FFF",
-  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "background_color": "#f8fafc",
   "display": "standalone"
 }

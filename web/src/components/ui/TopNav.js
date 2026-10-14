@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { ChevronDown, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { BRAND } from '@/lib/constants/brand';
 import ConfirmDialog from './ConfirmDialog';
 
 export default function TopNav({ title, subtitle }) {
@@ -13,6 +15,8 @@ export default function TopNav({ title, subtitle }) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [signingIn, setSigningIn] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const displayTitle = title || BRAND.name;
 
   const handleSignIn = async () => {
     setSigningIn(true);
@@ -40,17 +44,35 @@ export default function TopNav({ title, subtitle }) {
 
   return (
     <>
-      <header className="bg-white shadow-sm sticky top-0 z-40">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white shadow-md">
-              <img src="/logo.svg" alt="Regimen Logo" className="w-[18px] h-[18px]" />
+      <header className="bg-white/90 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40">
+        <div className="max-w-2xl mx-auto px-4 py-3 sm:py-3.5 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-indigo-700 flex items-center justify-center text-white shadow-xs p-1.5">
+              <Image
+                src="/logo.svg"
+                alt={BRAND.logoAlt}
+                width={20}
+                height={20}
+                className="w-full h-full"
+                priority
+              />
             </div>
             <div>
-              <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 tracking-tight">
-                {title || 'Regimen'}
-              </h1>
-              {subtitle && <p className="text-xs text-gray-500 font-medium tracking-wide uppercase">{subtitle}</p>}
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900 tracking-tight leading-none">
+                  {displayTitle}
+                </h1>
+                {title && title !== BRAND.name && (
+                  <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 hidden sm:inline-block">
+                    {BRAND.name}
+                  </span>
+                )}
+              </div>
+              {subtitle && (
+                <p className="text-2xs sm:text-xs text-gray-500 font-medium tracking-wide mt-0.5">
+                  {subtitle}
+                </p>
+              )}
             </div>
           </div>
 
@@ -59,25 +81,33 @@ export default function TopNav({ title, subtitle }) {
               <div className="relative">
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center gap-2 hover:bg-gray-50 rounded-lg p-2 transition-colors"
+                  className="flex items-center gap-2 hover:bg-gray-50 rounded-xl p-1.5 transition-colors border border-transparent hover:border-gray-200"
                   aria-expanded={showProfileMenu}
                   aria-label="Profile menu"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={user.photoURL || '/icons/icon-192x192.svg'}
-                    alt={user.displayName || 'User'}
-                    className="w-8 h-8 rounded-full"
-                    referrerPolicy="no-referrer"
-                    width={32}
-                    height={32}
-                  />
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-indigo-100 border border-indigo-200 flex items-center justify-center text-xs font-bold text-indigo-700">
+                    {user.photoURL ? (
+                      <Image
+                        src={user.photoURL}
+                        alt={user.displayName || 'User'}
+                        width={32}
+                        height={32}
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                        unoptimized
+                      />
+                    ) : (
+                      (user.displayName ? user.displayName[0] : 'U')
+                    )}
+                  </div>
                   <div className="hidden sm:block text-left">
-                    <p className="text-sm font-medium text-gray-900">{user.displayName}</p>
-                    <p className="text-xs text-gray-500">{user.email}</p>
+                    <p className="text-xs font-semibold text-gray-900 leading-tight">
+                      {user.displayName || 'Manish'}
+                    </p>
+                    <p className="text-2xs text-gray-400 truncate max-w-[120px]">{user.email}</p>
                   </div>
                   <ChevronDown
-                    className={`w-4 h-4 text-gray-500 transition-transform ${showProfileMenu ? 'rotate-180' : ''}`}
+                    className={`w-3.5 h-3.5 text-gray-400 transition-transform ${showProfileMenu ? 'rotate-180' : ''}`}
                   />
                 </button>
 
@@ -88,22 +118,22 @@ export default function TopNav({ title, subtitle }) {
                       onClick={() => setShowProfileMenu(false)}
                     />
                     <div
-                      className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-40"
+                      className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-1.5 z-40"
                       role="menu"
                     >
-                      <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900">{user.displayName}</p>
-                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      <div className="px-3.5 py-2.5 border-b border-gray-100">
+                        <p className="text-xs font-bold text-gray-900">{user.displayName || 'User'}</p>
+                        <p className="text-2xs text-gray-400 truncate">{user.email}</p>
                       </div>
                       <button
                         onClick={() => {
                           setShowProfileMenu(false);
                           setShowLogoutModal(true);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                        className="w-full text-left px-3.5 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-2"
                         role="menuitem"
                       >
-                        <LogOut className="w-4 h-4" />
+                        <LogOut className="w-3.5 h-3.5" />
                         Sign Out
                       </button>
                     </div>
@@ -114,20 +144,14 @@ export default function TopNav({ title, subtitle }) {
               <button
                 onClick={handleSignIn}
                 disabled={signingIn}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
-                transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                className="flex items-center gap-2 px-3.5 py-1.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 
+                transition-colors disabled:opacity-50 text-xs font-semibold shadow-2xs"
               >
                 {signingIn ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                  <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white/40 border-t-white" />
                 ) : (
-                  <svg className="w-4 h-4" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                    <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                    <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                    <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                  </svg>
+                  <span>Sign In</span>
                 )}
-                {signingIn ? 'Signing in...' : 'Sign In'}
               </button>
             )}
           </div>
@@ -139,7 +163,7 @@ export default function TopNav({ title, subtitle }) {
         onClose={() => setShowLogoutModal(false)}
         onConfirm={handleLogout}
         title="Sign Out?"
-        message="Are you sure you want to sign out? You'll need to sign in again to access your habits."
+        message="Are you sure you want to sign out? Your offline and synced data remains securely saved on your account."
         confirmText="Sign Out"
         isDanger={true}
         isLoading={isLoggingOut}

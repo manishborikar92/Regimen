@@ -1,311 +1,468 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Check } from 'lucide-react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { Check, Calendar, TrendingUp, Sparkles, BookOpen, Activity, Headphones, Moon, Award } from 'lucide-react';
 import { useData } from '@/contexts/DataContext';
 import { TopNav } from '@/components/ui';
 import { getDateString, getDaysAgo, getDayOfWeek, formatDate } from '@/utils/date-helpers';
+import { MOVEMENT_SCHEDULE } from '@/lib/fixtures/exercise-plan';
+import { OSHO_LIBRARY } from '@/lib/fixtures/osho-library';
+import { BRAND } from '@/lib/constants/brand';
+
+// Map day names to Monday-based column index (0=Mon, 6=Sun)
+const DAY_TO_COLUMN = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
 
 export default function AnalyticsPage() {
-    const { habits, dailyLogs, fetchDailyLogs } = useData();
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [viewMode, setViewMode] = useState('calendar');
+  const { habits, dailyLogs, userProfile, fetchDailyLogs } = useData();
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [viewMode, setViewMode] = useState('insights'); // 'insights' | 'calendar'
 
-    // Fetch historical logs for analytics
-    useEffect(() => {
-        fetchDailyLogs(90);
-    }, [fetchDailyLogs]);
+  // Fetch historical logs on mount
+  useEffect(() => {
+    fetchDailyLogs();
+  }, [fetchDailyLogs]);
 
-    // Map day names to Monday-based column index (0=Mon, 6=Sun)
-    const dayToColumn = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
-
-    // Generate last 30 days for calendar view
-    const last30Days = Array.from({ length: 30 }, (_, i) => {
-        const date = getDaysAgo(i);
-        const dow = getDayOfWeek(date);
-        return {
-            date,
-            dateStr: getDateString(date),
-            dayOfWeek: dow,
-            dayNum: date.getDate(),
-            column: dayToColumn[dow],
-        };
+  // Generate last 30 days for calendar view
+  const last30Days = useMemo(() => {
+    return Array.from({ length: 30 }, (_, i) => {
+      const date = getDaysAgo(i);
+      const dow = getDayOfWeek(date);
+      return {
+        date,
+        dateStr: getDateString(date),
+        dayOfWeek: dow,
+        dayNum: date.getDate(),
+        column: DAY_TO_COLUMN[dow],
+      };
     }).reverse();
+  }, []);
 
-    // Compute leading spacer cells so the first day aligns to its weekday column
-    const firstDayColumn = last30Days[0]?.column || 0;
+  const firstDayColumn = last30Days[0]?.column || 0;
 
-    // Calculate completion rate for a specific date
-    const getCompletionRate = (dateStr, dayOfWeek) => {
-        const activeHabits = habits.filter(h => h.frequency?.includes(dayOfWeek));
-        if (activeHabits.length === 0) return null;
+  // Calculate completion rate for a specific date, strictly excluding planned rest days
+  const getDayMetrics = useCallback((dateStr, dayOfWeek) => {
+    const activeHabits = habits.filter(h => {
+      if (!h.frequency || h.frequency.length === 0) return true;
+      return h.frequency.includes(dayOfWeek);
+    });
 
-        const completed = dailyLogs[dateStr]?.length || 0;
-        return Math.round((completed / activeHabits.length) * 100);
+    if (activeHabits.length === 0) {
+      return { rate: null, isAllRest: true, scheduledCount: 0, completedCount: 0 };
+    }
+
+    // Exclude Sunday exercise from required denominator
+    const requiredHabits = activeHabits.filter(h => {
+      const isSundayRest = dayOfWeek === 'Sun' &&
+        (h.completionMethod === 'exercise_plan' || h.category === 'Movement & Strength');
+      return !isSundayRest;
+    });
+
+    if (requiredHabits.length === 0) {
+      return { rate: 100, isAllRest: true, scheduledCount: 0, completedCount: 0 };
+    }
+
+    const logEntry = dailyLogs[dateStr];
+    const completedIds = Array.isArray(logEntry)
+      ? logEntry
+      : (logEntry?.completedHabitIds || []);
+
+    const completedRequired = requiredHabits.filter(h => completedIds.includes(h.id)).length;
+    const rate = Math.round((completedRequired / requiredHabits.length) * 100);
+
+    return {
+      rate,
+      isAllRest: false,
+      scheduledCount: requiredHabits.length,
+      completedCount: completedRequired,
+      isSunday: dayOfWeek === 'Sun',
     };
+  }, [habits, dailyLogs]);
 
-    // Calculate overall stats
-    const calculateStats = () => {
-        let totalDays = 0;
-        let completedDays = 0;
-        let totalHabitsCompleted = 0;
-        let perfectDays = 0;
-        let currentStreak = 0;
-        let longestStreak = 0;
-        let tempStreak = 0;
+  // Calculate overall statistics
+  const stats = useMemo(() => {
+    if (!habits || habits.length === 0) return null;
 
-        for (let i = 0; i < 30; i++) {
-            const date = getDaysAgo(i);
-            const dateStr = getDateString(date);
-            const dayOfWeek = getDayOfWeek(date);
-            const activeHabits = habits.filter(h => h.frequency?.includes(dayOfWeek));
+    let totalActiveDays = 0;
+    let completedDays = 0;
+    let totalCompletions = 0;
+    let workbookSessionsTotal = 0;
+    let workoutDaysCompleted = 0;
+    let walkDaysCompleted = 0;
+    let oshoListeningDays = 0;
+    let readingDays = 0;
 
-            if (activeHabits.length === 0) continue;
+    for (let i = 0; i < 30; i++) {
+      const date = getDaysAgo(i);
+      const dateStr = getDateString(date);
+      const dow = getDayOfWeek(date);
 
-            totalDays++;
-            const completed = dailyLogs[dateStr]?.length || 0;
-            totalHabitsCompleted += completed;
+      const metrics = getDayMetrics(dateStr, dow);
+      if (metrics.scheduledCount > 0) {
+        totalActiveDays++;
+        if (metrics.rate >= 50) completedDays++;
+        totalCompletions += metrics.completedCount;
+      }
 
-            const rate = completed / activeHabits.length;
-            if (rate >= 0.5) {
-                completedDays++;
-                tempStreak++;
-                if (i === 0 || currentStreak > 0) currentStreak = tempStreak;
-            } else {
-                tempStreak = 0;
-                if (i === 0) currentStreak = 0;
-            }
+      // Check specific domain completions from log
+      const logEntry = dailyLogs[dateStr];
+      const completedIds = Array.isArray(logEntry) ? logEntry : (logEntry?.completedHabitIds || []);
+      const habitProgress = (!Array.isArray(logEntry) && logEntry?.habitProgress) || {};
 
-            if (rate === 1) perfectDays++;
-            longestStreak = Math.max(longestStreak, tempStreak);
+      habits.forEach(h => {
+        const isDone = completedIds.includes(h.id);
+        const prog = habitProgress[h.id] || {};
+
+        if (h.category === 'English Learning' || h.completionMethod === 'workbook_sessions') {
+          workbookSessionsTotal += prog.sessionsCompleted || (isDone ? 2 : 0);
         }
+        if (h.category === 'Movement & Strength' || h.completionMethod === 'exercise_plan') {
+          if (isDone) {
+            if (dow === 'Mon' || dow === 'Wed' || dow === 'Fri') workoutDaysCompleted++;
+            if (dow === 'Tue' || dow === 'Thu' || dow === 'Sat') walkDaysCompleted++;
+          }
+        }
+        if (h.category === 'Listening & Awareness' || h.completionMethod === 'osho_listening') {
+          if (isDone) oshoListeningDays++;
+        }
+        if (h.category === 'Reading' || h.completionMethod === 'reading_duration') {
+          if (isDone) readingDays++;
+        }
+      });
+    }
 
+    const avgRate = totalActiveDays > 0 ? Math.round((completedDays / totalActiveDays) * 100) : 0;
+
+    return {
+      totalActiveDays,
+      completedDays,
+      totalCompletions,
+      workbookSessionsTotal,
+      workoutDaysCompleted,
+      walkDaysCompleted,
+      oshoListeningDays,
+      readingDays,
+      avgRate,
+    };
+  }, [habits, dailyLogs, getDayMetrics]);
+
+  // Selected date details
+  const selectedDateHabits = useMemo(() => {
+    if (!selectedDate) return [];
+    const dow = getDayOfWeek(selectedDate);
+    const logEntry = dailyLogs[selectedDate];
+    const completedIds = Array.isArray(logEntry) ? logEntry : (logEntry?.completedHabitIds || []);
+
+    return habits
+      .filter(h => !h.frequency || h.frequency.includes(dow))
+      .map(h => {
+        const isSundayRest = dow === 'Sun' &&
+          (h.completionMethod === 'exercise_plan' || h.category === 'Movement & Strength');
         return {
-            totalDays,
-            completedDays,
-            totalHabitsCompleted,
-            perfectDays,
-            currentStreak,
-            longestStreak,
-            avgCompletion: totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0,
+          ...h,
+          isCompleted: completedIds.includes(h.id),
+          isSundayRest,
         };
-    };
+      });
+  }, [selectedDate, habits, dailyLogs]);
 
-    const stats = habits.length > 0 ? calculateStats() : null;
+  return (
+    <>
+      <TopNav title="Insights & Consistency" subtitle="Supportive Rhythm Tracking" />
 
-    // Get details for selected date
-    const getDateDetails = (dateStr) => {
-        const date = new Date(dateStr);
-        const dayOfWeek = getDayOfWeek(date);
-        const activeHabits = habits.filter(h => h.frequency?.includes(dayOfWeek));
-        const completedIds = dailyLogs[dateStr] || [];
+      {/* Mode Switcher */}
+      <div className="max-w-2xl mx-auto px-4 pt-5 sm:pt-6">
+        <div className="flex bg-gray-100 p-1 rounded-xl">
+          <button
+            type="button"
+            onClick={() => setViewMode('insights')}
+            className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
+              viewMode === 'insights'
+                ? 'bg-white text-indigo-700 shadow-2xs'
+                : 'text-gray-500 hover:text-gray-900'
+            }`}
+          >
+            Supportive Insights
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('calendar')}
+            className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
+              viewMode === 'calendar'
+                ? 'bg-white text-indigo-700 shadow-2xs'
+                : 'text-gray-500 hover:text-gray-900'
+            }`}
+          >
+            30-Day Rhythm Map
+          </button>
+        </div>
+      </div>
 
-        return activeHabits.map(habit => ({
-            ...habit,
-            completed: completedIds.includes(habit.id)
-        }));
-    };
-
-    return (
-        <>
-            <TopNav title="Analytics" />
-
-            {/* View Mode Toggle */}
-            <div className="bg-transparent">
-                <div className="max-w-2xl mx-auto px-4 pt-6">
-                    <div className="flex justify-between gap-3">
-                        <button
-                            onClick={() => setViewMode('calendar')}
-                            className={`flex-1 px-6 py-2.5 text-sm font-medium transition-all ${viewMode === 'calendar'
-                                ? 'bg-blue-500 text-white shadow-md'
-                                : 'bg-white/50 text-gray-600 hover:bg-white/80 border border-gray-200'
-                                }`}
-                            style={{ borderRadius: '50px' }}
-                        >
-                            Calendar
-                        </button>
-                        <button
-                            onClick={() => setViewMode('stats')}
-                            className={`flex-1 px-6 py-2.5 text-sm font-medium transition-all ${viewMode === 'stats'
-                                ? 'bg-blue-500 text-white shadow-md'
-                                : 'bg-white/50 text-gray-600 hover:bg-white/80 border border-gray-200'
-                                }`}
-                            style={{ borderRadius: '50px' }}
-                        >
-                            Statistics
-                        </button>
-                    </div>
+      <main className="max-w-2xl mx-auto px-4 py-5 sm:py-6 space-y-5">
+        {/* VIEW 1: Insights & Domain Progress */}
+        {viewMode === 'insights' && stats && (
+          <div className="space-y-4">
+            {/* High-level Rhythm Cards */}
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-2xs space-y-1">
+                <span className="text-2xs font-bold text-indigo-500 uppercase tracking-wider block">
+                  30-Day Consistency
+                </span>
+                <div className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+                  {stats.avgRate}%
                 </div>
+                <p className="text-2xs text-gray-400">
+                  {stats.completedDays} of {stats.totalActiveDays} scheduled days fulfilled
+                </p>
+              </div>
+
+              <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-2xs space-y-1">
+                <span className="text-2xs font-bold text-teal-500 uppercase tracking-wider block">
+                  Total Activities Done
+                </span>
+                <div className="text-2xl sm:text-3xl font-extrabold text-teal-600">
+                  {stats.totalCompletions}
+                </div>
+                <p className="text-2xs text-gray-400">Activities completed in 30 days</p>
+              </div>
             </div>
 
-            <main className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-                {viewMode === 'stats' && stats && (
-                    <>
-                        {/* Stats Grid */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-white rounded-xl p-4 shadow-sm">
-                                <div className="text-3xl font-bold text-orange-500">🔥 {stats.currentStreak}</div>
-                                <div className="text-sm text-gray-500 mt-1">Current Streak</div>
-                            </div>
-                            <div className="bg-white rounded-xl p-4 shadow-sm">
-                                <div className="text-3xl font-bold text-purple-500">{stats.longestStreak}</div>
-                                <div className="text-sm text-gray-500 mt-1">Longest Streak</div>
-                            </div>
-                            <div className="bg-white rounded-xl p-4 shadow-sm">
-                                <div className="text-3xl font-bold text-blue-500">{stats.avgCompletion}%</div>
-                                <div className="text-sm text-gray-500 mt-1">Avg Completion</div>
-                            </div>
-                            <div className="bg-white rounded-xl p-4 shadow-sm">
-                                <div className="text-3xl font-bold text-green-500">{stats.perfectDays}</div>
-                                <div className="text-sm text-gray-500 mt-1">Perfect Days</div>
-                            </div>
+            {/* Core Routine Deep Dives */}
+            <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-2xs space-y-4">
+              <h3 className="text-xs sm:text-sm font-bold text-gray-900 flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-indigo-600" />
+                Domain Consistency Highlights
+              </h3>
+
+              <div className="space-y-3">
+                {/* 1. Workbook Sessions */}
+                <div className="p-3 bg-indigo-50/50 rounded-xl border border-indigo-100/60 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
+                      <BookOpen className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-gray-900">Word Power Made Easy</p>
+                      <p className="text-2xs text-gray-500">English vocabulary workbook sessions</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm font-extrabold text-indigo-900">
+                      {stats.workbookSessionsTotal}
+                    </span>
+                    <span className="text-2xs text-indigo-700 block">sessions logged</span>
+                  </div>
+                </div>
+
+                {/* 2. Movement & Rest Routine */}
+                <div className="p-3 bg-teal-50/50 rounded-xl border border-teal-100/60 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center font-bold">
+                      <Activity className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-gray-900">12-Week Movement Plan</p>
+                      <p className="text-2xs text-gray-500">
+                        {stats.workoutDaysCompleted} strength workouts • {stats.walkDaysCompleted} walk days
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 border border-teal-200">
+                      Sunday Rest Protected
+                    </span>
+                  </div>
+                </div>
+
+                {/* 3. Osho Listening */}
+                <div className="p-3 bg-amber-50/50 rounded-xl border border-amber-100/60 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
+                      <Headphones className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-gray-900">Osho Listening Habit</p>
+                      <p className="text-2xs text-gray-500">Daily contemplative listening</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm font-extrabold text-amber-900">{stats.oshoListeningDays}</span>
+                    <span className="text-2xs text-amber-700 block">days listened</span>
+                  </div>
+                </div>
+
+                {/* 4. Bedtime Reading */}
+                <div className="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100/60 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                      <Moon className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-gray-900">Bedtime Reading</p>
+                      <p className="text-2xs text-gray-500">30 minutes before sleep</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm font-extrabold text-emerald-900">{stats.readingDays}</span>
+                    <span className="text-2xs text-emerald-700 block">evenings read</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Non-Punitive Philosophy Callout */}
+            <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 text-xs text-gray-500 space-y-1.5 leading-relaxed">
+              <p className="font-semibold text-gray-800">Supportive Analytics Philosophy:</p>
+              <p>
+                Metrics are calculated only on days when activities are scheduled. Sunday movement is an intentional planned rest day and is excluded from the failure denominator. The goal is long-term sustainable rhythm, not rigid perfection.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* VIEW 2: Calendar 30-Day Map */}
+        {viewMode === 'calendar' && (
+          <div className="space-y-4">
+            <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-2xs">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs sm:text-sm font-bold text-gray-900 flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4 text-indigo-600" />
+                  Last 30 Days Activity Map
+                </h3>
+                <span className="text-2xs text-gray-400">Tap a date to inspect activities</span>
+              </div>
+
+              {/* Day Headers (Mon-Sun) */}
+              <div className="grid grid-cols-7 gap-1.5 text-center text-2xs font-bold text-gray-400 py-1 border-b border-gray-100 mb-2">
+                {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, idx) => (
+                  <div key={idx}>{d}</div>
+                ))}
+              </div>
+
+              {/* Day Cells Grid */}
+              <div className="grid grid-cols-7 gap-1.5">
+                {/* Spacers for start of calendar offset */}
+                {Array.from({ length: firstDayColumn }, (_, i) => (
+                  <div key={`spacer-${i}`} />
+                ))}
+
+                {last30Days.map(({ dateStr, dayOfWeek, dayNum }) => {
+                  const metrics = getDayMetrics(dateStr, dayOfWeek);
+                  const isSelected = selectedDate === dateStr;
+
+                  // Calm, supportive color mapping (NO aggressive red!)
+                  let cellStyle = 'bg-gray-100 text-gray-600';
+                  if (metrics.isSunday) {
+                    cellStyle = metrics.rate === 100
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-purple-100 text-purple-800 border border-purple-200';
+                  } else if (metrics.rate === 100) {
+                    cellStyle = 'bg-emerald-500 text-white shadow-2xs';
+                  } else if (metrics.rate >= 50) {
+                    cellStyle = 'bg-teal-400 text-white';
+                  } else if (metrics.rate > 0) {
+                    cellStyle = 'bg-amber-300 text-gray-900';
+                  } else {
+                    cellStyle = 'bg-gray-100 text-gray-400';
+                  }
+
+                  return (
+                    <button
+                      key={dateStr}
+                      type="button"
+                      onClick={() => setSelectedDate(isSelected ? null : dateStr)}
+                      className={`aspect-square rounded-xl flex flex-col items-center justify-center text-xs font-bold transition-all ${cellStyle} ${
+                        isSelected ? 'ring-2 ring-indigo-600 ring-offset-2 scale-105' : 'hover:opacity-85'
+                      }`}
+                      aria-label={`${dateStr}: ${metrics.rate}% completed`}
+                    >
+                      <span>{dayNum}</span>
+                      {metrics.isSunday && (
+                        <span className="text-3xs font-normal opacity-80 leading-none mt-0.5">rest</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Legend */}
+              <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-4 pt-3 border-t border-gray-100 text-2xs text-gray-500">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-emerald-500" />
+                  <span>100% Complete</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-teal-400" />
+                  <span>50%+ Fulfilled</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-purple-100 border border-purple-200" />
+                  <span>Sunday Rest Day</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-gray-100" />
+                  <span>Unscheduled / Open</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Selected Date Inspector */}
+            {selectedDate && (
+              <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-2xs space-y-3 animate-in fade-in duration-200">
+                <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+                  <h4 className="text-xs sm:text-sm font-bold text-gray-900">
+                    {formatDate(selectedDate)}
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDate(null)}
+                    className="text-xs text-gray-400 hover:text-gray-600"
+                  >
+                    Close
+                  </button>
+                </div>
+
+                <div className="space-y-2">
+                  {selectedDateHabits.map(habit => (
+                    <div
+                      key={habit.id}
+                      className={`p-2.5 rounded-xl border flex items-center justify-between text-xs ${
+                        habit.isSundayRest
+                          ? 'bg-purple-50/60 border-purple-100 text-purple-900'
+                          : habit.isCompleted
+                          ? 'bg-emerald-50/50 border-emerald-100 text-emerald-900'
+                          : 'bg-gray-50 border-gray-200 text-gray-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                            habit.isSundayRest
+                              ? 'bg-purple-200 text-purple-800'
+                              : habit.isCompleted
+                              ? 'bg-emerald-500 text-white'
+                              : 'bg-gray-200 text-gray-400'
+                          }`}
+                        >
+                          {habit.isSundayRest ? 'R' : habit.isCompleted ? <Check className="w-3 h-3 stroke-[3]" /> : '–'}
                         </div>
+                        <span className="font-semibold">{habit.title}</span>
+                      </div>
 
-                        {/* Summary */}
-                        <div className="bg-white rounded-xl p-4 shadow-sm">
-                            <h3 className="font-semibold text-gray-900 mb-3">Last 30 Days Summary</h3>
-                            <div className="space-y-2 text-sm">
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">Days with 50%+ completion</span>
-                                    <span className="font-medium">{stats.completedDays} / {stats.totalDays}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">Total habits completed</span>
-                                    <span className="font-medium">{stats.totalHabitsCompleted}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Per-Habit Stats */}
-                        <div className="bg-white rounded-xl p-4 shadow-sm">
-                            <h3 className="font-semibold text-gray-900 mb-3">Habit Performance</h3>
-                            <div className="space-y-3">
-                                {habits.map(habit => {
-                                    let completed = 0;
-                                    let total = 0;
-                                    for (let i = 0; i < 30; i++) {
-                                        const date = getDaysAgo(i);
-                                        const dateStr = getDateString(date);
-                                        const dayOfWeek = getDayOfWeek(date);
-                                        if (habit.frequency?.includes(dayOfWeek)) {
-                                            total++;
-                                            if (dailyLogs[dateStr]?.includes(habit.id)) completed++;
-                                        }
-                                    }
-                                    const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
-
-                                    return (
-                                        <div key={habit.id}>
-                                            <div className="flex justify-between text-sm mb-1">
-                                                <span className="text-gray-700 truncate flex-1">{habit.title}</span>
-                                                <span className="text-gray-500 ml-2">{completed}/{total} ({rate}%)</span>
-                                            </div>
-                                            <div className="w-full bg-gray-200 rounded-full h-2">
-                                                <div
-                                                    className="bg-blue-500 h-2 rounded-full transition-all"
-                                                    style={{ width: `${rate}%` }}
-                                                />
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    </>
-                )}
-
-                {viewMode === 'calendar' && (
-                    <>
-                        {/* Calendar Grid */}
-                        <div className="bg-white rounded-xl p-4 shadow-sm">
-                            <h3 className="font-semibold text-gray-900 mb-3">Last 30 Days</h3>
-                            <div className="grid grid-cols-7 gap-2">
-                                {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
-                                    <div key={i} className="text-center text-xs text-gray-400 font-medium py-1">{d}</div>
-                                ))}
-                                {/* Empty spacers so the first day aligns to its weekday column */}
-                                {Array.from({ length: firstDayColumn }, (_, i) => (
-                                    <div key={`spacer-${i}`} />
-                                ))}
-                                {last30Days.map(({ dateStr, dayOfWeek, dayNum }) => {
-                                    const rate = getCompletionRate(dateStr, dayOfWeek);
-                                    const isSelected = selectedDate === dateStr;
-
-                                    let bgColor = 'bg-gray-100';
-                                    if (rate === null) bgColor = 'bg-gray-50';
-                                    else if (rate === 100) bgColor = 'bg-green-500';
-                                    else if (rate >= 75) bgColor = 'bg-green-400';
-                                    else if (rate >= 50) bgColor = 'bg-yellow-400';
-                                    else if (rate > 0) bgColor = 'bg-orange-400';
-                                    else bgColor = 'bg-red-400';
-
-                                    return (
-                                        <button
-                                            key={dateStr}
-                                            onClick={() => setSelectedDate(isSelected ? null : dateStr)}
-                                            className={`aspect-square rounded-lg flex items-center justify-center text-sm font-medium transition-all
-                        ${rate === null ? 'text-gray-300' : 'text-white'}
-                        ${bgColor}
-                        ${isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : ''}
-                        hover:opacity-80`}
-                                        >
-                                            {dayNum}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                            <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-500">
-                                <div className="flex items-center gap-1">
-                                    <div className="w-3 h-3 rounded bg-red-400"></div>
-                                    <span>0%</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <div className="w-3 h-3 rounded bg-yellow-400"></div>
-                                    <span>50%+</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <div className="w-3 h-3 rounded bg-green-500"></div>
-                                    <span>100%</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Selected Date Details */}
-                        {selectedDate && (
-                            <div className="bg-white rounded-xl p-4 shadow-sm">
-                                <h3 className="font-semibold text-gray-900 mb-3">
-                                    {formatDate(new Date(selectedDate))}
-                                </h3>
-                                <div className="space-y-2">
-                                    {getDateDetails(selectedDate).map(habit => (
-                                        <div
-                                            key={habit.id}
-                                            className={`flex items-center gap-3 p-2 rounded-lg ${habit.completed ? 'bg-green-50' : 'bg-gray-50'
-                                                }`}
-                                        >
-                                            <div className={`w-5 h-5 rounded-full flex items-center justify-center ${habit.completed ? 'bg-green-500 text-white' : 'bg-gray-300'
-                                                }`}>
-                                                {habit.completed && (
-                                                    <Check className="w-3 h-3" strokeWidth={3} />
-                                                )}
-                                            </div>
-                                            <div className="flex-1">
-                                                <span className={`text-sm ${habit.completed ? 'text-green-700' : 'text-gray-600'}`}>
-                                                    {habit.title}
-                                                </span>
-                                            </div>
-                                            <span className="text-xs text-gray-400">{habit.time}</span>
-                                        </div>
-                                    ))}
-                                    {getDateDetails(selectedDate).length === 0 && (
-                                        <p className="text-sm text-gray-500 text-center py-4">No habits scheduled for this day</p>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </>
-                )}
-            </main>
-        </>
-    );
+                      <span className="text-2xs opacity-80">
+                        {habit.isSundayRest
+                          ? 'Planned Rest'
+                          : habit.isCompleted
+                          ? 'Completed'
+                          : 'Not logged'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+    </>
+  );
 }

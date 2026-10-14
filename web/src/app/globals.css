@@ -1,37 +1,44 @@
 @import "tailwindcss";
 
 /* ========================================
-   Design Tokens — Regimen Design System
+   Design Tokens — Vritta Design System
    ======================================== */
 
 :root {
-  /* Colors — Primary */
-  --color-bg-primary: #f9fafb;
+  /* Colors — Primary Surfaces */
+  --color-bg-primary: #f8fafc;
   --color-bg-secondary: #ffffff;
-  --color-bg-tertiary: #f3f4f6;
-  --color-text-primary: #111827;
-  --color-text-secondary: #6b7280;
-  --color-text-muted: #9ca3af;
+  --color-bg-tertiary: #f1f5f9;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94a3b8;
 
-  /* Colors — Accent */
-  --color-accent: #3b82f6;
-  --color-accent-hover: #2563eb;
-  --color-accent-light: #dbeafe;
+  /* Colors — Accent (Warm Indigo) */
+  --color-accent: #4f46e5;
+  --color-accent-hover: #4338ca;
+  --color-accent-light: #e0e7ff;
 
   /* Colors — Semantic */
-  --color-success: #22c55e;
-  --color-success-light: #dcfce7;
-  --color-warning: #eab308;
-  --color-warning-light: #fef9c3;
-  --color-error: #ef4444;
-  --color-error-light: #fef2f2;
-  --color-streak: #f97316;
+  --color-success: #059669;
+  --color-success-light: #d1fae5;
+  --color-warning: #d97706;
+  --color-warning-light: #fef3c7;
+  --color-error: #e11d48;
+  --color-error-light: #ffe4e6;
+  --color-streak: #6366f1;
 
-  /* Colors — Category */
-  --color-category-movement: #3b82f6;
-  --color-category-nutrition: #22c55e;
-  --color-category-recovery: #a855f7;
-  --color-category-schedule: #6b7280;
+  /* Colors — Canonical Categories */
+  --color-category-english: #4f46e5;
+  --color-category-movement: #0d9488;
+  --color-category-listening: #d97706;
+  --color-category-reading: #059669;
+  --color-category-communication: #0284c7;
+  --color-category-reflection: #e11d48;
+
+  /* Colors — Legacy Categories */
+  --color-category-schedule: #64748b;
+  --color-category-nutrition: #16a34a;
+  --color-category-recovery: #9333ea;
 
   /* Layout */
   --max-content-width: 42rem;
@@ -45,14 +52,17 @@
   --transition-slow: 300ms ease;
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-2xs: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-xs: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+  --shadow-sm: 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
 
   /* Border Radius */
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
   --radius-full: 9999px;
 }
 
@@ -60,7 +70,7 @@
    Global Resets & Base Styles
    ======================================== */
 
-/* Hide scrollbar but still allow scrolling */
+/* Hide scrollbar while preserving scrolling */
 * {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -70,20 +80,20 @@
   display: none;
 }
 
-/* Smooth focus styles */
+/* Accessible focus outline */
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
 
-/* Better text selection */
+/* Selection */
 ::selection {
   background-color: var(--color-accent-light);
   color: var(--color-text-primary);
 }
 
-/* Prevent text size adjustment on orientation change (iOS) */
+/* Prevent text zoom inflation on orientation change */
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -92,4 +102,5 @@ html {
 body {
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
+  min-height: 100vh;
 }

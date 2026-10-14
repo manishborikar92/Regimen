@@ -2,11 +2,18 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { onSnapshot } from 'firebase/firestore';
-import { getHabitsQuery, createHabit, updateHabitDoc, deleteHabitDoc, seedHabitsForUser } from '@/lib/firebase/firestore';
-import { getTodayString, getDayOfWeek } from '@/utils/date-helpers';
+import {
+    getHabitsQuery,
+    createHabit,
+    updateHabitDoc,
+    deleteHabitDoc,
+    seedHabitsForUser,
+} from '@/lib/firebase/firestore';
+import { CANONICAL_ROUTINES } from '@/lib/seed-data';
+import { getDayOfWeek } from '@/utils/date-helpers';
 
 /**
- * Hook for managing habits — CRUD operations and real-time sync.
+ * Hook for managing habits — CRUD operations, real-time sync, and idempotent seeding.
  * @param {import('firebase/auth').User | null} user
  * @returns {Object} Habits state and mutation functions
  */
@@ -36,7 +43,8 @@ export function useHabits(user) {
                 id: doc.id,
                 ...doc.data()
             }));
-            habitsData.sort((a, b) => a.order - b.order);
+            // Sort primarily by order, then by title
+            habitsData.sort((a, b) => (a.order || 99) - (b.order || 99));
             setHabits(habitsData);
             setLoading(false);
         }, (err) => {
@@ -48,8 +56,11 @@ export function useHabits(user) {
         return () => unsubscribe();
     }, [user]);
 
-    // Today's habits filtered by day of week
-    const todaysHabits = habits.filter(habit => habit.frequency?.includes(dayOfWeek));
+    // Today's habits filtered by active day of week (or everyday if frequency not set)
+    const todaysHabits = habits.filter(habit => {
+        if (!habit.frequency || habit.frequency.length === 0) return true;
+        return habit.frequency.includes(dayOfWeek);
+    });
 
     // Add a new habit
     const addHabit = useCallback(async (habitData) => {
@@ -69,14 +80,11 @@ export function useHabits(user) {
         return deleteHabitDoc(habitId);
     }, [user]);
 
-    // Seed sample habits
-    const seedHabits = useCallback(async (seedData) => {
+    // Seed or update canonical habits (idempotent, safe to rerun anytime)
+    const seedHabits = useCallback(async (seedData = CANONICAL_ROUTINES) => {
         if (!user) return;
-        if (habits.length > 0) {
-            throw new Error('You already have habits! Delete them first if you want to re-seed.');
-        }
         return seedHabitsForUser(user.uid, seedData);
-    }, [user, habits.length]);
+    }, [user]);
 
     return {
         habits,

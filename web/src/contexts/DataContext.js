@@ -1,24 +1,26 @@
 'use client';
 
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHabits } from '@/hooks/use-habits';
 import { useDailyLogs } from '@/hooks/use-daily-logs';
 import { useStreak } from '@/hooks/use-streak';
+import { fetchUserProfile, saveUserProfile } from '@/lib/firebase/firestore';
 
 const DataContext = createContext({});
 
 /**
- * DataProvider composes domain-specific hooks into a single context.
- * Each hook owns its own slice of state and Firestore listeners.
+ * DataProvider composes domain-specific hooks and profile state into a single context.
+ * Provides both binary toggles and rich, activity-specific progress tracking.
  */
 export function DataProvider({ children }) {
   const { user } = useAuth();
+  const [userProfile, setUserProfile] = useState(null);
 
   const {
     habits,
     todaysHabits,
-    loading,
+    loading: habitsLoading,
     error,
     addHabit,
     updateHabit,
@@ -29,19 +31,49 @@ export function DataProvider({ children }) {
   const {
     dailyLogs,
     todayLog,
+    todayProgress,
     todayStats,
     toggleHabit,
+    updateProgress,
     fetchDailyLogs,
   } = useDailyLogs(user, todaysHabits);
 
   const streak = useStreak(habits, dailyLogs);
+
+  // Fetch long-term user profile & preferences (e.g. 12-week exercise plan, Osho series)
+  useEffect(() => {
+    if (!user) {
+      queueMicrotask(() => setUserProfile(null));
+      return;
+    }
+
+    let isMounted = true;
+    fetchUserProfile(user.uid).then(profile => {
+      if (isMounted && profile) {
+        setUserProfile(profile);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
+
+  // Save profile updates (e.g. activating exercise plan or updating series talk count)
+  const updateProfile = useCallback(async (data) => {
+    if (!user) return;
+    setUserProfile(prev => ({ ...(prev || {}), ...data }));
+    return saveUserProfile(user.uid, data);
+  }, [user]);
 
   const value = {
     // State
     habits,
     dailyLogs,
     todayLog,
-    loading,
+    todayProgress,
+    userProfile,
+    loading: habitsLoading,
     error,
     // Computed
     todaysHabits,
@@ -49,6 +81,8 @@ export function DataProvider({ children }) {
     streak,
     // Actions
     toggleHabit,
+    updateProgress,
+    updateProfile,
     addHabit,
     updateHabit,
     deleteHabit,
