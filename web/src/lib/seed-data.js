@@ -1,163 +1,159 @@
-export const seedHabits = [
+/**
+ * Foundation Starter Routines for Vritta (Client-Safe).
+ * High-utility, general wellness, focus, and reflection routines suitable for any user.
+ * 
+ * Contains zero proprietary personal book titles, exercise protocols, or private audio catalogs.
+ */
+
+const ALL_WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const WORKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+
+export const DEFAULT_ROUTINES = [
+  // 1. Morning Hydration & Mindfulness
   {
-    title: "Wake Up & Hydrate",
-    time: "08:30 AM",
-    category: "Schedule",
-    instructions: "Immediately consume 500ml water upon waking. Hydration kickstarts metabolism and cognitive function.",
-    checklistItems: [],
-    frequency: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    order: 1
-  },
-  {
-    title: "Sunlight Exposure",
-    time: "08:45 AM",
-    category: "Recovery",
-    instructions: "15 minutes of direct sunlight for Vitamin D synthesis (bone health & mood regulation). Go outside or stand by a sunny window.",
-    checklistItems: [],
-    frequency: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    order: 2
-  },
-  {
-    title: "Morning Hygiene",
-    time: "09:00 AM",
-    category: "Schedule",
-    instructions: "Bathroom routine and oral care. Maintain consistency for circadian rhythm.",
-    checklistItems: [],
-    frequency: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    order: 3
-  },
-  {
-    title: "Morning Posture & Voice Training",
-    time: "09:30 AM",
-    category: "Movement",
-    instructions: "Duration: 30 minutes. Goals: Open chest cavity, correct spinal alignment, activate resonant voice production.\n\nCore Principles:\n• Always perform stretching before strengthening\n• Focus on diaphragmatic breathing (belly expansion)\n• Never strain throat or vocal cords\n• Sharp pain means stop immediately",
+    stableKey: 'routine_hydration_mindfulness',
+    title: 'Morning Hydration & Mindfulness',
+    category: 'Reflection',
+    completionMethod: 'simple',
+    timingType: 'preferred_period',
+    preferredPeriod: 'Morning',
+    time: 'Morning',
+    frequency: [...ALL_WEEKDAYS],
+    order: 1,
+    isSystemSeed: true,
+    seedOrigin: 'foundation_preset',
+    metadata: {
+      targetGlassCount: 2,
+      mindfulnessMinutes: 5,
+    },
+    instructions:
+      'Begin your morning with a tall glass of fresh water and 5 minutes of quiet, centered breathing before engaging with digital screens or work.',
     checklistItems: [
-      { label: "Chin Tucks (10 Reps) - Sit upright, retract chin posteriorly, hold 3s" },
-      { label: "Chair Extensions (Hold 30s) - Kneel with elbows on chair, lower head between arms" },
-      { label: "Shoulder Extensions (Hold 30s) - Hands behind torso, slide hips forward" },
-      { label: "Prone Back Rotations (10 Reps) - Lie face-down, rotate arms in arcs" },
-      { label: "Wall Angels (10 Reps) - Back against wall, slide arms up/down slowly" },
-      { label: "Belly Balloon Breathing (1 min) - Hand on abdomen, inhale expanding belly, exhale 'Shhh'" },
-      { label: "Lip Trills (1 min) - Motorboat sound with relaxed lips, vary pitch high to low" },
-      { label: "Chest Resonance Hum (1 min) - Hand on chest, hum low 'Mmmm', feel vibration" },
-      { label: "Articulation Drill (2 min) - Pen between teeth, read aloud, then repeat without pen" }
+      { label: 'Drink 1-2 glasses of water' },
+      { label: '5 minutes of quiet breathing or gentle morning stretch' },
     ],
-    frequency: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-    order: 4
   },
+
+  // 2. Daily Physical Movement
   {
-    title: "Breakfast: Chunky Monkey Shake",
-    time: "10:00 AM",
-    category: "Nutrition",
-    instructions: "High-calorie, nutrient-dense meal for healthy weight gain and sustained energy.\n\nIngredients:\n• 2 ripe bananas (spotted for higher sugar)\n• 250ml full-cream milk (high fat)\n• 2 tbsp peanut butter (primary calorie source)\n• 1 tbsp honey\n\nBlend until smooth. Consume immediately.\n\n*Rule: Never Skip Breakfast.*",
-    checklistItems: [],
-    frequency: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    order: 5
-  },
-  {
-    title: "Meal Preparation",
-    time: "10:15 AM",
-    category: "Schedule",
-    instructions: "Prepare lunch and dinner (batch cooking recommended). Cook extra portions to simplify dinner preparation. Utilize this 2-hour block efficiently.",
-    checklistItems: [],
-    frequency: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    order: 6
-  },
-  {
-    title: "Lunch: Solid Meal",
-    time: "12:15 PM",
-    category: "Nutrition",
-    instructions: "Solid meal: Rice/Roti + Protein source + Curd (yogurt). Balanced macros for sustained energy throughout the afternoon.",
-    checklistItems: [],
-    frequency: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    order: 7
-  },
-  {
-    title: "Rest Period",
-    time: "01:15 PM",
-    category: "Recovery",
-    instructions: "Relaxation and buffer time before work. Allow digestion. Light activity only - no intense exercise or heavy mental work.",
-    checklistItems: [],
-    frequency: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    order: 8
-  },
-  {
-    title: "Work & Skill Development",
-    time: "02:00 PM",
-    category: "Schedule",
-    instructions: "Professional responsibilities and personal growth activities. Deep work block until 8 PM. Focus on high-priority tasks during peak afternoon energy.",
-    checklistItems: [],
-    frequency: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-    order: 9
-  },
-  {
-    title: "Afternoon Snack",
-    time: "06:00 PM",
-    category: "Nutrition",
-    instructions: "Quick nutrition to maintain energy levels. Options: nuts, boiled eggs, or fruit. Keep it light but nutritious.",
-    checklistItems: [],
-    frequency: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    order: 10
-  },
-  {
-    title: "Evening Lower Body Routine",
-    time: "08:00 PM",
-    category: "Movement",
-    instructions: "Duration: 30 minutes. Goals: Correct anterior pelvic tilt ('duck butt'), reduce hip flexor tightness, improve leg flexibility.\n\nFollow prescribed order exactly. Perform stretching before strengthening.",
+    stableKey: 'routine_physical_movement',
+    title: 'Daily Physical Movement',
+    category: 'Movement & Strength',
+    completionMethod: 'simple',
+    timingType: 'preferred_period',
+    preferredPeriod: 'Afternoon',
+    time: 'Afternoon',
+    frequency: [...ALL_WEEKDAYS],
+    order: 2,
+    isSystemSeed: true,
+    seedOrigin: 'foundation_preset',
+    metadata: {
+      targetDurationMinutes: 30,
+    },
+    instructions:
+      'Dedicate 20 to 30 minutes to intentional movement: an outdoor walk, bodyweight mobility exercises, yoga, or functional conditioning.',
     checklistItems: [
-      { label: "Hip Flexor Lunge Stretch (30s per leg) - Push hips forward in lunge position" },
-      { label: "Glute Bridges (3 Sets of 10) - Lie supine, lift hips, contract glutes at peak" },
-      { label: "Dead Bugs (10 Reps) - Lie supine, press lumbar into floor, extend opposite arm/leg" },
-      { label: "Hamstring Stretch (30s per leg) - Sit with legs extended, lean forward gently" },
-      { label: "Clamshells (10 Reps per side) - Lie on side, open top knee, keep feet together" },
-      { label: "Legs-Up-The-Wall (5 min) - DO LAST - Lie supine, legs vertical against wall, relax completely" }
+      { label: 'Warm-up & joint mobility (3–5 min)' },
+      { label: 'Main movement session (20–25 min)' },
+      { label: 'Cool-down & gentle stretch' },
     ],
-    frequency: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-    order: 11
   },
+
+  // 3. Deep Work & Focus Block
   {
-    title: "Dinner Preparation",
-    time: "08:30 PM",
-    category: "Schedule",
-    instructions: "Cook evening meal. Use pre-prepared ingredients from morning batch cooking to simplify this process.",
-    checklistItems: [],
-    frequency: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    order: 12
+    stableKey: 'routine_focus_block',
+    title: 'Deep Work & Focus Block',
+    category: 'Schedule',
+    completionMethod: 'simple',
+    timingType: 'preferred_period',
+    preferredPeriod: 'Morning',
+    time: 'Morning',
+    frequency: [...WORKDAYS],
+    order: 3,
+    isSystemSeed: true,
+    seedOrigin: 'foundation_preset',
+    metadata: {
+      targetDurationMinutes: 60,
+    },
+    instructions:
+      'Dedicate 45 to 90 minutes of distraction-free focus to your highest-priority creative, engineering, or study goal. Silence notifications.',
+    checklistItems: [
+      { label: 'Clear workspace and silence notifications' },
+      { label: 'Complete uninterrupted deep work sprint' },
+    ],
   },
+
+  // 4. Balanced Nourishment & Hydration
   {
-    title: "Dinner",
-    time: "09:30 PM",
-    category: "Nutrition",
-    instructions: "Similar composition to lunch, slightly lighter portion. Rice/Roti + Protein source + Vegetables. Avoid heavy eating close to bedtime.",
-    checklistItems: [],
-    frequency: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    order: 13
+    stableKey: 'routine_balanced_nutrition',
+    title: 'Balanced Nourishment & Hydration',
+    category: 'Nutrition',
+    completionMethod: 'checklist',
+    timingType: 'anytime',
+    preferredPeriod: null,
+    time: 'Flexible',
+    frequency: [...ALL_WEEKDAYS],
+    order: 4,
+    isSystemSeed: true,
+    seedOrigin: 'foundation_preset',
+    metadata: {
+      dailyWaterTargetLiters: 2.5,
+    },
+    instructions:
+      'Support sustained energy and cognitive clarity with wholesome meals, regular water intake, and mindful eating habits.',
+    checklistItems: [
+      { label: 'Hydrate consistently throughout the day (2L+)' },
+      { label: 'Eat balanced, whole-food meals without rushed snacking' },
+    ],
   },
+
+  // 5. Evening Digital Wind-Down
   {
-    title: "Free Time",
-    time: "10:15 PM",
-    category: "Recovery",
-    instructions: "Personal relaxation activities. Light entertainment, hobbies, or social time. Begin transitioning mind toward rest.",
-    checklistItems: [],
-    frequency: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    order: 14
+    stableKey: 'routine_digital_winddown',
+    title: 'Evening Digital Wind-Down',
+    category: 'Recovery',
+    completionMethod: 'simple',
+    timingType: 'preferred_period',
+    preferredPeriod: 'Evening',
+    time: 'Evening',
+    frequency: [...ALL_WEEKDAYS],
+    order: 5,
+    isSystemSeed: true,
+    seedOrigin: 'foundation_preset',
+    metadata: {
+      screenFreeMinutesBeforeBed: 45,
+    },
+    instructions:
+      'Disconnect from high-stimulation work screens, email, and social feeds 45 minutes before bedtime to allow the nervous system to relax.',
+    checklistItems: [
+      { label: 'Put work devices away 45 minutes before sleep' },
+      { label: 'Engage in a quiet, screen-free evening transition' },
+    ],
   },
+
+  // 6. Daily Reflection & Gratitude
   {
-    title: "Wind Down (No Screens)",
-    time: "11:30 PM",
-    category: "Recovery",
-    instructions: "Electronic devices must be set aside. No screens allowed. Read physical books, journal, meditate, or practice breathing exercises. Prepare mind for sleep.",
+    stableKey: 'routine_daily_reflection',
+    title: 'Daily Reflection & Gratitude',
+    category: 'Reflection',
+    completionMethod: 'diary_entry',
+    timingType: 'preferred_period',
+    preferredPeriod: 'Night',
+    time: 'Night',
+    frequency: [...ALL_WEEKDAYS],
+    order: 6,
+    isSystemSeed: true,
+    seedOrigin: 'foundation_preset',
+    metadata: {
+      isPrivateDiary: true,
+      reflectionPrompts: [
+        'What went well today and why?',
+        'What challenge did I navigate, and what did I learn?',
+        'What is one thing I am genuinely grateful for today?',
+      ],
+    },
+    instructions:
+      'Jot down brief notes celebrating small wins, capturing insights, and noting gratitude to close out your day with peace of mind.',
     checklistItems: [],
-    frequency: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    order: 15
   },
-  {
-    title: "Sleep",
-    time: "12:00 AM",
-    category: "Recovery",
-    instructions: "Complete darkness and uninterrupted rest. Target 8+ hours for optimal recovery, muscle growth, and cognitive function. Consistency in sleep timing is essential for circadian rhythm optimization.",
-    checklistItems: [],
-    frequency: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    order: 16
-  }
 ];

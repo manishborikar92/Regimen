@@ -1,3 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.48 12H2"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="vrittaPurple" x1="20%" y1="10%" x2="90%" y2="90%">
+      <stop offset="0%" stop-color="#7279f5"/>
+      <stop offset="100%" stop-color="#5550e9"/>
+    </linearGradient>
+    <linearGradient id="vrittaCyan" x1="25%" y1="25%" x2="75%" y2="75%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+  </defs>
+  <!-- Purple outer arc -->
+  <path
+    d="M 50.05 9.92 A 40.13 40.13 0 1 1 16.02 28.78"
+    stroke="url(#vrittaPurple)"
+    stroke-width="7.83"
+    stroke-linecap="round"
+  />
+  <!-- Cyan inner arc -->
+  <path
+    d="M 64.70 32.40 A 24.54 24.54 0 1 1 47.65 25.51"
+    stroke="url(#vrittaCyan)"
+    stroke-width="6.79"
+    stroke-linecap="round"
+  />
+  <!-- Central seed dot -->
+  <circle
+    cx="48.43"
+    cy="50.00"
+    r="9.14"
+    fill="#5550e9"
+  />
 </svg>

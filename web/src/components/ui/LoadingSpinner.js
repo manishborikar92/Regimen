@@ -1,36 +1,45 @@
 'use client';
 
-import { Activity } from 'lucide-react';
+import { BRAND } from '@/lib/constants/brand';
+import Logo from './Logo';
 
-export default function LoadingSpinner({ size = 'md', className = '' }) {
+export default function LoadingSpinner({ size = 'md', message, className = '' }) {
   const sizeClasses = {
-    sm: 'w-8 h-8',
-    md: 'w-16 h-16',
-    lg: 'w-24 h-24',
+    sm: 'w-10 h-10 p-2',
+    md: 'w-16 h-16 p-3',
+    lg: 'w-24 h-24 p-4',
   };
 
-  const iconSizes = {
-    sm: 16,
-    md: 32,
-    lg: 48,
+  const ringSizes = {
+    sm: 'w-12 h-12',
+    md: 'w-20 h-20',
+    lg: 'w-28 h-28',
   };
 
   return (
-    <div className={`fixed inset-0 flex flex-col items-center justify-center bg-gray-50/80 backdrop-blur-sm z-[9999] ${className}`}>
+    <div
+      className={`fixed inset-0 flex flex-col items-center justify-center bg-gray-50/85 backdrop-blur-sm z-[9999] ${className}`}
+      role="status"
+      aria-live="polite"
+    >
       <div className="relative flex items-center justify-center">
-        {/* Outer glowing ring */}
-        <div className={`absolute ${sizeClasses[size]} rounded-full border-4 border-indigo-500/20 animate-ping`}></div>
-        {/* Fast spinning gradient border */}
-        <div className={`absolute ${sizeClasses[size]} rounded-full border-4 border-transparent border-t-indigo-600 animate-spin`}></div>
-        {/* Inner solid circle background */}
-        <div className={`${sizeClasses[size]} bg-white rounded-full shadow-lg flex items-center justify-center`}>
-          <Activity className={`text-indigo-600 animate-pulse`} size={iconSizes[size]} strokeWidth={2.5} />
+        {/* Soft breathing halo */}
+        <div className={`absolute ${ringSizes[size]} rounded-full border-2 border-indigo-400/20 animate-ping opacity-60`} />
+        {/* Calm spinning outer ring */}
+        <div className={`absolute ${ringSizes[size]} rounded-full border-2 border-transparent border-t-indigo-500/60 animate-spin`} />
+        {/* White card carrying the Vritta logo */}
+        <div className={`${sizeClasses[size]} bg-white rounded-2xl shadow-md border border-gray-100 flex items-center justify-center relative z-10`}>
+          <Logo className="w-full h-full" />
         </div>
       </div>
 
-      <div className="mt-8 text-center animate-pulse">
-        <p className="text-sm font-semibold text-indigo-900 tracking-widest uppercase mb-1">Regimen</p>
-        <p className="text-xs text-indigo-500/80 font-medium tracking-wider">Syncing Data</p>
+      <div className="mt-6 text-center animate-pulse">
+        <p className="text-sm font-bold text-gray-900 tracking-wider uppercase mb-1">
+          {BRAND.name}
+        </p>
+        <p className="text-xs text-indigo-600/80 font-medium tracking-wide">
+          {message || 'Mindful Routine Companion'}
+        </p>
       </div>
     </div>
   );
