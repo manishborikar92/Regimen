@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { BookOpen, Activity, Headphones, Lock, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { LoadingSpinner } from '@/components/ui';
+import { LoadingSpinner, Logo } from '@/components/ui';
 import { BRAND } from '@/lib/constants/brand';
 
 const features = [
@@ -72,16 +72,9 @@ export default function LoginPage() {
         <div className="max-w-md w-full text-center mb-10">
           <div className="flex justify-center mb-6 relative">
             {/* Glow effect */}
-            <div className="absolute inset-0 bg-indigo-400 blur-2xl opacity-20 rounded-full w-24 h-24 mx-auto animate-pulse" />
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-indigo-700 flex items-center justify-center text-white shadow-xl relative z-10 p-3.5 border border-indigo-400/30">
-              <Image
-                src="/logo.svg"
-                alt={BRAND.logoAlt}
-                width={56}
-                height={56}
-                className="w-full h-full"
-                priority
-              />
+            <div className="absolute inset-0 bg-indigo-300 blur-2xl opacity-25 rounded-full w-24 h-24 mx-auto animate-pulse" />
+            <div className="w-20 h-20 rounded-3xl bg-white shadow-xl relative z-10 p-3.5 border border-indigo-100/90 flex items-center justify-center">
+              <Logo className="w-full h-full" />
             </div>
           </div>
 

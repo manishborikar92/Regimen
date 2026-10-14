@@ -123,7 +123,7 @@ export async function toggleHabitCompletion(userId, dateStr, habitId, isCurrentl
  * @param {string} dateStr
  * @param {string} habitId
  * @param {Object} progressDetails - Granular activity details
- * @param {boolean} isFullyCompleted - Whether the activity now satisfies completion requirements
+ * @param {boolean} [isFullyCompleted] - Whether the activity now satisfies completion requirements
  */
 export async function updateDailyHabitProgress(userId, dateStr, habitId, progressDetails, isFullyCompleted) {
     const dailyLogRef = getDailyLogRef(userId, dateStr);
@@ -131,13 +131,18 @@ export async function updateDailyHabitProgress(userId, dateStr, habitId, progres
     const updatePayload = {
         userId,
         date: dateStr,
-        [`habitProgress.${habitId}`]: {
-            ...progressDetails,
-            updatedAt: new Date().toISOString(),
+        habitProgress: {
+            [habitId]: {
+                ...progressDetails,
+                updatedAt: new Date().toISOString(),
+            },
         },
-        completedHabitIds: isFullyCompleted ? arrayUnion(habitId) : arrayRemove(habitId),
         updatedAt: serverTimestamp(),
     };
+
+    if (typeof isFullyCompleted === 'boolean') {
+        updatePayload.completedHabitIds = isFullyCompleted ? arrayUnion(habitId) : arrayRemove(habitId);
+    }
 
     return setDoc(dailyLogRef, updatePayload, { merge: true });
 }
@@ -178,24 +183,26 @@ export async function seedHabitsForUser(userId, seedData) {
 
 /**
  * Fetch historical daily logs for a user.
+ * Queries by userId only (avoiding composite index requirement) and sorts safely in memory.
  * @param {string} userId
  * @returns {Promise<Object>} Map of dateStr -> { completedHabitIds: string[], habitProgress: Object }
  */
 export async function fetchHistoricalLogs(userId) {
     const logsQuery = query(
         collection(db, 'dailyLogs'),
-        where('userId', '==', userId),
-        orderBy('date', 'desc')
+        where('userId', '==', userId)
     );
     const snapshot = await getDocs(logsQuery);
 
     const logsMap = {};
     snapshot.forEach(doc => {
         const data = doc.data();
-        logsMap[data.date] = {
-            completedHabitIds: data.completedHabitIds || [],
-            habitProgress: data.habitProgress || {},
-        };
+        if (data.date) {
+            logsMap[data.date] = {
+                completedHabitIds: data.completedHabitIds || [],
+                habitProgress: data.habitProgress || {},
+            };
+        }
     });
     return logsMap;
 }

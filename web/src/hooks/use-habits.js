@@ -39,10 +39,13 @@ export function useHabits(user) {
         const habitsQuery = getHabitsQuery(user.uid);
 
         const unsubscribe = onSnapshot(habitsQuery, (snapshot) => {
-            const habitsData = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
+            const habitsData = snapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    ...data,
+                };
+            });
             // Sort primarily by order, then by title
             habitsData.sort((a, b) => (a.order || 99) - (b.order || 99));
             setHabits(habitsData);

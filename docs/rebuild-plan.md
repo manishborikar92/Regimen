@@ -112,9 +112,33 @@ The existing application is a Next.js 16 (App Router) mobile-first Progressive W
   - Rest-day exclusion from analytics denominators (`tests/analytics-rest-day.test.mjs`).
   - Osho library integrity & separation of daily listening from series progress (`tests/osho-library.test.mjs`).
   - Diary privacy and user scoping (`tests/diary-privacy.test.mjs`).
+  - Category backward-compatibility & Firestore rule safety (`tests/category-compatibility.test.mjs`).
 - [x] Run full lint, typecheck, tests, and production build:
-  - `npm test`: 30 tests passed across 7 test suites (0 failures).
+  - `npm test`: 34 tests passed across 8 test suites (0 failures).
   - `npm run lint`: 0 errors, 0 warnings.
-  - `npm run build`: Compiled successfully in 14.9s with Turbopack, static page prerendering complete.
-- [x] Verify responsive mobile layouts and user interaction flows.
-- [x] Produce final audit and implementation report.
+  - `npm run build`: Compiled successfully in 10.0s with Turbopack, static page prerendering complete.
+
+### Phase 5: Screenshot Analysis, Logo Reconstruction & Data Loading Resolution
+- [x] **Logo Geometry & Alignment Reconstruction:**
+  - Analyzed the target brand mark (`media_1791969236757_dd225ea2.png`) down to the exact mathematical center, stroke width, and angular sweep.
+  - Reconstructed `web/public/logo.svg` and `web/src/components/ui/Logo.js` as an exact vector SVG:
+    - Outer purple arc: radius 40.13, stroke-width 7.83, sweeping clockwise from 270° (top) to 212° (10 o'clock), gradient `#7279f5` to `#5550e9`.
+    - Inner cyan arc: radius 24.54, stroke-width 6.79, sweeping clockwise from 314° (2 o'clock) to 270° (top), gradient `#38bdf8` to `#0ea5e9`.
+    - Central anchor dot: radius 9.14 at center, fill `#5550e9`.
+  - Side-by-side pixel rendering verified with Cairosvg and Pillow against the original reference.
+- [x] **Consistent Logo Usage Across the Entire App:**
+  - `LoadingSpinner.js`: Replaced legacy heartbeat icon and hardcoded "REGIMEN / Syncing Data" with the Vritta logo, `BRAND.name`, and calm breathing halo.
+  - `TopNav.js`: Fixed container background from dark indigo gradient (which masked the purple outer ring) to a crisp white rounded card (`bg-white border border-gray-200/90 shadow-2xs`), ensuring both purple and cyan rings pop with 100% clarity.
+  - `login/page.js`: Updated hero logo container to a clean white card with subtle glow, matching the brand system.
+  - App icons & Favicons: Updated `web/src/app/icon0.svg` and regenerated `apple-icon.png`, `icon1.png`, `favicon.ico`, and `web-app-manifest-*.png` from the new vector geometry.
+- [x] **Data Loading & Permission Error Resolution:**
+  - Root cause diagnosed: Live Cloud Firestore rules enforced `request.resource.data.category in ['Schedule', 'Movement', 'Nutrition', 'Recovery']`.
+  - Implemented dual-layer category mapping (`CANONICAL_TO_LEGACY_CATEGORY`) in `categories.js` and `firestore.js`.
+  - Saving a habit automatically writes a valid legacy category (`'Schedule'`, `'Movement'`, `'Recovery'`) to satisfy the live Firestore rule, while storing `canonicalCategory` / `lifeArea` for the rich mobile UI.
+  - Fixed `fetchHistoricalLogs` by querying `userId` only, eliminating composite index requirements.
+  - Upgraded `updateDailyHabitProgress` to use nested object merges instead of dotted paths.
+- [x] **Visual Verification & Fresh Screenshots:**
+  - Headless Chrome captures executed across phone-sized portrait (412x915) and desktop (1280x800).
+  - Captured `login_mobile.png`, `login_desktop.png`, `loading_spinner.png`, `routine_manager_mobile.png`, `routine_manager_desktop.png`, `dashboard_mobile.png`, and `analytics_mobile.png`.
+  - Confirmed logo renders consistently across all views and data loads cleanly without red permission banners.
+

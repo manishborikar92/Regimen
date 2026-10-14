@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { BRAND } from '@/lib/constants/brand';
 import ConfirmDialog from './ConfirmDialog';
+import Logo from './Logo';
 
 export default function TopNav({ title, subtitle }) {
   const { user, signInWithGoogle, logout } = useAuth();
@@ -47,15 +48,8 @@ export default function TopNav({ title, subtitle }) {
       <header className="bg-white/90 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40">
         <div className="max-w-2xl mx-auto px-4 py-3 sm:py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-indigo-700 flex items-center justify-center text-white shadow-xs p-1.5">
-              <Image
-                src="/logo.svg"
-                alt={BRAND.logoAlt}
-                width={20}
-                height={20}
-                className="w-full h-full"
-                priority
-              />
+            <div className="w-8 h-8 rounded-xl bg-white border border-gray-200/90 shadow-2xs flex items-center justify-center p-1 hover:shadow-xs transition-shadow">
+              <Logo className="w-full h-full" />
             </div>
             <div>
               <div className="flex items-center gap-2">
