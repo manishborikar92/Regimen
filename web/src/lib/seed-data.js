@@ -1,190 +1,162 @@
 /**
- * Canonical Seed Data & Routines for Vritta.
- * Strictly adheres to section 4 and section 6 of docs/regimen_project_brief.md.
+ * Foundation Starter Routines for Vritta (Client-Safe).
+ * High-utility, general wellness, focus, and reflection routines suitable for any user.
  * 
- * Rules:
- * - Stable, deterministic keys for idempotent upserting.
- * - Distinct separation between category, timing, recurrence, completion method, and instructions.
- * - Preferred timing is guidance, never a deadline.
- * - No historical completions, past diary entries, or assumed exercise start dates are seeded.
+ * Contains zero proprietary personal book titles, exercise protocols, or private audio catalogs.
  */
 
-import { OSHO_LIBRARY, OSHO_GROUPS } from './fixtures/osho-library.js';
-import {
-  MOVEMENT_SCHEDULE,
-  WORKOUT_EXERCISES,
-  WALK_DAY_ROUTINE,
-  PROGRESSION_PHASES,
-  READINESS_CRITERIA,
-  STOP_SIGNALS,
-  GENERAL_HEALTH_NOTES,
-} from './fixtures/exercise-plan.js';
-
-export {
-  OSHO_LIBRARY,
-  OSHO_GROUPS,
-  MOVEMENT_SCHEDULE,
-  WORKOUT_EXERCISES,
-  WALK_DAY_ROUTINE,
-  PROGRESSION_PHASES,
-  READINESS_CRITERIA,
-  STOP_SIGNALS,
-  GENERAL_HEALTH_NOTES,
-};
-
 const ALL_WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const WORKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
-export const CANONICAL_ROUTINES = [
-  // 1. Practice English Workbook
+export const DEFAULT_ROUTINES = [
+  // 1. Morning Hydration & Mindfulness
   {
-    stableKey: 'canonical_english_workbook',
-    title: 'Practice English Workbook',
-    category: 'English Learning',
-    completionMethod: 'workbook_sessions',
-    timingType: 'anytime',
-    preferredPeriod: null,
-    relativeTiming: null,
-    time: 'Flexible',
+    stableKey: 'routine_hydration_mindfulness',
+    title: 'Morning Hydration & Mindfulness',
+    category: 'Reflection',
+    completionMethod: 'simple',
+    timingType: 'preferred_period',
+    preferredPeriod: 'Morning',
+    time: 'Morning',
     frequency: [...ALL_WEEKDAYS],
     order: 1,
     isSystemSeed: true,
+    seedOrigin: 'foundation_preset',
     metadata: {
-      bookTitle: 'Word Power Made Easy',
-      bookAuthor: 'Norman Lewis',
-      dailySessionsTarget: 2,
-      reviewRequired: true,
-      uninterruptedCheckRequired: true,
+      targetGlassCount: 2,
+      mindfulnessMinutes: 5,
     },
     instructions:
-      'Daily vocabulary-building with Word Power Made Easy by Norman Lewis to strengthen English vocabulary and build confident speaking, writing, and reading.\n\nRequired steps:\n1. Review and revise the previous day\'s work before beginning new work (if previous work exists).\n2. Complete Session 1.\n3. Complete Session 2.\n4. Note whether at least one session was completed without interruption.',
+      'Begin your morning with a tall glass of fresh water and 5 minutes of quiet, centered breathing before engaging with digital screens or work.',
     checklistItems: [
-      { label: 'Review previous day\'s workbook notes' },
-      { label: 'Session 1 completed' },
-      { label: 'Session 2 completed' },
-      { label: 'At least one session completed uninterrupted' },
+      { label: 'Drink 1-2 glasses of water' },
+      { label: '5 minutes of quiet breathing or gentle morning stretch' },
     ],
   },
 
-  // 2. Exercise / Movement Plan
+  // 2. Daily Physical Movement
   {
-    stableKey: 'canonical_exercise_plan',
-    title: 'Exercise / Movement Plan',
+    stableKey: 'routine_physical_movement',
+    title: 'Daily Physical Movement',
     category: 'Movement & Strength',
-    completionMethod: 'exercise_plan',
+    completionMethod: 'simple',
     timingType: 'preferred_period',
     preferredPeriod: 'Afternoon',
-    relativeTiming: null,
     time: 'Afternoon',
     frequency: [...ALL_WEEKDAYS],
     order: 2,
     isSystemSeed: true,
+    seedOrigin: 'foundation_preset',
     metadata: {
-      is12WeekPlan: true,
-      hasPlannedRestDays: true,
-      restDays: ['Sun'],
-      workoutDays: ['Mon', 'Wed', 'Fri'],
-      walkDays: ['Tue', 'Thu', 'Sat'],
       targetDurationMinutes: 30,
     },
     instructions:
-      'A 12-week progressive movement plan for posture, mobility, basic functional strength, and overall well-being at home with no equipment.\n\nSchedule:\n• Mon, Wed, Fri: Strength and Posture Workout (~30 min)\n• Tue, Thu, Sat: Easy Walk (10–20 min) and 3 Stretches\n• Sun: Planned Rest & Recovery (no workout required)\n\nPreferred timing is Afternoon. Completing your movement at any point today counts fully.',
-    checklistItems: [],
+      'Dedicate 20 to 30 minutes to intentional movement: an outdoor walk, bodyweight mobility exercises, yoga, or functional conditioning.',
+    checklistItems: [
+      { label: 'Warm-up & joint mobility (3–5 min)' },
+      { label: 'Main movement session (20–25 min)' },
+      { label: 'Cool-down & gentle stretch' },
+    ],
   },
 
-  // 3. Listen to Osho
+  // 3. Deep Work & Focus Block
   {
-    stableKey: 'canonical_listen_osho',
-    title: 'Listen to Osho',
-    category: 'Listening & Awareness',
-    completionMethod: 'osho_listening',
-    timingType: 'anytime',
-    preferredPeriod: null,
-    relativeTiming: null,
-    time: 'Flexible',
-    frequency: [...ALL_WEEKDAYS],
+    stableKey: 'routine_focus_block',
+    title: 'Deep Work & Focus Block',
+    category: 'Schedule',
+    completionMethod: 'simple',
+    timingType: 'preferred_period',
+    preferredPeriod: 'Morning',
+    time: 'Morning',
+    frequency: [...WORKDAYS],
     order: 3,
     isSystemSeed: true,
+    seedOrigin: 'foundation_preset',
     metadata: {
-      hasLibrary: true,
-      libraryCount: 30,
-      libraryGroups: 6,
+      targetDurationMinutes: 60,
     },
     instructions:
-      'Listen to an Osho discourse daily for awareness, meditation, and thoughtful inquiry. Explore the 30-entry listening library across 6 thematic groups (Hindi series 1–23, English series 24–30) at your own pace.',
-    checklistItems: [],
+      'Dedicate 45 to 90 minutes of distraction-free focus to your highest-priority creative, engineering, or study goal. Silence notifications.',
+    checklistItems: [
+      { label: 'Clear workspace and silence notifications' },
+      { label: 'Complete uninterrupted deep work sprint' },
+    ],
   },
 
-  // 4. Read Books
+  // 4. Balanced Nourishment & Hydration
   {
-    stableKey: 'canonical_read_books',
-    title: 'Read Books',
-    category: 'Reading',
-    completionMethod: 'reading_duration',
-    timingType: 'relative',
+    stableKey: 'routine_balanced_nutrition',
+    title: 'Balanced Nourishment & Hydration',
+    category: 'Nutrition',
+    completionMethod: 'checklist',
+    timingType: 'anytime',
     preferredPeriod: null,
-    relativeTiming: 'Before bed',
-    time: 'Before bed',
+    time: 'Flexible',
     frequency: [...ALL_WEEKDAYS],
     order: 4,
     isSystemSeed: true,
+    seedOrigin: 'foundation_preset',
     metadata: {
-      targetMinutes: 30,
-      context: 'Before going to sleep',
+      dailyWaterTargetLiters: 2.5,
     },
     instructions:
-      'Read a book for 30 minutes before going to sleep. Relative timing: Before bed (no rigid clock time). Helps unwind and settle the mind.',
-    checklistItems: [],
+      'Support sustained energy and cognitive clarity with wholesome meals, regular water intake, and mindful eating habits.',
+    checklistItems: [
+      { label: 'Hydrate consistently throughout the day (2L+)' },
+      { label: 'Eat balanced, whole-food meals without rushed snacking' },
+    ],
   },
 
-  // 5. Practice English Speaking
+  // 5. Evening Digital Wind-Down
   {
-    stableKey: 'canonical_english_speaking',
-    title: 'Practice English Speaking',
-    category: 'Communication',
-    completionMethod: 'simple_with_notes',
-    timingType: 'anytime',
-    preferredPeriod: null,
-    relativeTiming: null,
-    time: 'Flexible',
+    stableKey: 'routine_digital_winddown',
+    title: 'Evening Digital Wind-Down',
+    category: 'Recovery',
+    completionMethod: 'simple',
+    timingType: 'preferred_period',
+    preferredPeriod: 'Evening',
+    time: 'Evening',
     frequency: [...ALL_WEEKDAYS],
     order: 5,
     isSystemSeed: true,
+    seedOrigin: 'foundation_preset',
     metadata: {
-      tool: 'ChatGPT Voice / Conversation',
+      screenFreeMinutesBeforeBed: 45,
     },
     instructions:
-      'Practise speaking English with ChatGPT. Practice conversational fluency, pronunciation, and confident expression at any time during the day.',
-    checklistItems: [],
+      'Disconnect from high-stimulation work screens, email, and social feeds 45 minutes before bedtime to allow the nervous system to relax.',
+    checklistItems: [
+      { label: 'Put work devices away 45 minutes before sleep' },
+      { label: 'Engage in a quiet, screen-free evening transition' },
+    ],
   },
 
-  // 6. Maintain a Diary
+  // 6. Daily Reflection & Gratitude
   {
-    stableKey: 'canonical_maintain_diary',
-    title: 'Maintain a Diary',
+    stableKey: 'routine_daily_reflection',
+    title: 'Daily Reflection & Gratitude',
     category: 'Reflection',
     completionMethod: 'diary_entry',
-    timingType: 'anytime',
-    preferredPeriod: null,
-    relativeTiming: null,
-    time: 'Flexible',
+    timingType: 'preferred_period',
+    preferredPeriod: 'Night',
+    time: 'Night',
     frequency: [...ALL_WEEKDAYS],
     order: 6,
     isSystemSeed: true,
+    seedOrigin: 'foundation_preset',
     metadata: {
-      isPrivateJournal: true,
-      reflectivePrompts: [
-        'What happened or what thought came to mind?',
-        'What did I feel?',
-        'What assumption might I be making?',
-        'What did I learn?',
-        'Is there a small next step?',
+      isPrivateDiary: true,
+      reflectionPrompts: [
+        'What went well today and why?',
+        'What challenge did I navigate, and what did I learn?',
+        'What is one thing I am genuinely grateful for today?',
       ],
     },
     instructions:
-      'Write in your personal diary about what you learned and your personal thoughts. Private to your account. Optional reflection prompts are provided in the journal view.',
+      'Jot down brief notes celebrating small wins, capturing insights, and noting gratitude to close out your day with peace of mind.',
     checklistItems: [],
   },
 ];
 
-// Alias for default export / legacy consumers
-export const seedHabits = CANONICAL_ROUTINES;
+// Default export for client seed actions
+export const seedHabits = DEFAULT_ROUTINES;

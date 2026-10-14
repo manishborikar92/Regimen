@@ -1,6 +1,6 @@
 import { test, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { CANONICAL_ROUTINES } from '../src/lib/seed-data.js';
+import { CANONICAL_ROUTINES } from '../src/lib/server/personal-schedule.js';
 
 // Pure helper function simulating the analytics day metric calculation
 function calculateDayCompletionRate(habits, completedIds, dayOfWeek) {

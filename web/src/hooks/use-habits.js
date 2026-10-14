@@ -9,7 +9,7 @@ import {
     deleteHabitDoc,
     seedHabitsForUser,
 } from '@/lib/firebase/firestore';
-import { CANONICAL_ROUTINES } from '@/lib/seed-data';
+import { DEFAULT_ROUTINES } from '@/lib/seed-data';
 import { getDayOfWeek } from '@/utils/date-helpers';
 
 /**
@@ -83,8 +83,8 @@ export function useHabits(user) {
         return deleteHabitDoc(habitId);
     }, [user]);
 
-    // Seed or update canonical habits (idempotent, safe to rerun anytime)
-    const seedHabits = useCallback(async (seedData = CANONICAL_ROUTINES) => {
+    // Seed or update foundation habits (idempotent, safe to rerun anytime)
+    const seedHabits = useCallback(async (seedData = DEFAULT_ROUTINES) => {
         if (!user) return;
         return seedHabitsForUser(user.uid, seedData);
     }, [user]);

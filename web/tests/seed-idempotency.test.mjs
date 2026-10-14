@@ -1,6 +1,6 @@
 import { test, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { CANONICAL_ROUTINES } from '../src/lib/seed-data.js';
+import { CANONICAL_ROUTINES } from '../src/lib/server/personal-schedule.js';
 
 describe('Seed Idempotency & Data Preservation', () => {
   it('should define exactly 6 canonical routines with unique stable keys', () => {
