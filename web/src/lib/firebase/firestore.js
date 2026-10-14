@@ -148,7 +148,7 @@ export async function updateDailyHabitProgress(userId, dateStr, habitId, progres
 }
 
 /**
- * Idempotent Seed: Seed or update canonical habits for a user.
+ * Idempotent Seed: Seed or update foundation routines for a user.
  * Running this multiple times NEVER duplicates habits and NEVER wipes existing user records.
  * Uses deterministic document IDs derived from the routine's stableKey.
  * 

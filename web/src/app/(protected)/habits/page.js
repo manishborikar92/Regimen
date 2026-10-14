@@ -54,9 +54,9 @@ export default function HabitsPage() {
     setSeeding(true);
     try {
       await seedHabits();
-      addToast('Canonical routines synced idempotently!', 'success');
+      addToast('Foundation routines synced successfully!', 'success');
     } catch (err) {
-      addToast(err.message || 'Failed to sync canonical routines.', 'error');
+      addToast(err.message || 'Failed to sync foundation routines.', 'error');
     } finally {
       setSeeding(false);
     }
@@ -123,7 +123,7 @@ export default function HabitsPage() {
             {habits.map((habit) => {
               const config = getCategoryConfig(habit.category);
               const timingText = getTimingDisplay(habit);
-              const isCanonical = Boolean(habit.stableKey || habit.isSystemSeed);
+              const isFoundation = Boolean(habit.stableKey || habit.isSystemSeed);
 
               return (
                 <div
@@ -142,9 +142,9 @@ export default function HabitsPage() {
                           {timingText}
                         </span>
 
-                        {isCanonical && (
+                        {isFoundation && (
                           <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
-                            Canonical
+                            Foundation
                           </span>
                         )}
 
