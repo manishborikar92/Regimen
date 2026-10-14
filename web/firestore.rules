@@ -42,9 +42,13 @@ service cloud.firestore {
                             && request.resource.data.title.size() <= 200
                             && isValidCategory(request.resource.data.category);
 
-      // READ/DELETE: Must own the existing document
-      allow read, delete: if isAuthenticated()
-                          && resource.data.userId == request.auth.uid;
+      // READ: Must own the existing document, or be non-existent check by authenticated user, or match user UID prefix
+      allow read: if isAuthenticated()
+                  && (resource == null || resource.data.userId == request.auth.uid || habitId.matches('^' + request.auth.uid + '_.*'));
+
+      // DELETE: Must own the existing document
+      allow delete: if isAuthenticated()
+                    && resource.data.userId == request.auth.uid;
     }
 
     // =============================================

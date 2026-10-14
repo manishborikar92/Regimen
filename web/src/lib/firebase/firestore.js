@@ -160,18 +160,29 @@ export async function seedHabitsForUser(userId, seedData) {
     if (!userId) throw new Error('User ID is required to seed routines.');
     if (!Array.isArray(seedData) || seedData.length === 0) return [];
 
+    // Query existing habits for this user in a single request (avoids non-existent getDoc calls)
+    const existingSnap = await getDocs(getHabitsQuery(userId));
+    const existingByStableKey = new Map();
+    const existingById = new Map();
+
+    existingSnap.forEach(docSnap => {
+        const data = docSnap.data();
+        if (data.stableKey) {
+            existingByStableKey.set(data.stableKey, data);
+        }
+        existingById.set(docSnap.id, data);
+    });
+
     const promises = seedData.map(async (habit, index) => {
         // Deterministic document ID based on stableKey or index
         const key = habit.stableKey || `routine_${index + 1}`;
         const docId = `${userId}_${key}`;
         const habitRef = doc(db, 'habits', docId);
 
-        // Fetch existing habit document to preserve user customizations
-        const existingSnap = await getDoc(habitRef);
+        const existing = existingByStableKey.get(key) || existingById.get(docId);
         let dataToSave;
 
-        if (existingSnap.exists()) {
-            const existing = existingSnap.data();
+        if (existing) {
             dataToSave = {
                 title: habit.title,
                 category: habit.category,
@@ -182,23 +193,31 @@ export async function seedHabitsForUser(userId, seedData) {
                 userId,
                 updatedAt: serverTimestamp(),
                 // Preserve user customizations
-                time: existing.time ?? habit.time,
-                timingType: existing.timingType ?? habit.timingType,
-                preferredPeriod: existing.preferredPeriod !== undefined ? existing.preferredPeriod : habit.preferredPeriod,
-                relativeTiming: existing.relativeTiming !== undefined ? existing.relativeTiming : habit.relativeTiming,
+                time: existing.time ?? habit.time ?? 'Flexible',
+                timingType: existing.timingType ?? habit.timingType ?? 'anytime',
+                ...(habit.preferredPeriod !== undefined || existing.preferredPeriod !== undefined
+                    ? { preferredPeriod: existing.preferredPeriod ?? habit.preferredPeriod }
+                    : {}),
+                ...(habit.relativeTiming !== undefined || existing.relativeTiming !== undefined
+                    ? { relativeTiming: existing.relativeTiming ?? habit.relativeTiming }
+                    : {}),
                 frequency: Array.isArray(existing.frequency) && existing.frequency.length > 0 ? existing.frequency : habit.frequency,
                 order: existing.order ?? habit.order,
                 checklistItems: Array.isArray(existing.checklistItems) && existing.checklistItems.length > 0
                     ? existing.checklistItems
-                    : habit.checklistItems,
+                    : (habit.checklistItems || []),
                 metadata: {
                     ...(habit.metadata || {}),
                     ...(existing.metadata || {}),
                 },
             };
         } else {
+            const cleanHabit = {};
+            for (const [k, v] of Object.entries(habit)) {
+                if (v !== undefined) cleanHabit[k] = v;
+            }
             dataToSave = {
-                ...habit,
+                ...cleanHabit,
                 id: docId,
                 userId,
                 seedOrigin: habit.seedOrigin || 'foundation_preset',
