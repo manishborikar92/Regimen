@@ -2,525 +2,449 @@
 
 **Project Name:** VRITTA (वृत्त)  
 **Author:** Manish Borikar  
-**Target Repository:** `c:\Users\manis\Projects\Regimen` (to be renamed to `c:\Users\manis\Projects\Vritta`)  
-**Date:** 14 October 2026  
+**Target Repository:** `c:\Users\manis\Projects\Regimen` → `c:\Users\manis\Projects\Vritta`  
+**Date:** 14 October 2026 (Revision 3 — Corrected & Evidence-Based)  
 **Status:** **PLANNING & RESEARCH GATE (APPROVAL-FIRST — DO NOT IMPLEMENT UNTIL EXPLICITLY APPROVED)**  
-**Authority:** Follows `docs/regimen_project_brief.md`, verified repository state, and user branding directives.
+**Canonical Implementation Plan:** This document is the single authoritative implementation roadmap in the repository.
 
 ---
-
-## Executive Summary & Branding Lock
-
-The project branding decisions are finalized and locked:
-- **Project Name:** **VRITTA** (वृत्त — classical Sanskrit: "conduct, regular cadence, rhythmic observance, and the cyclical nature of daily life").
-- **Color Theme:** **Restorative Juniper** (deep verdigris teal `#0F766E` / luminous teal `#14B8A6`, paired with earthy warm amber `#B45309` / `#F59E0B`, misty slate `#F8FAFC`, and deep obsidian `#090D16`).
-- **Approved Logo Mark:** **Concept 3: Guiding Sutra** (`docs/branding-exploration/03-logo-concepts/logo-concept-3-guiding-sutra.svg` and its engineered master suite `guiding-sutra-master.svg`, `guiding-sutra-light.svg`, `guiding-sutra-dark.svg`, and `guiding-sutra-favicon.svg`).
-- **Target Deployment Subdomain:** `vritta-app.vercel.app` (verified 100% available/unclaimed on Vercel's edge network).
 
 > [!IMPORTANT]
-> **Strict Planning Gate:** This document is an architectural roadmap and operational guide. **Zero production code files, database schemas, environment variables, GitHub remotes, or cloud configurations have been modified.** Execution will begin only upon explicit user approval.
+> **Strict Planning-Only Gate:**  
+> This document is an architectural blueprint, audit report, and operational runbook. **No production code files, environment variables, Firebase resources, GitHub settings, Vercel configurations, domains, or existing data have been modified.** No files have been deleted or archived. Execution will proceed phase-by-phase only after explicit approval.
 
 ---
 
-## Deliverable 1: Repository & Deployment Audit
+## 1. Finalized Branding & Design System Specifications
 
-### 1.1 Verified Repository State
-- **Git Branch:** `m/dev` (tracking `origin/m/dev`).
-- **Git Remote:** `origin https://github.com/manishborikar92/Regimen.git` (fetch & push).
-- **Working Tree:** Clean production tree; active exploration deliverables isolated in `docs/branding-exploration/`.
-- **Framework & Core Runtime:**
-  - Next.js: `16.1.0` (App Router, Webpack server bundle flag `next build --webpack`).
-  - React: `19.2.3`, React DOM `19.2.3`.
-  - Tailwind CSS: `4.0.0` (`@tailwindcss/postcss: ^4`, `@import "tailwindcss";` in `globals.css`).
-  - Lucide Icons: `lucide-react: ^0.577.0`.
-  - TypeScript: `^5.9.3` (installed for typechecking support).
-- **Database & Authentication:**
-  - Firebase Web Client SDK: `^12.7.0` (`firebase/app`, `firebase/auth`, `firebase/firestore`).
-  - Firebase Admin SDK: `^14.5.0` (`firebase-admin/app`, `firebase-admin/auth`, `firebase-admin/firestore`).
-  - Offline Cache: `initializeFirestore` with `persistentLocalCache` and `persistentSingleTabManager({ forceOwnership: false })`.
-  - Existing Firebase Project ID: `regimen-e32a8`.
-  - Firestore Configuration: Region `nam5`, database `(default)`, rules in `web/firestore.rules`, indexes in `web/firestore.indexes.json`.
-- **Automated Test Suite:**
-  - Node.js built-in test runner (`node --test tests/**/*.test.mjs`).
-  - Test count: **57 passing unit tests across 13 test suites** (0 failures, 287ms execution duration).
-  - Test coverage: Date/timezone handling, category whitelist conformance, default routine seeding, diary privacy, 12-week movement schedule, Osho library integrity, schedule isolation, backend authorization, and seed idempotency.
+### 1.1 Brand Identity Lock
+- **Project Name:** **VRITTA** (वृत्त — classical Sanskrit: "conduct, regular cadence, rhythmic observance, and the cyclical nature of daily life").
+- **Theme Name:** **Restorative Juniper** (organic, calming health companion; deep verdigris teal and warm amber on misty slate/obsidian).
+- **Authoritative Selected Logo:** `docs/branding-exploration/03-logo-concepts/logo-concept-3-guiding-sutra.svg`.
 
-### 1.2 Existing Deficiencies & Technical Debt
-1. **Branding Assets Outdated:**
-   - `web/src/components/ui/Logo.js` and `web/public/logo.svg` still render the outdated concentric purple/cyan gradient mark.
-   - Favicon (`icon0.svg`, `favicon.ico`, `apple-icon.png`) lacks the approved Guiding Sutra mark.
-   - `web/src/lib/constants/brand.js` still references legacy Tailwind Indigo `#4f46e5` tokens.
-2. **Zero Dark Mode Support in Production:**
-   - `web/src/app/globals.css` defines only light mode `:root` variables without a `.dark` variant or dark color values.
-   - `web/src/app/layout.js` hardcodes `bg-slate-50 text-gray-900` on `<body>` and lacks `suppressHydrationWarning`.
-   - No `ThemeContext` or theme switcher exists in the application chrome.
-3. **AI-Slop Visual Tells on Login Screen:**
-   - `web/src/app/(auth)/login/page.js` contains an animated purple glowing blob (`animate-pulse blur-2xl bg-indigo-300 opacity-25`).
-   - Feature cards have hardcoded Indigo/Slate badges instead of semantic design system tokens.
-4. **Hardcoded Fallbacks in Backend Code:**
-   - `web/src/lib/server/firebase-admin.js` (lines 50 & 107) contains hardcoded `'regimen-e32a8'` fallbacks if environment variables are unset.
-5. **Documentation Drift:**
-   - `docs/firebase-setup.md` still documents an obsolete `/api/schedule/personal` Route Handler which was intentionally removed during Phase 5 dead code simplification.
-   - `docs/BODY-RESTORATION-PROTOCOL.md` documents an obsolete pre-rebuild schedule (Chunky Monkey shake, voice exercises) that contradicts the 12-week body restoration plan in `docs/regimen_project_brief.md`.
+### 1.2 Logo Asset Audit & Derived Asset Plan
+An audit of `docs/branding-exploration/03-logo-concepts/` confirms the following files exist:
+- `logo-concept-3-guiding-sutra.svg` (766 bytes): The **authoritative original vector mark**. Geometry consists of a 200×200 viewBox, a background rect (`#F8FAFC`, `rx=36`), a continuous bezier loop path (`stroke="#0F766E"`, `stroke-width="13"`), and a center balance dot (`cx="100"`, `cy="100"`, `r="8"`, `fill="#D97706"`).
+- `guiding-sutra-master.svg` (802 bytes): 800×800 scaled version preserving identical bezier geometry.
+- `guiding-sutra-light.svg` (702 bytes) & `guiding-sutra-dark.svg` (710 bytes): Standalone marks without background rects, styled for light and dark surfaces.
+- `guiding-sutra-favicon.svg` (656 bytes): Standalone mark with stroke boosted to 20px for optical clarity at 16×16 and 32×32 pixel browser tab sizes.
+- `guiding-sutra-lockup.svg` (1397 bytes): Horizontal header lockup pairing the mark with VRITTA typography.
+
+**Necessary Derived Production Assets (and strict constraints):**
+1. `web/src/components/ui/Logo.js`: Reusable React SVG component. Must render the exact bezier curve (`M 68 132 C 44 132 40 100 68 84 C 92 70 108 130 132 116 C 160 100 156 68 132 68 C 108 68 92 128 68 132 Z`) and center dot, using `currentColor` and semantic accent CSS variables to adapt dynamically to light/dark surfaces.
+2. `web/public/logo.svg`: Standalone vector logo file derived directly from `logo-concept-3-guiding-sutra.svg`.
+3. `web/src/app/icon0.svg`: Scalable vector favicon for Next.js App Router metadata.
+4. Binary Favicons & PWA Icons: `web/src/app/favicon.ico`, `web/src/app/apple-icon.png` (180×180), `web/public/web-app-manifest-192x192.png`, `web/public/web-app-manifest-512x512.png`. Generated from the authoritative vector geometry to ensure crisp rendering without pixelation.
+
+### 1.3 Removal of Conflicting Heather Purple
+In earlier exploratory drafts, a Heather Purple (`#6D28D9` / `#A78BFA`) was proposed for Sunday rest badges. This color conflicts with the approved Restorative Juniper palette and has been **completely removed**.
+- **Approved Rest & Recovery Token:** Sunday rest is represented through harmonious slate and muted teal surfaces:
+  - **Light Mode:** Canvas Surface `#F1F5F9` (Slate 100), Border `#CBD5E1` (Slate 300), Text `#475569` (Slate 600), Rest Badge `#0F766E14` (Juniper 8% tint).
+  - **Dark Mode:** Canvas Surface `#1E293B` (Slate 800), Border `#334155` (Slate 700), Text `#94A3B8` (Slate 400), Rest Badge `#14B8A61F` (Teal 12% tint).
+
+### 1.4 Approved Semantic Design Tokens (Restorative Juniper)
+
+```css
+/* ========================================
+   VRITTA Design Tokens — Restorative Juniper
+   ======================================== */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Surfaces & Canvas */
+  --color-bg-canvas: #f8fafc;       /* Misty Slate canvas */
+  --color-bg-surface: #ffffff;      /* Pure Porcelain card surface */
+  --color-bg-subtle: #f1f5f9;       /* Slate 100 input/badge background */
+  --color-border-subtle: #e2e8f0;   /* Slate 200 border */
+  --color-border-strong: #cbd5e1;   /* Slate 300 border */
+
+  /* Text & Content */
+  --color-text-primary: #0f172a;    /* Deep Charcoal Slate (17.85:1 on surface) */
+  --color-text-secondary: #475569;  /* Slate 600 (7.58:1 on surface) */
+  --color-text-muted: #64748b;      /* Slate 500 (4.76:1 on surface) */
+
+  /* Brand & Rhythm Accents */
+  --color-accent-primary: #0f766e;  /* Verdigris Juniper (5.47:1 on surface) */
+  --color-accent-hover: #115e59;    /* Deepened Juniper */
+  --color-accent-subtle: #ccfbf1;   /* Juniper 100 tint */
+  --color-warm-accent: #b45309;     /* Warm Amber Ochre (5.02:1 on surface) */
+  --color-warm-subtle: #fef3c7;     /* Amber 100 tint */
+
+  /* Semantic Feedback */
+  --color-success: #059669;         /* Emerald */
+  --color-warning: #d97706;         /* Amber */
+  --color-error: #e11d48;           /* Rose */
+}
+
+.dark {
+  /* Surfaces & Canvas */
+  --color-bg-canvas: #090d16;       /* Deep Obsidian canvas */
+  --color-bg-surface: #111827;      /* Mineral Charcoal card surface */
+  --color-bg-subtle: #1e293b;       /* Slate 800 input/badge background */
+  --color-border-subtle: #1e293b;   /* Slate 800 border */
+  --color-border-strong: #334155;   /* Slate 700 border */
+
+  /* Text & Content */
+  --color-text-primary: #f8fafc;    /* Crisp Slate (16.96:1 on surface) */
+  --color-text-secondary: #94a3b8;  /* Slate 400 (6.92:1 on surface) */
+  --color-text-muted: #64748b;      /* Slate 500 (4.50:1 on canvas) */
+
+  /* Brand & Rhythm Accents */
+  --color-accent-primary: #14b8a6;  /* Luminous Teal (7.13:1 on surface) */
+  --color-accent-hover: #2dd4bf;    /* Lightened Teal */
+  --color-accent-subtle: #134e4a;   /* Teal 900 dark tint */
+  --color-warm-accent: #f59e0b;     /* Luminous Amber Gold (8.26:1 on surface) */
+  --color-warm-subtle: #78350f;     /* Amber 900 dark tint */
+
+  /* Semantic Feedback */
+  --color-success: #10b981;         /* Mint Emerald */
+  --color-warning: #f59e0b;         /* Amber Gold */
+  --color-error: #fb7185;           /* Light Rose */
+}
+```
 
 ---
 
-## Deliverable 2: Final Implementation Roadmap
+## 2. Technical Audit & Accessibility Verification
+
+### 2.1 Actual Installed Environment & Scripts
+- **Framework:** Next.js `16.1.0` (App Router). In Next.js 16, `next lint` is deprecated in favor of running ESLint directly.
+- **Linting Verification:** Verified directly against `web/package.json` line 10 (`"lint": "eslint"`) and `web/eslint.config.mjs`. Running `npm --prefix web run lint` executes ESLint flat config and exits with **code 0 (0 errors, 0 warnings)**.
+- **Test Runner Verification:** Verified against `web/package.json` line 11 (`"lint": "eslint"`, `"test": "node --test tests/**/*.test.mjs"`). Running `npm --prefix web run test` executes Node.js native test runner and reports **57 passing tests across 13 suites in ~287ms (0 failures)**.
+- **Personal Schedule CLI Verification:** Verified script `scripts/fetch-personal-schedule.mjs`. Can be executed from repository root via `npm --prefix web run schedule:fetch-personal` or directly within `web/` via `npm run schedule:fetch-personal`.
+- **Build Script:** `"build": "next build --webpack"`. Uses Webpack mode for compatibility with server external package `firebase-admin`.
+
+### 2.2 Mathematically Calculated Contrast Ratios
+Contrast ratios were mathematically calculated using the official W3C relative luminance formula ($L = 0.2126 R + 0.7152 G + 0.0722 B$ where $R, G, B$ are sRGB converted to linear values) and contrast ratio formula $\frac{L_1 + 0.05}{L_2 + 0.05}$:
+
+| Evaluated Foreground / Background Pair | Contrast Ratio | WCAG 2.2 AA Result | WCAG 2.2 AAA Result |
+| :--- | :--- | :--- | :--- |
+| **Light:** Primary Text `#0F172A` on Canvas `#F8FAFC` | **17.06 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Light:** Secondary Text `#475569` on Canvas `#F8FAFC` | **7.24 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Light:** Muted Text `#64748B` on Canvas `#F8FAFC` | **4.55 : 1** | PASS (>= 4.5:1) | Not AAA |
+| **Light:** Primary Brand `#0F766E` on Canvas `#F8FAFC` | **5.23 : 1** | PASS (>= 4.5:1) | Not AAA |
+| **Light:** Warm Amber `#B45309` on Canvas `#F8FAFC` | **4.80 : 1** | PASS (>= 4.5:1) | Not AAA |
+| **Light:** Primary Text `#0F172A` on Card Surface `#FFFFFF` | **17.85 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Light:** Secondary Text `#475569` on Card Surface `#FFFFFF` | **7.58 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Light:** Muted Text `#64748B` on Card Surface `#FFFFFF` | **4.76 : 1** | PASS (>= 4.5:1) | Not AAA |
+| **Light:** Primary Brand `#0F766E` on Card Surface `#FFFFFF` | **5.47 : 1** | PASS (>= 4.5:1) | Not AAA |
+| **Light:** Warm Amber `#B45309` on Card Surface `#FFFFFF` | **5.02 : 1** | PASS (>= 4.5:1) | Not AAA |
+| **Light:** White Text `#FFFFFF` on Brand Button `#0F766E` | **5.47 : 1** | PASS (>= 4.5:1) | Not AAA |
+| **Light:** White Text `#FFFFFF` on Amber Button `#B45309` | **5.02 : 1** | PASS (>= 4.5:1) | Not AAA |
+| **Dark:** Primary Text `#F8FAFC` on Dark Canvas `#090D16` | **18.57 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Dark:** Secondary Text `#94A3B8` on Dark Canvas `#090D16` | **7.58 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Dark:** Brand Teal `#14B8A6` on Dark Canvas `#090D16` | **7.81 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Dark:** Amber Gold `#F59E0B` on Dark Canvas `#090D16` | **9.05 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Dark:** Primary Text `#F8FAFC` on Dark Surface `#111827` | **16.96 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Dark:** Secondary Text `#94A3B8` on Dark Surface `#111827` | **6.92 : 1** | PASS (>= 4.5:1) | Large/UI AAA only |
+| **Dark:** Brand Teal `#14B8A6` on Dark Surface `#111827` | **7.13 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Dark:** Amber Gold `#F59E0B` on Dark Surface `#111827` | **8.26 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Dark:** Obsidian Text `#090D16` on Brand Button `#14B8A6`| **7.81 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+
+### 2.3 Corrected WCAG 2.2 Target Size & Accessibility Standards
+- **WCAG 2.2 SC 2.5.8 (Target Size - Minimum) — Level AA:** Requires an interactive target size of at least **24 × 24 CSS pixels**, or sufficient spacing such that a 24px diameter circle centered on the target does not intersect adjacent targets. All application buttons meet this criterion.
+- **WCAG 2.2 SC 2.5.5 (Target Size - Enhanced) — Level AAA:** Requires a target size of at least **44 × 44 CSS pixels**.
+- **Mobile Usability Goal:** 44 × 44 CSS pixels is adopted as the primary touch-target design standard for core mobile interactions (`BottomNav` links, habit completion checkmarks, modal buttons) in alignment with Apple Human Interface Guidelines and Google Material Design, satisfying Level AAA where implemented.
+- **Focus Appearance (WCAG 2.2 SC 2.4.11 / 2.4.13 Level AA):** Focus outlines are styled with `:focus-visible` using `--color-accent-primary` with a 2px outline and 2px offset, ensuring >= 3:1 contrast against adjacent surface borders.
+
+---
+
+## 3. Disentangling Names, URLs & Resource Availability
+
+To eliminate ambiguity, all project identifiers are separated into their distinct functional contexts:
+
+| Identifier Context | Current Repository / Service Reality | Proposed Target Value | Availability / Verification Status |
+| :--- | :--- | :--- | :--- |
+| **Brand / Display Name** | "Vritta" in `brand.js`; "Regimen" in docs | **VRITTA** | **APPROVED & FINALIZED** by user |
+| **Vercel Project Name** | Currently `Regimen` or `regimen-web` | `vritta-app` (or `vritta-web`) | **PROVISIONAL:** Must be verified in Vercel Dashboard |
+| **Vercel Deployment Domain**| Existing deployment active on Vercel | `myvritta.vercel.app` | **PROVISIONAL:** Returned HTTP 404 on network check, but domain assignment can only be confirmed upon project creation or domain addition in Vercel |
+| **GitHub Repository Name** | `manishborikar92/Regimen` | `manishborikar92/Vritta` | **PROVISIONAL:** Pending user rename in GitHub Settings |
+| **Local Workspace Folder** | `c:\Users\manis\Projects\Regimen` | `c:\Users\manis\Projects\Vritta` | **LOCAL TARGET:** Pending execution in Phase 8 |
+| **Firebase Project ID** | `regimen-e32a8` | `vritta-app` (or auto-suffixed) | **PROVISIONAL:** ID will be chosen during Firebase Console setup |
+
+> [!CAUTION]
+> **Domain Availability Clarification:** An HTTP 404 response on the public internet only indicates that no deployment is currently responding at that URL. It does **not** prove that the subdomain is unreserved, unblocked, or claimable by our Vercel account. Availability can only be confirmed by attempting to assign the domain within the Vercel Dashboard.
+
+---
+
+## 4. Firebase Architecture, Migration Options & Rollback
+
+### 4.1 Resource Inventory from Existing Codebase
+- **Client Configuration (`web/src/lib/firebase/config.js`):** Uses public environment variables (`NEXT_PUBLIC_FIREBASE_*`) to initialize client-side auth and Firestore with `persistentLocalCache` and `persistentSingleTabManager`.
+- **Server Configuration (`web/src/lib/server/firebase-admin.js`):** Authoritative Admin SDK initialization. Supports `FIREBASE_SERVICE_ACCOUNT_KEY` (Sensitive JSON string), `GOOGLE_APPLICATION_CREDENTIALS` (file path), and individual private key variables. Contains hardcoded `'regimen-e32a8'` fallbacks on lines 50 and 107 that must be removed.
+- **Security Rules (`web/firestore.rules`):** Rules version 2 enforcing authenticated access, owner-only reads/writes (`request.auth.uid == resource.data.userId`), category whitelisting, and read-only access to `/personalRoutines`.
+- **Composite Indexes (`web/firestore.indexes.json`):** Defines collection group indexes for `dailyLogs` (`userId ASC`, `date DESC`) and `habits` (`userId ASC`, `order ASC`).
+
+### 4.2 Detailed Comparison of Migration Options
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│ OPTION A: Clean Slate (Fresh Start)                                                         │
+├─────────────────────────────────────────────────────────────────────────────────────────────┤
+│ • What is Lost: Historical daily completion logs (/dailyLogs), past streak counters, custom │
+│   habits added by user, user customizations to timing/frequency, profile progress (/users). │
+│ • What is Recreated: User signs in with Google; new account and new project-scoped UID are  │
+│   provisioned; running "npm run schedule:fetch-personal" seeds the 6 canonical routines.   │
+│ • Migration Overhead: Minimal (no export/import script needed).                             │
+│ • Risk Profile: Zero risk of carrying forward corrupted or legacy schemas.                  │
+└─────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│ OPTION B: Preserve Required Data (Admin SDK Scripted Migration)                             │
+├─────────────────────────────────────────────────────────────────────────────────────────────┤
+│ • What is Preserved: Past daily logs (/dailyLogs), historical streak records, custom user   │
+│   habits, customized frequency/notes, and long-term user profile progress (/users).         │
+│ • Why Native Cloud Export/Import Fails: Google OAuth assigns a DIFFERENT project-scoped UID │
+│   to manishborikar92@gmail.com in a new Firebase project. Standard Firestore export/import  │
+│   dumps documents with the old UID. Because security rules require "auth.uid == userId",    │
+│   the user would be permanently locked out of their own imported documents!                 │
+│ • Required Scripted Mechanism: An Admin SDK script must read documents from "regimen-e32a8",│
+│   remap document IDs from ${oldUid}_* to ${newUid}_*, remap foreign keys inside             │
+│   completedHabitIds and habitProgress, and batch-write to the new project database.         │
+│ • Migration Overhead: High (requires developing, testing, and running migration script).    │
+│ • Risk Profile: Moderate (requires validation of UID mapping across all collections).       │
+└─────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+> [!IMPORTANT]
+> **Data-Preservation Decision Status:** This decision remains **explicitly pending**. Implementation will not proceed with any database migration until Manish explicitly chooses Option A or Option B.
+
+### 4.3 Cloud Firestore Location Decision
+- **Immutability Fact:** Once a Cloud Firestore database is created, **its physical location cannot be changed**. Choosing a location requires evaluating permanent trade-offs:
+  - **`asia-south1` (Mumbai, India):** Closest physical proximity to Manish (India). Provides lowest latency for direct client-side browser queries, but is a single-region location (99.99% availability SLA).
+  - **`nam5` (US Central multi-region):** Current location of `regimen-e32a8`. High availability multi-region location (99.999% SLA), closer to Vercel default serverless regions (`iad1`), but introduces higher round-trip latency for browser requests originating in India.
+- **Decision Status:** Pending user confirmation of preferred location (`asia-south1` vs `nam5`) prior to provisioning Phase 6.
+
+### 4.4 Environment Scoping & Staging Strategy
+- **Local Development:** Uses `web/.env.local` pointing to local test credentials.
+- **Preview Staging:** Vercel Preview environment variables point to the **new Firebase project**, allowing full integration testing on preview deployments before touching Production.
+- **Production Cutover:** Vercel Production environment variables remain pointing to `regimen-e32a8` until the complete application and data migration have passed acceptance criteria on Preview.
+
+### 4.5 Rollback Strategy
+- The existing Firebase project `regimen-e32a8` will remain completely active and untouched throughout migration.
+- If any defect or data inconsistency is detected on the new setup, rollback is instant:
+  1. Revert `web/.env.local` to `regimen-e32a8`.
+  2. Revert Vercel environment variables to `regimen-e32a8`.
+  3. Redeploy the previous production deployment in Vercel Dashboard.
+
+---
+
+## 5. Dependency-Aware 10-Phase Roadmap & Safe Sequencing
 
 ```mermaid
 flowchart TD
-    Gate["Approval Gate (User Approves Plan)"] --> P1["Phase 1: Design Tokens & Zero-Flash Theme Engine"]
-    P1 --> P2["Phase 2: Master Vector Assets & Branding Metadata"]
-    P2 --> P3["Phase 3: UI/UX Component Polish (Mobile-First)"]
-    P3 --> P4["Phase 4: Login & Authentication Page Redesign"]
-    P4 --> P5["Phase 5: Mobile-First Browser Verification & Accessibility Audit"]
-    P5 --> P6["Phase 6: Fresh Firebase Project Setup & Data Migration"]
-    P6 --> P7["Phase 7: Project Folder & GitHub Repository Renaming"]
-    P7 --> P8["Phase 8: Vercel Project & Deployment Renaming"]
-    P8 --> P9["Phase 9: Documentation Cleanup, Archival & Handover"]
+    Gate["Approval Gate (User Authorizes Plan)"] --> P1["Phase 1: Design Tokens & Theme Engine (Local)"]
+    P1 --> P2["Phase 2: Master Vector Assets Migration (Local)"]
+    P2 --> P3["Phase 3: UI/UX Component Polish (Local)"]
+    P3 --> P4["Phase 4: Login Page Redesign (Local)"]
+    P4 --> P5["Phase 5: Browser Verification & Accessibility Audit (Local)"]
+    P5 --> Checkpoint["Recovery Checkpoint (Clean Git Tree & Local Tests Pass)"]
+    Checkpoint --> P6["Phase 6: Fresh Firebase Setup & Staging Validation (Cloud/Preview)"]
+    P6 --> P7["Phase 7: GitHub Repository Renaming & Git Remote Update"]
+    P7 --> P8["Phase 8: Local Folder Renaming (External PowerShell)"]
+    P8 --> P9["Phase 9: Vercel Project Renaming & Production Cutover"]
+    P9 --> P10["Phase 10: Documentation Archival, Cleanup & Final Handover"]
 ```
 
----
-
-### Phase 1: Design Tokens & Zero-Flash Theme Engine
-- **Objectives:** Establish the semantic design token architecture for **Restorative Juniper** in both Light and Dark modes with zero visual flash (FOUC) and zero hydration errors.
-- **Issues Addressed:** Absence of dark mode; blinding white screens during evening reading or diary reflections; lack of semantic token abstraction.
-- **Affected Files:**
-  - `web/src/app/globals.css` (add `@custom-variant dark`, define full semantic tokens in `:root` and `.dark`).
-  - `web/src/contexts/ThemeContext.js` (new zero-dependency React Context managing `theme`, `resolvedTheme`, and `setTheme`).
-  - `web/src/contexts/index.js` (export `ThemeContext` and `useTheme`).
-  - `web/src/app/layout.js` (add `suppressHydrationWarning` to `<html>`, inject blocking inline theme script before `<body>`, wrap with `ThemeProvider`).
-  - `web/src/components/ui/TopNav.js` (add accessible 3-state Theme Toggle pill: Light, Dark, System).
-  - `web/src/lib/constants/brand.js` (update primary themeColor to `#0F766E` and define Restorative Juniper color constants).
-- **Dependencies:** None (foundation phase).
-- **Risks & Mitigation:**
-  - *Risk:* React hydration mismatch warning on `<html>` class.  
-    *Mitigation:* Add `suppressHydrationWarning` to `<html>` per official Next.js documentation and mount the toggle UI only after client-side hydration.
-  - *Risk:* Tailwind v4 not honoring `.dark` class.  
-    *Mitigation:* Explicitly declare `@custom-variant dark (&:where(.dark, .dark *));` in `globals.css`.
-- **Outputs:** Working zero-flash theme engine supporting Light, Dark, and System modes.
-- **Acceptance Criteria:**
-  - Toggling theme updates the `dark` class on `<html>` and persists selection to `localStorage`.
-  - Reloading page in dark mode produces zero white flash before first paint.
-  - Console shows 0 hydration mismatch warnings.
-  - All 57 existing unit tests pass cleanly.
+### Why This Sequence is Safest:
+1. **Phases 1–5 (Local Frontend Polish):** Completely decoupled from external cloud infrastructure. Developed and tested on the working local environment.
+2. **Recovery Checkpoint:** Before modifying external repositories or databases, `git status` verifies a clean working tree and all 57 tests pass.
+3. **Phase 6 (Firebase Setup in Isolation):** New project is created and validated in Preview staging. Production remains on `regimen-e32a8`.
+4. **Phases 7–8 (Repository & Folder Renaming):** Executed in a dedicated maintenance window. Git remote is updated before Vercel builds from the new URL.
+5. **Phase 9 (Vercel Cutover):** Triggered only after frontend code, Firebase project, and GitHub repository are completely verified.
+6. **Phase 10 (Cleanup):** Archival occurs only after production is live and verified.
 
 ---
 
-### Phase 2: Brand Identity & Vector Assets Migration
-- **Objectives:** Replace all legacy Regimen/provisional assets with the finalized **VRITTA** brand identity and **Concept 3: Guiding Sutra** master vector graphics.
-- **Issues Addressed:** Outdated concentric gradient logo; low favicon legibility at 16px/32px; inconsistent metadata.
+### Detailed Phase Specifications
+
+#### Phase 1: Design Tokens & Zero-Flash Theme Engine
+- **Objectives:** Implement Restorative Juniper semantic tokens and zero-flash theme switching without introducing external dependencies.
 - **Affected Files:**
-  - `web/src/components/ui/Logo.js` (replace with Guiding Sutra SVG geometry, using currentColor and semantic accent fills).
-  - `web/public/logo.svg` (replace with `guiding-sutra-master.svg`).
-  - `web/src/app/icon0.svg` (replace with optically boosted `guiding-sutra-favicon.svg`, 20px stroke).
-  - `web/public/web-app-manifest-192x192.png` and `web-app-manifest-512x512.png` (regenerate crisp icons from Guiding Sutra master).
-  - `web/src/app/apple-icon.png` and `web/src/app/favicon.ico` (update).
-  - `web/src/app/manifest.json` (name: "VRITTA", short_name: "VRITTA", theme_color: "#0F766E", background_color: "#F8FAFC").
-  - `web/src/app/layout.js` (metadata title: "VRITTA — Personal Routine Companion", description, icons).
+  - `web/src/app/globals.css` (add `@custom-variant dark`, define semantic tokens in `:root` and `.dark`).
+  - `web/src/contexts/ThemeContext.js` (create React Context managing `theme`, `resolvedTheme`, and `setTheme`).
+  - `web/src/contexts/index.js` (export `ThemeContext`).
+  - `web/src/app/layout.js` (add `suppressHydrationWarning`, inject blocking script before `<body>`, wrap with `ThemeProvider`).
+  - `web/src/components/ui/TopNav.js` (add 3-state Theme Toggle pill).
+  - `web/src/lib/constants/brand.js` (update `BRAND.themeColor` to `#0F766E` and define Restorative Juniper constants).
+- **Dependencies:** None.
+- **Working Directory:** `web/`
+- **Verification Commands:**
+  - `npm --prefix web run lint` (must exit 0).
+  - `npm --prefix web run test` (must pass 57/57 tests).
+- **Acceptance Criteria:** Theme toggles between Light, Dark, and System; selection persists across reloads; dark mode reload produces zero white flash; 0 console hydration errors.
+
+#### Phase 2: Master Vector Assets & Branding Metadata
+- **Objectives:** Replace legacy gradient logo with the approved **Concept 3: Guiding Sutra** mark and install crisp icons.
+- **Affected Files:**
+  - `web/src/components/ui/Logo.js` (replace with Guiding Sutra SVG geometry adapting to theme).
+  - `web/public/logo.svg` (replace with `logo-concept-3-guiding-sutra.svg`).
+  - `web/src/app/icon0.svg` (replace with 20px-stroke `guiding-sutra-favicon.svg`).
+  - `web/public/web-app-manifest-192x192.png`, `512x512.png`, `apple-icon.png`, `favicon.ico` (regenerate).
+  - `web/src/app/manifest.json` (name: "VRITTA", theme_color: "#0F766E").
+  - `web/src/app/layout.js` (metadata title: "VRITTA — Personal Routine Companion").
 - **Dependencies:** Phase 1 complete.
-- **Risks & Mitigation:**
-  - *Risk:* Tiny browser tabs blur the monoline mark.  
-    *Mitigation:* Use the optically boosted favicon asset (`guiding-sutra-favicon.svg`) with 20px stroke and enlarged amber anchor dot.
-- **Outputs:** Fully unified vector identity across browser tabs, PWA install prompts, and UI headers.
-- **Acceptance Criteria:**
-  - Browser tab renders the crisp Guiding Sutra mark at 16×16 and 32×32 resolutions.
-  - PWA manifest validates in Chrome DevTools Application tab without icon errors.
-  - `Logo.js` renders sharply across mobile (24px), header (32px), and hero (80px).
+- **Verification Commands:** `npm --prefix web run test` (57/57 pass); inspect browser tab at 16×16 and 32×32.
+- **Acceptance Criteria:** Favicon renders clearly in browser tabs; PWA manifest loads without error.
 
----
-
-### Phase 3: UI/UX Component Polish (Mobile-First)
-- **Objectives:** Apply the Restorative Juniper semantic tokens and mobile-first ergonomic improvements to all application cards and navigation views.
-- **Issues Addressed:** Hardcoded Tailwind Indigo classes; floaty touch targets (<44px); redundant uppercase eyebrow labels; lack of tactile active states.
+#### Phase 3: UI/UX Component Polish (Mobile-First)
+- **Objectives:** Apply semantic tokens and mobile touch ergonomics (>= 44px) across core views; remove uppercase eyebrow clutter.
 - **Affected Files:**
-  - `web/src/app/(protected)/dashboard/page.js`: Group routines cleanly into Flexible, Afternoon (Movement), and Before Bed (Reading); replace hardcoded gradients with semantic tokens; remove excessive uppercase eyebrow styling.
-  - `web/src/components/habits/WorkbookCard.js`: Polish dual-session buttons, review checkbox, and session counter with tactile `:active` state.
-  - `web/src/components/habits/MovementCard.js`: Style weekday-adaptive cards and Sunday rest banner with Heather recovery tokens (`#7C3AED` / `#A78BFA`).
-  - `web/src/components/habits/OshoCard.js`, `ReadingCard.js`, `SpeakingCard.js`, `DiaryCard.js`: Apply semantic surface and text tokens.
-  - `web/src/components/habits/StreakCounter.js`: Update with Warm Amber rhythm accent (`#B45309` / `#F59E0B`).
-  - `web/src/components/ui/BottomNav.js`: Normalize icon strokes to 2.0px, ensure touch targets >= 44×44px, update active tab indicator.
-  - `web/src/components/ui/TopNav.js`: Style profile dropdown and branding header with semantic surface tokens.
-  - `web/src/app/(protected)/habits/page.js`: Polish Routine Manager list, badge chips (`Personal` vs `Foundation`), and modal dialogs.
-  - `web/src/app/(protected)/analytics/page.js`: Style 30-day calendar heatmap with Restorative Juniper activity levels and rest day badges.
-- **Dependencies:** Phases 1 and 2 complete.
-- **Risks & Mitigation:**
-  - *Risk:* Regressions in custom habit editing or completion toggles.  
-    *Mitigation:* Retain all existing event handlers and state hooks (`useData`, `useHabits`, `useDailyLogs`); verify with unit tests.
-- **Outputs:** Cohesive, tactile, distraction-free mobile UI in both Light and Dark modes.
-- **Acceptance Criteria:**
-  - Zero horizontal scrollbar or element overflow across 375px–430px viewports.
-  - Every interactive element has a minimum touch target of 44×44px.
-  - All 57 unit tests pass.
+  - `web/src/app/(protected)/dashboard/page.js`: Clean grouping (Flexible, Afternoon Movement, Before Bed Reading); replace hardcoded gradients; eliminate excessive uppercase eyebrows.
+  - `web/src/components/habits/WorkbookCard.js`: Dual-session buttons with tactile `:active` state.
+  - `web/src/components/habits/MovementCard.js`: Weekday-adaptive card and Sunday rest banner using slate/juniper tokens.
+  - `web/src/components/habits/OshoCard.js`, `ReadingCard.js`, `SpeakingCard.js`, `DiaryCard.js`: Semantic surface/text styling.
+  - `web/src/components/habits/StreakCounter.js`: Warm Amber rhythm styling.
+  - `web/src/components/ui/BottomNav.js`: 44px touch targets; normalized 2.0px stroke icons.
+  - `web/src/app/(protected)/habits/page.js`: Routine Manager list and modal styling.
+  - `web/src/app/(protected)/analytics/page.js`: 30-day heatmap with Restorative Juniper activity tokens.
+- **Dependencies:** Phases 1–2 complete.
+- **Verification Commands:** `npm --prefix web run lint` (exit 0); `npm --prefix web run test` (57/57 pass).
+- **Acceptance Criteria:** Zero horizontal overflow across mobile viewports; touch targets >= 44×44px; tactile active states.
 
----
-
-### Phase 4: Login & Authentication Page Redesign
-- **Objectives:** Replace the animated AI glow effect with a dignified, calm, distraction-free authentication experience.
-- **Issues Addressed:** AI-slop pulse glow; hardcoded Indigo background tints; lack of dark mode styling on auth view.
+#### Phase 4: Login & Authentication Page Redesign
+- **Objectives:** Replace the animated AI glowing blob with a calm, dignified authentication experience.
 - **Affected Files:**
-  - `web/src/app/(auth)/login/page.js`:
-    - Remove the `animate-pulse blur-2xl bg-indigo-300` glow element.
-    - Render the Guiding Sutra master mark inside a clean porcelain/obsidian surface container.
-    - Update the 4 core pillars with Restorative Juniper badges and semantic typography.
-    - Style Google Sign-In button with subtle border, shadow, and tactile `:active` scale state.
-    - Add complete dark mode styling.
+  - `web/src/app/(auth)/login/page.js`: Remove `animate-pulse blur-2xl` glow; render Guiding Sutra mark in porcelain/obsidian card; style 4 pillars with Restorative Juniper badges; tactile Google button.
 - **Dependencies:** Phases 1–3 complete.
-- **Risks & Mitigation:**
-  - *Risk:* OAuth popup blocked or failing.  
-    *Mitigation:* Keep existing `signInWithGoogle()` flow untouched; verify Google button keyboard navigability.
-- **Outputs:** Dignified, calm login experience matching the philosophical spirit of VRITTA.
-- **Acceptance Criteria:**
-  - Zero animated blur blobs or distracting glows.
-  - Google Sign-In functions seamlessly in both Light and Dark modes.
+- **Verification Commands:** `npm --prefix web run test` (57/57 pass).
+- **Acceptance Criteria:** Zero animated glow blobs; Google Sign-In functions in Light and Dark modes.
 
----
-
-### Phase 5: Mobile-First Browser Verification & Accessibility Audit
-- **Objectives:** Execute exhaustive visual and functional verification across mobile, tablet, and desktop viewports, auditing contrast, keyboard navigation, and touch ergonomics.
-- **Issues Addressed:** Visual clipping, uninspected mobile layouts, contrast regressions.
-- **Affected Files / Environment:**
-  - Local dev server (`npm --prefix web run dev` at `http://localhost:3000`).
-  - Viewport matrix: 375×667 (iPhone SE), 390×844 (iPhone 14), 412×915 (Android), 768×1024 (Tablet), 1280×800 (Desktop).
-  - Evidence output directory: `docs/test-evidence/`.
+#### Phase 5: Browser Verification & Accessibility Audit
+- **Objectives:** Comprehensive visual and functional audit across viewports.
 - **Dependencies:** Phases 1–4 complete.
-- **Risks & Mitigation:**
-  - *Risk:* Subtle CSS overflow causing page wobble on mobile devices.  
-    *Mitigation:* Run automated viewport inspection asserting `document.documentElement.scrollWidth === window.innerWidth`.
-- **Outputs:** Comprehensive test report with screenshot evidence across light and dark modes.
-- **Acceptance Criteria:**
-  - All viewports render with zero horizontal overflow and zero clipping.
-  - WCAG 2.2 AA contrast verified: text >= 4.5:1, UI components >= 3:1.
-  - Focus indicators (`:focus-visible`) clear and visible on all interactive elements.
-  - Production build (`npm --prefix web run build`) compiles with 0 errors.
+- **Verification Commands:**
+  - `npm --prefix web run test` (57/57 pass).
+  - `npm --prefix web run build` (Next.js build in `--webpack` mode compiles with 0 errors).
+  - Execute viewport matrix audit (375px, 390px, 412px, 768px, 1280px).
+- **Acceptance Criteria:** Zero element overflow (`scrollWidth === innerWidth`); contrast ratios verified; focus outlines clear.
 
----
+#### Recovery Checkpoint
+- Perform clean working-tree check: `git status` must show only planned local changes.
+- Ensure all 57 tests pass and build succeeds.
 
-### Phase 6: Fresh Firebase Project Setup & Data Migration
-- **Objectives:** Provision and configure a clean, dedicated Firebase project for VRITTA, configure Google Authentication, deploy security rules and indexes, establish least-privilege Admin SDK credentials, and preserve user routine data.
-- **Issues Addressed:** Legacy project naming (`regimen-e32a8`); unorganized credentials; potential data contamination.
-- **Affected Files & Resources:**
-  - New Firebase Project (e.g. `vritta-app` or `vritta-routine-XXXX`).
-  - Google Cloud IAM Service Account & key file (`%USERPROFILE%\.credentials\vritta-firebase-adminsdk.json`).
-  - `web/.firebaserc` (update default project ID).
-  - `web/.env.local` (update client credentials and `GOOGLE_APPLICATION_CREDENTIALS`).
-  - `web/src/lib/server/firebase-admin.js` (remove hardcoded `'regimen-e32a8'` fallback).
-  - `web/firestore.rules` and `web/firestore.indexes.json` (deploy to new project).
-- **Dependencies:** Phase 5 verified. Existing `regimen-e32a8` remains running and untouched as rollback baseline.
-- **Risks & Mitigation:**
-  - *Risk:* New Firebase project issues a different UID for `manishborikar92@gmail.com` on first Google Sign-In.  
-    *Mitigation:* Admin CLI sync tool resolves user by email via `adminAuth.getUserByEmail('manishborikar92@gmail.com')`. Signing in once on the new project provisions the account, after which `npm run schedule:fetch-personal` seeds the 6 personalized routines with the new UID automatically.
-- **Outputs:** Operational Firebase project with verified auth, deployed rules, and synchronized routines.
-- **Acceptance Criteria:**
-  - Google Sign-In works on `localhost:3000` with the new Firebase project.
-  - `npm run schedule:fetch-personal` synchronizes 6 routines to Firestore `/habits` with 0 errors.
-  - Firestore security rules deny unauthorized client reads/writes.
+#### Phase 6: Fresh Firebase Project Setup & Staging Validation
+- **Objectives:** Provision fresh Firebase project, deploy security rules and indexes, configure Admin SDK credentials, and validate in Preview.
+- **Dependencies:** Phase 5 verified; user decision on Option A vs Option B confirmed.
+- **Tasks:**
+  1. Create Firebase project in Firebase Console.
+  2. Enable Google Authentication; add authorized domains (`localhost`, `127.0.0.1`, Vercel domains).
+  3. Provision Firestore Database in confirmed location (`asia-south1` or `nam5`).
+  4. Deploy rules: `firebase deploy --only firestore:rules --project <new-id>`.
+  5. Deploy indexes: `firebase deploy --only firestore:indexes --project <new-id>`.
+  6. Generate Admin SDK service account key; store in `%USERPROFILE%\.credentials\`.
+  7. Update `web/.firebaserc` and `web/.env.local`. Remove hardcoded fallbacks in `firebase-admin.js`.
+  8. Execute data strategy (Option A: seed routines via `npm run schedule:fetch-personal`; Option B: execute migration script).
+  9. Deploy to Vercel Preview environment and validate end-to-end.
+- **Acceptance Criteria:** Sign-in and habit tracking verified on local dev server and Vercel Preview.
 
----
-
-### Phase 7: Project Folder & GitHub Repository Renaming
-- **Objectives:** Safely rename the local directory from `Regimen` to `Vritta` and the GitHub repository from `manishborikar92/Regimen` to `manishborikar92/Vritta`, updating local Git remotes without corrupting history.
-- **Issues Addressed:** Outdated repository name; directory name mismatch.
-- **Affected Resources:**
-  - GitHub Repository settings (`https://github.com/manishborikar92/Regimen/settings`).
-  - Local directory path (`C:\Users\manis\Projects\Regimen` -> `C:\Users\manis\Projects\Vritta`).
-  - Local Git remote URL (`git remote set-url origin`).
-  - `web/package.json` (`"name": "vritta-web"`).
+#### Phase 7: GitHub Repository Renaming & Git Remote Update
+- **Objectives:** Rename GitHub repository and update local Git remotes safely.
 - **Dependencies:** Phase 6 complete.
-- **Risks & Mitigation:**
-  - *Risk:* Windows folder lock (`ResourceInUse`) if terminals or dev servers have open file handles.  
-    *Mitigation:* Stop all Node processes; perform folder rename from an external PowerShell terminal located at `C:\Users\manis\Projects`.
-- **Outputs:** Renamed GitHub repository and clean local workspace at `C:\Users\manis\Projects\Vritta`.
-- **Acceptance Criteria:**
-  - `git remote -v` outputs `https://github.com/manishborikar92/Vritta.git`.
-  - `git status` shows clean branch `m/dev`.
-  - `git fetch origin` succeeds without authentication or redirect errors.
+- **Tasks:**
+  1. Go to GitHub repo settings: Rename repository from `Regimen` to `Vritta`.
+  2. Update local Git remote: `git remote set-url origin https://github.com/manishborikar92/Vritta.git`.
+  3. Verify with `git remote -v` and `git fetch origin`.
+  4. Check Vercel Project Settings > Git to confirm repository link is active.
+- **Acceptance Criteria:** `git remote -v` reflects `Vritta.git`; fetch succeeds.
+
+#### Phase 8: Local Folder Renaming
+- **Objectives:** Safely rename local workspace directory on Windows.
+- **Dependencies:** Phase 7 complete.
+- **Tasks:**
+  1. Terminate all Node.js and terminal processes running in `C:\Users\manis\Projects\Regimen`.
+  2. Open an external PowerShell window at `C:\Users\manis\Projects`.
+  3. Execute: `Rename-Item -Path "C:\Users\manis\Projects\Regimen" -NewName "Vritta"`.
+  4. Reopen project at `C:\Users\manis\Projects\Vritta` and verify `git status`.
+- **Acceptance Criteria:** Directory is `Vritta`; git working tree is intact.
+
+#### Phase 9: Vercel Project Renaming & Production Cutover
+- **Objectives:** Rename Vercel project, configure production domain, update Sensitive env vars, and cut over Production.
+- **Dependencies:** Phases 6–8 complete.
+- **Tasks:**
+  1. In Vercel Dashboard, update Project Name to `vritta-app` (provisional).
+  2. Add production domain in Vercel Domains.
+  3. Add production domain to Firebase Auth Authorized Domains.
+  4. Update Production environment variables in Vercel (`FIREBASE_SERVICE_ACCOUNT_KEY` Sensitive, `NEXT_PUBLIC_FIREBASE_*`).
+  5. Trigger production redeployment.
+- **Acceptance Criteria:** Production deployment succeeds; Google Sign-In authenticates on live domain; routines load.
+
+#### Phase 10: Documentation Archival, Cleanup & Final Handover
+- **Objectives:** Execute documentation cleanup matrix; archive superseded documents to `docs/archive/`; deliver handover sign-off.
+- **Dependencies:** Phase 9 live and verified.
+- **Acceptance Criteria:** All documentation updated; temporary debug files removed; obsolete plans safely archived.
 
 ---
 
-### Phase 8: Vercel Project & Deployment Renaming
-- **Objectives:** Update the Vercel project name to `vritta-app`, configure the production deployment domain `vritta-app.vercel.app`, update Sensitive environment variables, and verify live edge routing.
-- **Issues Addressed:** Old deployment URL referencing Regimen; broken Google OAuth if authorized domains are missing.
-- **Affected Resources:**
-  - Vercel Project Settings > General (Project Name: `vritta-app`).
-  - Vercel Project Settings > Domains (Domain: `vritta-app.vercel.app`).
-  - Vercel Project Settings > Environment Variables (`FIREBASE_SERVICE_ACCOUNT_KEY` Sensitive, `NEXT_PUBLIC_FIREBASE_*`).
-  - Firebase Authentication > Settings > Authorized Domains (add `vritta-app.vercel.app`).
-- **Dependencies:** Phases 6 and 7 complete.
-- **Risks & Mitigation:**
-  - *Risk:* Google Sign-In throws `auth/unauthorized-domain` on Vercel.  
-    *Mitigation:* Add `vritta-app.vercel.app` to Firebase Console Authorized Domains **before** testing live sign-in.
-- **Outputs:** Live, production-deployed web application running at `https://vritta-app.vercel.app`.
-- **Acceptance Criteria:**
-  - Production build on Vercel succeeds in `--webpack` mode.
-  - Visiting `https://vritta-app.vercel.app` loads the application over HTTPS with zero console errors.
-  - Google Sign-In authenticates successfully on production.
-  - Theme switcher toggles Light and Dark modes flawlessly on production.
+## 6. Comprehensive Testing Coverage Matrix
+
+The 57 automated unit tests are a logic baseline, not proof of complete UI correctness. Full verification requires testing all application routes and states:
+
+| Route / Component | Interaction / State Tested | Testing Method | Acceptance Criteria |
+| :--- | :--- | :--- | :--- |
+| **`/login` (Auth Page)** | Initial load (Light & Dark) | Visual / Playwright | Guiding Sutra mark crisp; zero AI glow; cards readable |
+| **`/login` (Auth Page)** | Google Sign-In click | Manual Browser | Popup opens, authenticates, redirects to `/dashboard` |
+| **`/dashboard` (Today)** | Groups rendering | Visual / Playwright | Routines grouped into Flexible, Afternoon, Before Bed |
+| **`WorkbookCard`** | Session 1 & 2 increments | Interaction / Manual | Progress updates; complete only when review is checked |
+| **`MovementCard`** | Weekday-adaptive display | Unit test & Browser | Displays Mon/Wed/Fri workout, Tue/Thu/Sat walk, Sun rest |
+| **`OshoCard`** | Discourse catalog modal | Interaction / Manual | Modal opens, shows 30 talks across 6 groups, saves progress |
+| **`ReadingCard`** | 30-min bedtime timer | Interaction / Manual | Timer starts, pauses, updates duration progress |
+| **`SpeakingCard`** | ChatGPT practice toggle | Interaction / Manual | Opens practice notes, toggles binary completion |
+| **`DiaryCard`** | Private reflection modal | Interaction / Manual | Opens 5 reflection prompts; saves privately to account |
+| **`StreakCounter`** | Consistency rhythm display| Unit test & Visual | Amber accent renders; rest days excluded from streak |
+| **`TopNav`** | 3-state Theme Switcher | Interaction / Manual | Toggles Light, Dark, System; zero flash on reload |
+| **`TopNav`** | Profile menu & Sign out | Interaction / Manual | Menu opens, confirmation dialog prompts, signs out clean |
+| **`BottomNav`** | Navigation tabs (Today, Routine, Insights)| Interaction / Manual | Active tab highlighted; touch targets >= 44×44px |
+| **`/habits` (Manager)** | Add / Edit Habit modal | Interaction / Manual | Saves custom habit; displays `Personal` vs `Foundation` badge |
+| **`/habits` (Manager)** | Delete habit | Interaction / Manual | ConfirmDialog warns; habit removed; past logs preserved |
+| **`/analytics` (Insights)**| 30-day calendar heatmap | Interaction / Visual | Sunday rest excluded from denominator; heatmap colored |
+| **Loading States** | Page navigation loading | Visual / Playwright | `LoadingSpinner` centers cleanly with semantic accent |
+| **Empty States** | No habits scheduled | Visual / Playwright | Helpful empty state with link to Routine Manager |
+| **Responsive Viewports**| 375px, 390px, 412px, 768px, 1280px | Playwright / DevTools | Zero horizontal scrollbar (`scrollWidth === clientWidth`) |
+
+### Recommended Browser Automation Tooling
+- **Recommendation:** Install **Playwright** (`@playwright/test`) as a devDependency in `web/` during Phase 5.
+- **Justification:** Playwright natively supports viewport emulation (iPhone SE 375px, iPhone 14 390px, Pixel 7 412px), dark mode emulation (`colorScheme: 'dark'`), full-page screenshot capture, and automated assertion of `scrollWidth === clientWidth`.
+- **Evidence Storage:** Automated and manual screenshots will be stored in `docs/test-evidence/`.
 
 ---
 
-### Phase 9: Documentation Cleanup, Archival & Handover
-- **Objectives:** Execute the documentation inventory plan, archive superseded historical records, update core operational runbooks, and deliver the final handover package.
-- **Issues Addressed:** Obsolete documentation; clutter of rejected concepts; stale command references.
-- **Affected Files:**
-  - Update: `README.md`, `web/README.md`, `docs/Architecture.md`, `docs/UserFlow.md`, `docs/Workflow.md`, `docs/firebase-setup.md`.
-  - Archive: `docs/rebuild-plan.md`, `docs/schedule-isolation-and-firebase-plan.md`, `docs/BODY-RESTORATION-PROTOCOL.md`, rejected logo concepts.
-  - Delete: `web/firebase-debug.log`.
-  - Create: `docs/migration-and-renaming-runbook.md`, `docs/mobile-testing-and-release-checklist.md`.
-- **Dependencies:** All previous phases verified.
-- **Outputs:** Clean, professional, maintainable repository documentation.
-- **Acceptance Criteria:**
-  - Every link and command in `README.md` and `docs/` is verified accurate.
-  - No temporary debug files remain.
-  - All historical records safely preserved in `docs/archive/`.
+## 7. Documentation & Artifact Inventory
 
----
-
-## Deliverable 3: Operation Sequencing & Migration Plan
-
-The implementation sequence is structured around strict safety dependencies:
-
-```
-[Phase 1-4: Frontend & Tokens] ──► [Phase 5: Browser QA] ──► [Phase 6: Fresh Firebase]
-                                                                     │
-[Phase 9: Final Cleanup] ◄── [Phase 8: Vercel Deploy] ◄── [Phase 7: Rename Git & Folder]
-```
-
-### Why This Order is Safest:
-1. **Frontend First (Phases 1–4):** Implemented on the working local environment. If any styling or UI issues arise, they are resolved immediately without external network or service interference.
-2. **Local Verification Before Cloud Changes (Phase 5):** Guarantees zero regression on existing functionality before touching databases, repositories, or deployments.
-3. **Firebase Migration Before GitHub/Vercel (Phase 6):** Creating and validating the new Firebase project locally ensures that credentials and security rules are 100% operational. The existing `regimen-e32a8` project remains active as a zero-downtime rollback baseline.
-4. **GitHub & Folder Renaming Before Vercel (Phase 7):** Updating the GitHub repository URL ensures that when Vercel triggers its next build, it is already pointing to the canonical `manishborikar92/Vritta` repository.
-5. **Vercel Deployment as Capstone (Phase 8):** Deployed only after frontend code, Firebase project, and GitHub repo are fully aligned.
-6. **Documentation Cleanup Last (Phase 9):** Ensures all actual final URLs, project IDs, and paths are documented accurately.
-
----
-
-## Deliverable 4: Documentation & Artifact Inventory
-
-| Exact Path | Recommended Action | Justification |
+| Exact File Path | Proposed Action | Justification |
 | :--- | :--- | :--- |
-| `docs/branding-exploration/01-project-analysis-and-audit.md` | **Maintain** | Core architecture and anti-slop design audit. |
-| `docs/branding-exploration/02-name-proposals.md` | **Maintain** | Authoritative record of VRITTA etymology, subdomain audits, and candidate research. |
-| `docs/branding-exploration/03-logo-concepts/guiding-sutra-*.svg` | **Maintain** | Authoritative production vector assets for Guiding Sutra master, light, dark, and favicon. |
-| `docs/branding-exploration/03-logo-concepts/logo-concept-[1245]*.svg` | **Archive** | Historical discarded logo concepts (Move to `docs/archive/branding/`). |
-| `docs/branding-exploration/03-logo-concepts/logo-design-rationale.md` | **Maintain** | Construction geometry, aspect ratios, and stroke mathematics. |
-| `docs/branding-exploration/04-color-palette-and-tokens.md` | **Maintain** | Authoritative token specifications for Restorative Juniper and WCAG audits. |
-| `docs/branding-exploration/05-ui-ux-mockups/*.svg` | **Maintain** | Visual mockups and component comparison sheet. |
-| `docs/branding-exploration/06-phased-implementation-plan.md` | **Maintain** | Master technical roadmap (this document). |
-| `docs/branding-exploration/interactive-preview.html` | **Maintain** | Standalone browser preview tool for visual regression testing. |
-| `docs/regimen_project_brief.md` | **Maintain** | Authoritative baseline specification for Manish's 6 daily practices. |
-| `docs/Architecture.md` | **Update** | Update branding to VRITTA, document Restorative Juniper tokens, ThemeContext, and current SDK versions. |
-| `docs/firebase-setup.md` | **Update** | Remove obsolete `/api/schedule/personal` Route Handler references; document new Firebase project credentials. |
-| `docs/UserFlow.md` | **Update** | Document Theme switching flow, updated brand name, and simplified navigation. |
+| `docs/branding-exploration/01-project-analysis-and-audit.md` | **Maintain** | Permanent baseline audit and anti-slop guidelines. |
+| `docs/branding-exploration/02-name-proposals.md` | **Archive** | Move to `docs/archive/branding/02-name-proposals.md` as historical research record. |
+| `docs/branding-exploration/03-logo-concepts/logo-concept-3-guiding-sutra.svg` | **Maintain** | Authoritative approved logo vector mark. |
+| `docs/branding-exploration/03-logo-concepts/guiding-sutra-*.svg` | **Maintain** | Master, light, dark, and favicon derived vector assets. |
+| `docs/branding-exploration/03-logo-concepts/logo-concept-[1245]*.svg` | **Archive** | Move to `docs/archive/branding/` as historical discarded concepts. |
+| `docs/branding-exploration/03-logo-concepts/logo-design-rationale.md` | **Maintain** | Technical geometry documentation for Guiding Sutra mark. |
+| `docs/branding-exploration/04-color-palette-and-tokens.md` | **Maintain** | Comprehensive color palette research and token reference. |
+| `docs/branding-exploration/05-ui-ux-mockups/palette-comparison-sheet.svg` | **Maintain** | Visual design system component sheet. |
+| `docs/branding-exploration/05-ui-ux-mockups/mockup-*.svg` | **Maintain** | High-fidelity UI mockups used for visual regression verification. |
+| `docs/branding-exploration/06-phased-implementation-plan.md` | **Maintain** | **Canonical Implementation Plan** (this document). |
+| `docs/branding-exploration/interactive-preview.html` | **Maintain** | Interactive browser preview tool for theme testing. |
+| `docs/regimen_project_brief.md` | **Maintain** | Authoritative product brief defining Manish's 6 daily practices. |
+| `docs/Architecture.md` | **Update** | Update architecture to VRITTA, Restorative Juniper tokens, and ThemeContext. |
+| `docs/firebase-setup.md` | **Update** | Remove obsolete `/api/schedule/personal` references; document new Firebase project. |
+| `docs/UserFlow.md` | **Update** | Document theme switching and updated user journeys. |
 | `docs/Workflow.md` | **Update** | Update repository URLs, Node test commands, and CLI sync instructions. |
-| `README.md` (root) | **Update** | Full rewrite featuring VRITTA branding, Guiding Sutra logo, tech stack, and setup guide. |
-| `web/README.md` | **Update** | Update package instructions, script references, and environment configuration. |
-| `web/.env.local.example` | **Update** | Update placeholder variables for fresh Firebase project. |
-| `docs/schedule-isolation-and-firebase-plan.md` | **Archive** | Superseded planning document for Phase 5 (Move to `docs/archive/`). |
-| `docs/rebuild-plan.md` | **Archive** | Superseded initial rebuild plan (Move to `docs/archive/`). |
-| `docs/BODY-RESTORATION-PROTOCOL.md` | **Archive** | Obsolete pre-rebuild schedule (Chunky Monkey shake, etc.) superseded by `regimen_project_brief.md`. |
+| `README.md` (root) | **Update** | Rewrite to feature VRITTA branding, Guiding Sutra logo, and setup instructions. |
+| `web/README.md` | **Update** | Update package scripts and environment variable documentation. |
+| `web/.env.local.example` | **Update** | Update placeholders for fresh Firebase project. |
+| `docs/schedule-isolation-and-firebase-plan.md` | **Archive** | Move to `docs/archive/` (superseded Phase 5 plan). |
+| `docs/rebuild-plan.md` | **Archive** | Move to `docs/archive/` (superseded initial rebuild plan). |
+| `docs/BODY-RESTORATION-PROTOCOL.md` | **Archive** | Move to `docs/archive/` (superseded pre-rebuild schedule). |
 | `web/firebase-debug.log` | **Delete** | Temporary CLI debug log from past execution. |
-| `docs/migration-and-renaming-runbook.md` | **Create** | Step-by-step operational runbook for renaming and migration execution. |
-| `docs/mobile-testing-and-release-checklist.md` | **Create** | Complete mobile QA matrix, screenshot log, and release sign-off checklist. |
+| `docs/migration-and-renaming-runbook.md` | **Create** | Dedicated operational runbook for renaming and migration execution. |
+| `docs/mobile-testing-and-release-checklist.md` | **Create** | Dedicated mobile QA protocol, screenshot log, and sign-off checklist. |
 
 ---
 
-## Deliverable 5: Project Folder & GitHub Repository Renaming Guide
+## 8. Authoritative Research References
 
-### Step 5.1: Prerequisites
-- Ensure all local changes are saved and unit tests pass (`npm --prefix web run test`).
-- Ensure no terminal, IDE, or Node process has `C:\Users\manis\Projects\Regimen` open as its current working directory.
-
-### Step 5.2: Renaming the GitHub Repository
-1. Open browser and visit: `https://github.com/manishborikar92/Regimen/settings`
-2. Under the **General** tab > **Repository Name** field:
-   - Enter: `Vritta` (or `vritta`)
-   - Click **Rename**
-3. GitHub automatically establishes web and git redirects, but local remote must be updated immediately.
-
-### Step 5.3: Safely Renaming the Local Directory on Windows
-1. Open a new PowerShell window outside the project directory:
-   ```powershell
-   cd C:\Users\manis\Projects
-   ```
-2. Verify no locks exist on the folder:
-   ```powershell
-   Get-Process | Where-Object { $_.Path -like "*Regimen*" }
-   ```
-3. Rename the directory:
-   ```powershell
-   Rename-Item -Path "C:\Users\manis\Projects\Regimen" -NewName "Vritta"
-   ```
-4. Change into the renamed directory:
-   ```powershell
-   cd C:\Users\manis\Projects\Vritta
-   ```
-
-### Step 5.4: Updating the Local Git Remote URL
-1. Check current remote:
-   ```powershell
-   git remote -v
-   ```
-2. Set the updated repository URL:
-   ```powershell
-   git remote set-url origin https://github.com/manishborikar92/Vritta.git
-   ```
-3. Verify updated remote:
-   ```powershell
-   git remote -v
-   ```
-   *Expected output:*
-   ```
-   origin  https://github.com/manishborikar92/Vritta.git (fetch)
-   origin  https://github.com/manishborikar92/Vritta.git (push)
-   ```
-4. Test fetch and working branch:
-   ```powershell
-   git fetch origin
-   git status
-   ```
-   *Expected output:* On branch `m/dev`, up to date with `origin/m/dev`.
-
----
-
-## Deliverable 6: Vercel Project & Deployment Renaming Guide
-
-### Step 6.1: Vercel Project Renaming
-1. Log in to the [Vercel Dashboard](https://vercel.com/dashboard).
-2. Select project **Regimen** (or `regimen-web`).
-3. Navigate to **Settings** > **General**.
-4. In the **Project Name** field:
-   - Enter: `vritta-app` (Note: `vritta.vercel.app` is occupied by a 3rd party; `vritta-app.vercel.app` is verified 100% available).
-   - Click **Save**.
-
-### Step 6.2: Domain Configuration
-1. Navigate to **Settings** > **Domains**.
-2. Verify `vritta-app.vercel.app` is added as the Primary Production Domain.
-3. If a custom domain (e.g. `vritta.life` or `vritta.me`) is purchased later, add it here and configure DNS CNAME `cname.vercel-dns.com`.
-4. Keep the legacy `regimen-*.vercel.app` domain temporarily configured with a 308 permanent redirect to `vritta-app.vercel.app` to prevent broken bookmarks.
-
-### Step 6.3: Updating Vercel Environment Variables
-1. Navigate to **Settings** > **Environment Variables**.
-2. Update the following variables for **Production** and **Preview**:
-   - `NEXT_PUBLIC_FIREBASE_API_KEY`: New Firebase Web API Key.
-   - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`: `vritta-app.firebaseapp.com` (or new project ID).
-   - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`: New project ID.
-   - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`: `vritta-app.firebasestorage.app`.
-   - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`: New sender ID.
-   - `NEXT_PUBLIC_FIREBASE_APP_ID`: New app ID.
-   - `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID`: New measurement ID.
-   - `FIREBASE_SERVICE_ACCOUNT_KEY` (**Sensitive**): Full JSON string of the new service account key.
-3. Trigger a fresh deployment: **Deployments** > **...** > **Redeploy**.
-
----
-
-## Deliverable 7: Fresh Firebase Project Setup & Migration Guide
-
-### 7.1 Resource Inventory Matrix
-
-| Firebase Resource | Current Configuration (`regimen-e32a8`) | Target Configuration (`vritta-app`) | Migration Method |
-| :--- | :--- | :--- | :--- |
-| **Project ID** | `regimen-e32a8` | e.g. `vritta-app` or `vritta-routine-XXXX` | Create fresh in Firebase Console |
-| **Auth Providers** | Google OAuth | Google OAuth | Enable in Authentication Console |
-| **Authorized Domains**| `localhost`, `regimen-e32a8.firebaseapp.com` | `localhost`, `127.0.0.1`, `vritta-app.vercel.app`, `<new-id>.firebaseapp.com` | Add in Auth Settings |
-| **User Account** | `manishborikar92@gmail.com` (Old UID) | `manishborikar92@gmail.com` (New UID) | Sign in with Google on new app to provision |
-| **Firestore DB** | `(default)` in `nam5` | `(default)` in `asia-south1` (Mumbai) or `nam5` | Provision in Firestore Console |
-| **Security Rules** | `web/firestore.rules` (v2) | `web/firestore.rules` (v2) | Deploy via `firebase deploy --only firestore:rules` |
-| **Indexes** | `web/firestore.indexes.json` (2 indexes) | `web/firestore.indexes.json` (2 indexes) | Deploy via `firebase deploy --only firestore:indexes` |
-| **Habits Data** | 6 personalized routines in `/habits` | 6 personalized routines in `/habits` | **Option A:** Re-seed via CLI `npm run schedule:fetch-personal` |
-| **DailyLogs Data** | Historical completion logs | Historical completion logs | **Option A:** Clean slate OR **Option B:** Data migration script |
-| **Admin Credentials**| `%USERPROFILE%\.credentials\regimen-e32a8...` | `%USERPROFILE%\.credentials\vritta-adminsdk.json` | Generate new private key in GCP/Firebase Console |
-
-### 7.2 Step-by-Step Setup
-1. **Create Firebase Project:**
-   - Go to [Firebase Console](https://console.firebase.google.com/) > **Add project** > Name: `vritta-app`.
-   - Enable Google Analytics (optional).
-2. **Enable Google Authentication:**
-   - Authentication > Get Started > Sign-in method > Google > Enable.
-   - Project support email: `manishborikar92@gmail.com`.
-3. **Configure Authorized Domains:**
-   - Authentication > Settings > Authorized domains > Add:
-     - `vritta-app.vercel.app`
-     - `localhost`
-     - `127.0.0.1`
-4. **Provision Cloud Firestore:**
-   - Firestore Database > Create database > Production mode.
-   - Location: Select `asia-south1` (Mumbai, India) for lowest latency (~20ms vs ~250ms), or `nam5` (US Central).
-5. **Deploy Security Rules & Indexes:**
-   ```powershell
-   npm install -g firebase-tools
-   firebase login
-   firebase use --add <new-project-id>
-   firebase deploy --only firestore:rules,firestore:indexes
-   ```
-6. **Generate Admin SDK Service Account Key:**
-   - Project Settings > Service accounts > Firebase Admin SDK > **Generate new private key**.
-   - Save securely to: `C:\Users\manis\.credentials\vritta-app-firebase-adminsdk.json`.
-7. **Configure Local Environment (`web/.env.local`):**
-   - Populate `NEXT_PUBLIC_FIREBASE_*` variables from Firebase Console Web App settings.
-   - Set `GOOGLE_APPLICATION_CREDENTIALS="C:/Users/manis/.credentials/vritta-app-firebase-adminsdk.json"`.
-8. **Initial Synchronization:**
-   - Start local dev server (`npm --prefix web run dev`).
-   - Sign in with Google using `manishborikar92@gmail.com` to provision the auth user record in the new project.
-   - Run the synchronization CLI tool:
-     ```powershell
-     npm --prefix web run schedule:fetch-personal
-     ```
-   - All 6 personalized routines are now seeded into Cloud Firestore under the new user's UID!
-
-### 7.3 Data Preservation & Rollback Plan
-- **Zero Interruption:** The existing project `regimen-e32a8` remains 100% active and untouched.
-- **Instant Rollback:** If any issue occurs during testing of the new Firebase project, simply revert the environment variables in `web/.env.local` back to `regimen-e32a8`.
-
----
-
-## Deliverable 8: Mobile-First Testing & Release Checklist
-
-### 8.1 Viewport Matrix
-
-| Category | Viewport (W × H) | Device Representation | Key Verification Focus |
-| :--- | :--- | :--- | :--- |
-| **Narrow Mobile** | 375 × 667 px | iPhone SE, iPhone 8 | Compact card padding, button stacking, zero text clipping |
-| **Standard Mobile**| 390 × 844 px | iPhone 12/13/14/15 | Bottom navigation reachability, touch target spacing |
-| **Large Mobile** | 412 × 915 px | Pixel 7/8, Samsung Galaxy | Fluid typography, card borders, no awkward whitespace |
-| **Tablet Portrait**| 768 × 1024 px | iPad Mini, Tablet | Two-column grid transitions, modal centering |
-| **Desktop Display**| 1280 × 800 px | Laptop / Desktop browser | Max content width constraint (`42rem`), top nav balance |
-
-### 8.2 Full Verification Checklist
-
-#### A. Static Checks & Builds
-- [ ] `npm --prefix web run lint` passes with 0 errors.
-- [ ] `npm --prefix web run build` compiles with 0 errors in `--webpack` mode.
-- [ ] All 57 automated unit tests pass in `web/tests/`.
-
-#### B. Visual & Theme Verification
-- [ ] Guiding Sutra mark displays crisply at 16px favicon, 32px top nav, and 80px login hero.
-- [ ] Light mode matches Restorative Juniper palette tokens (Misty Slate `#F8FAFC`, Porcelain `#FFFFFF`, Juniper `#0F766E`).
-- [ ] Dark mode matches Restorative Juniper dark tokens (Deep Obsidian `#090D16`, Mineral Slate `#111827`, Luminous Teal `#14B8A6`).
-- [ ] Zero white flash on dark mode page reload.
-- [ ] Contrast ratios meet WCAG 2.2 AA (>= 4.5:1 text, >= 3:1 UI components).
-
-#### C. Mobile Ergonomics & Layout
-- [ ] Zero horizontal overflow (`document.documentElement.scrollWidth === window.innerWidth`).
-- [ ] All touch targets (BottomNav tabs, habit completion checks, modal buttons) >= 44×44px.
-- [ ] Focus outlines visible on keyboard navigation (`:focus-visible`).
-
-#### D. Core User Flows (End-to-End)
-- [ ] **Login Flow:** Google Sign-In popup authenticates and redirects to `/dashboard`.
-- [ ] **Workbook Tracker:** Incrementing sessions updates progress, requires previous-day review check for completion.
-- [ ] **Movement Plan:** Renders weekday-appropriate workout/walk card; displays planned rest banner on Sunday.
-- [ ] **Osho Library:** Modal opens, shows 30 talks across 6 groups, remembers completion state.
-- [ ] **Bedtime Reading:** Timer starts, pauses, records 30-min duration target.
-- [ ] **Private Diary:** Opens reflection modal with 5 prompts, saves privately under user document path.
-- [ ] **Routine Manager:** Add, edit, and delete custom habits; displays `Personal` badge for system seed routines.
-- [ ] **Insights & Heatmap:** Heatmap renders accurately with rest-day excluded denominator.
-
----
-
-## Deliverable 9: Authoritative Research References
-
-1. **Next.js 16 App Router Layouts & Script Injection:**  
+1. **Next.js 16 App Router Layouts & Scripts:**  
    [https://nextjs.org/docs/app/building-your-application/routing/layouts-and-templates](https://nextjs.org/docs/app/building-your-application/routing/layouts-and-templates)  
    *Relevance:* Authoritative guide on `suppressHydrationWarning` and synchronous blocking script execution to prevent theme flashes.
 2. **React 19 Client Component Guidelines:**  
@@ -546,4 +470,24 @@ The implementation sequence is structured around strict safety dependencies:
    *Relevance:* Official steps for updating repository names and configuring local `git remote set-url`.
 9. **W3C Web Content Accessibility Guidelines (WCAG) 2.2:**  
    [https://www.w3.org/TR/WCAG22/](https://www.w3.org/TR/WCAG22/)  
-   *Relevance:* Contrast thresholds (SC 1.4.3 / 1.4.11), touch target sizes (SC 2.5.8), and focus appearance (SC 2.4.11).
+   *Relevance:* Contrast thresholds (SC 1.4.3 Level AA / SC 1.4.6 Level AAA), Target Size Minimum (SC 2.5.8 Level AA 24px) vs Target Size Enhanced (SC 2.5.5 Level AAA 44px), and Focus Appearance (SC 2.4.11 Level AA).
+
+---
+
+## 9. Decisions Requiring User Input & Remaining Uncertainties
+
+### Decisions Requiring User Input:
+1. **Firebase Data-Preservation Strategy:**
+   - **Option A (Fresh Start):** Provision fresh project `vritta-app`, sign in once with Google to create the account, and seed the 6 personalized routines cleanly via `npm run schedule:fetch-personal`. *(Historical daily logs and streaks in `regimen-e32a8` are not carried over).*
+   - **Option B (Preserve Required Data):** Develop and execute an Admin SDK migration script to read from `regimen-e32a8`, translate document IDs from the old UID to the new UID, and batch-write historical logs and custom habits into the new project.
+2. **Cloud Firestore Location Selection:**
+   - **`asia-south1` (Mumbai, India):** Lowest latency for client browser queries in India; single-region (99.99% SLA).
+   - **`nam5` (US Central multi-region):** Existing location of `regimen-e32a8`; multi-region redundancy (99.999% SLA); higher latency to India.
+   - *Note: Database location cannot be changed after creation.*
+3. **Approval to Proceed with Phase 1:**
+   - Confirmation to begin implementation strictly with **Phase 1: Design Tokens & Zero-Flash Theme Engine**.
+
+### Remaining Uncertainties (to be verified in service dashboards during execution):
+1. **Vercel Current Project Name:** Whether the project is currently registered in Vercel as `Regimen` or `regimen-web` can only be inspected inside Manish's Vercel Dashboard.
+2. **Vercel Subdomain Claim:** Whether `myvritta.vercel.app` is truly available to be claimed by Manish's account can only be confirmed upon project creation or domain assignment in the Vercel Dashboard.
+3. **GitHub Target Name Availability:** Confirmed that `Vritta` will be entered in GitHub settings under `manishborikar92`.
