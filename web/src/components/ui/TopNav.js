@@ -2,18 +2,21 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { ChevronDown, LogOut } from 'lucide-react';
+import { ChevronDown, LogOut, Sun, Moon, Monitor, Check } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { BRAND } from '@/lib/constants/brand';
 import ConfirmDialog from './ConfirmDialog';
 import Logo from './Logo';
 
 export default function TopNav({ title, subtitle }) {
   const { user, signInWithGoogle, logout } = useAuth();
+  const { theme, resolvedTheme, setTheme, isMounted } = useTheme();
   const router = useRouter();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showThemeMenu, setShowThemeMenu] = useState(false);
   const [signingIn, setSigningIn] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -45,41 +48,114 @@ export default function TopNav({ title, subtitle }) {
 
   return (
     <>
-      <header className="bg-white/90 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40">
+      <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 sticky top-0 z-40 transition-colors">
         <div className="max-w-2xl mx-auto px-4 py-3 sm:py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-white border border-gray-200/90 shadow-2xs flex items-center justify-center p-1 hover:shadow-xs transition-shadow">
+            <div className="w-8 h-8 rounded-xl bg-white dark:bg-gray-800 border border-gray-200/90 dark:border-gray-700 shadow-2xs flex items-center justify-center p-1 hover:shadow-xs transition-shadow">
               <Logo className="w-full h-full" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg sm:text-xl font-bold text-gray-900 tracking-tight leading-none">
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-none">
                   {displayTitle}
                 </h1>
                 {title && title !== BRAND.name && (
-                  <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 hidden sm:inline-block">
+                  <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200 dark:bg-teal-950 dark:text-teal-300 dark:border-teal-900 hidden sm:inline-block">
                     {BRAND.name}
                   </span>
                 )}
               </div>
               {subtitle && (
-                <p className="text-2xs sm:text-xs text-gray-500 font-medium tracking-wide mt-0.5">
+                <p className="text-2xs sm:text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wide mt-0.5">
                   {subtitle}
                 </p>
               )}
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Accessible 3-State Theme Switcher */}
+            <div className="relative">
+              {!isMounted ? (
+                <div className="w-9 h-9" aria-hidden="true" />
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setShowThemeMenu(!showThemeMenu)}
+                    className="w-9 h-9 p-2 rounded-xl flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
+                    aria-label={`Change theme. Current preference is ${theme}, displaying ${resolvedTheme} mode.`}
+                    aria-haspopup="menu"
+                    aria-expanded={showThemeMenu}
+                    title={`Theme: ${theme === 'system' ? `System (${resolvedTheme})` : theme}`}
+                  >
+                    {resolvedTheme === 'dark' ? (
+                      <Moon className="w-4 h-4 text-amber-400" aria-hidden="true" />
+                    ) : (
+                      <Sun className="w-4 h-4 text-amber-600" aria-hidden="true" />
+                    )}
+                  </button>
+
+                  {showThemeMenu && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-30"
+                        onClick={() => setShowThemeMenu(false)}
+                        aria-hidden="true"
+                      />
+                      <div
+                        className="absolute right-0 mt-2 w-36 bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 py-1.5 z-40 animate-in fade-in zoom-in-95 duration-150"
+                        role="menu"
+                        aria-label="Select color theme"
+                      >
+                        {[
+                          { id: 'light', label: 'Light', Icon: Sun },
+                          { id: 'dark', label: 'Dark', Icon: Moon },
+                          { id: 'system', label: 'System', Icon: Monitor },
+                        ].map(({ id, label, Icon }) => {
+                          const isSelected = theme === id;
+                          return (
+                            <button
+                              key={id}
+                              type="button"
+                              onClick={() => {
+                                setTheme(id);
+                                setShowThemeMenu(false);
+                              }}
+                              className={`w-full text-left px-3 py-2 text-xs font-medium flex items-center justify-between transition-colors ${
+                                isSelected
+                                  ? 'text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 font-semibold'
+                                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+                              }`}
+                              role="menuitemradio"
+                              aria-checked={isSelected}
+                            >
+                              <span className="flex items-center gap-2">
+                                <Icon className="w-3.5 h-3.5" aria-hidden="true" />
+                                {label}
+                              </span>
+                              {isSelected && (
+                                <Check className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" aria-hidden="true" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+
             {user ? (
               <div className="relative">
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center gap-2 hover:bg-gray-50 rounded-xl p-1.5 transition-colors border border-transparent hover:border-gray-200"
+                  className="flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl p-1.5 transition-colors border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
                   aria-expanded={showProfileMenu}
                   aria-label="Profile menu"
                 >
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-indigo-100 border border-indigo-200 flex items-center justify-center text-xs font-bold text-indigo-700">
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-teal-100 dark:bg-teal-900 border border-teal-200 dark:border-teal-800 flex items-center justify-center text-xs font-bold text-teal-800 dark:text-teal-200">
                     {user.photoURL ? (
                       <Image
                         src={user.photoURL}
@@ -95,13 +171,13 @@ export default function TopNav({ title, subtitle }) {
                     )}
                   </div>
                   <div className="hidden sm:block text-left">
-                    <p className="text-xs font-semibold text-gray-900 leading-tight">
+                    <p className="text-xs font-semibold text-gray-900 dark:text-gray-100 leading-tight">
                       {user.displayName || 'User'}
                     </p>
-                    <p className="text-2xs text-gray-400 truncate max-w-[120px]">{user.email}</p>
+                    <p className="text-2xs text-gray-400 dark:text-gray-400 truncate max-w-[120px]">{user.email}</p>
                   </div>
                   <ChevronDown
-                    className={`w-3.5 h-3.5 text-gray-400 transition-transform ${showProfileMenu ? 'rotate-180' : ''}`}
+                    className={`w-3.5 h-3.5 text-gray-400 dark:text-gray-400 transition-transform ${showProfileMenu ? 'rotate-180' : ''}`}
                   />
                 </button>
 
@@ -110,24 +186,25 @@ export default function TopNav({ title, subtitle }) {
                     <div
                       className="fixed inset-0 z-30"
                       onClick={() => setShowProfileMenu(false)}
+                      aria-hidden="true"
                     />
                     <div
-                      className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-1.5 z-40"
+                      className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 py-1.5 z-40"
                       role="menu"
                     >
-                      <div className="px-3.5 py-2.5 border-b border-gray-100">
-                        <p className="text-xs font-bold text-gray-900">{user.displayName || 'User'}</p>
-                        <p className="text-2xs text-gray-400 truncate">{user.email}</p>
+                      <div className="px-3.5 py-2.5 border-b border-gray-100 dark:border-gray-800">
+                        <p className="text-xs font-bold text-gray-900 dark:text-gray-100">{user.displayName || 'User'}</p>
+                        <p className="text-2xs text-gray-400 dark:text-gray-400 truncate">{user.email}</p>
                       </div>
                       <button
                         onClick={() => {
                           setShowProfileMenu(false);
                           setShowLogoutModal(true);
                         }}
-                        className="w-full text-left px-3.5 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-2"
+                        className="w-full text-left px-3.5 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors flex items-center gap-2"
                         role="menuitem"
                       >
-                        <LogOut className="w-3.5 h-3.5" />
+                        <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
                         Sign Out
                       </button>
                     </div>
@@ -138,7 +215,7 @@ export default function TopNav({ title, subtitle }) {
               <button
                 onClick={handleSignIn}
                 disabled={signingIn}
-                className="flex items-center gap-2 px-3.5 py-1.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 
+                className="flex items-center gap-2 px-3.5 py-1.5 bg-teal-700 dark:bg-teal-600 text-white rounded-xl hover:bg-teal-800 dark:hover:bg-teal-500 
                 transition-colors disabled:opacity-50 text-xs font-semibold shadow-2xs"
               >
                 {signingIn ? (
@@ -165,3 +242,4 @@ export default function TopNav({ title, subtitle }) {
     </>
   );
 }
+

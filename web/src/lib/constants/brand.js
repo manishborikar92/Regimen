@@ -14,25 +14,31 @@ export const BRAND = {
   shortDescription: 'A calm, flexible personal routine companion for mindful consistency.',
   logoAlt: 'Vritta Logo',
   author: 'Manish Borikar',
-  themeColor: '#4f46e5', // Warm Indigo
+  themeColor: '#0F766E', // Restorative Juniper (Verdigris Teal)
   colors: {
     primary: {
-      50: '#eef2ff',
-      100: '#e0e7ff',
-      500: '#6366f1',
-      600: '#4f46e5',
-      700: '#4338ca',
+      50: '#f0fdfa',
+      100: '#ccfbf1',
+      500: '#14b8a6',
+      600: '#0f766e',
+      700: '#115e59',
     },
     accent: {
-      teal: '#0d9488',
-      amber: '#d97706',
+      juniper: '#0f766e',
+      teal: '#14b8a6',
+      amber: '#b45309',
+      gold: '#f59e0b',
       emerald: '#059669',
       rose: '#e11d48',
     },
     surface: {
-      bg: '#f8fafc',
+      canvas: '#f8fafc',
       card: '#ffffff',
       border: '#e2e8f0',
+      canvasDark: '#090d16',
+      cardDark: '#111827',
+      borderDark: '#1e293b',
     },
   },
 };
+
