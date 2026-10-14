@@ -79,7 +79,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log('\n[Sync] Synchronizing 6 personalized routines to Cloud Firestore (/personalRoutines)...');
+  console.log('\n[Sync] Synchronizing 6 personalized routines to Cloud Firestore (/habits)...');
 
   try {
     const result = await syncPersonalSchedule(userRecord.uid);
@@ -90,7 +90,7 @@ async function main() {
     }
 
     console.log('\n[Integrity & Isolation Guarantees Applied]');
-    console.log('  • Persisted in dedicated /personalRoutines collection (isolated from public web UI)');
+    console.log('  • Persisted directly in /habits under user ID (deterministic IDs)');
     console.log('  • User customizations preserved (custom times, notes, frequencies)');
     console.log('  • Custom user habits preserved');
     console.log('  • Daily completion history and streak logs (/dailyLogs) unmodified\n');

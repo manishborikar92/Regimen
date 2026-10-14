@@ -3,14 +3,14 @@
 import { useState } from 'react';
 import { Pencil, Trash2, Plus, Sparkles, RefreshCw, Compass, Clock } from 'lucide-react';
 import { useData, useToast } from '@/contexts';
-import { TopNav, ConfirmDialog } from '@/components/ui';
+import { TopNav, ConfirmDialog, LoadingSpinner } from '@/components/ui';
 import { HabitModal } from '@/components/habits';
 import { getCategoryConfig } from '@/lib/constants/categories';
 import { getTimingDisplay } from '@/utils/date-helpers';
 import { BRAND } from '@/lib/constants/brand';
 
 export default function HabitsPage() {
-  const { habits, addHabit, updateHabit, deleteHabit, seedHabits } = useData();
+  const { habits, loading, addHabit, updateHabit, deleteHabit, seedHabits } = useData();
   const { addToast } = useToast();
   const [showModal, setShowModal] = useState(false);
   const [editingHabit, setEditingHabit] = useState(null);
@@ -51,6 +51,15 @@ export default function HabitsPage() {
   };
 
   const handleSeedHabits = async () => {
+    // If the user's routines were seeded via CLI, protect them from accidental override
+    const hasPersonalRoutines = habits.some(
+      h => h.seedOrigin === 'personal_preset' || h.stableKey?.startsWith('canonical_')
+    );
+    if (hasPersonalRoutines) {
+      addToast('Personal routines are managed via CLI: npm run schedule:fetch-personal', 'info');
+      return;
+    }
+
     setSeeding(true);
     try {
       await seedHabits();
@@ -61,6 +70,10 @@ export default function HabitsPage() {
       setSeeding(false);
     }
   };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>
@@ -123,7 +136,8 @@ export default function HabitsPage() {
             {habits.map((habit) => {
               const config = getCategoryConfig(habit.category);
               const timingText = getTimingDisplay(habit);
-              const isFoundation = Boolean(habit.stableKey || habit.isSystemSeed);
+              const isPersonal = habit.seedOrigin === 'personal_preset' || habit.stableKey?.startsWith('canonical_');
+              const isFoundation = !isPersonal && Boolean(habit.stableKey || habit.isSystemSeed);
 
               return (
                 <div
@@ -141,6 +155,12 @@ export default function HabitsPage() {
                           <Clock className="w-3 h-3 text-gray-400" />
                           {timingText}
                         </span>
+
+                        {isPersonal && (
+                          <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-100">
+                            Personal
+                          </span>
+                        )}
 
                         {isFoundation && (
                           <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">

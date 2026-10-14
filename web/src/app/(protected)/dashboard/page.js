@@ -12,7 +12,7 @@ import {
   GenericHabitCard,
   StreakCounter,
 } from '@/components/habits';
-import { TopNav } from '@/components/ui';
+import { TopNav, LoadingSpinner } from '@/components/ui';
 import { formatDate } from '@/utils/date-helpers';
 import { BRAND } from '@/lib/constants/brand';
 import { Compass, CheckCircle2 } from 'lucide-react';
@@ -26,6 +26,7 @@ export default function DashboardPage() {
     todayProgress,
     todayStats,
     userProfile,
+    loading,
     error,
     toggleHabit,
     updateProgress,
@@ -166,6 +167,10 @@ export default function DashboardPage() {
   };
 
   const allCompletedToday = todayStats.total > 0 && todayStats.completed >= todayStats.total;
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>

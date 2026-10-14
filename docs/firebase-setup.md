@@ -18,10 +18,8 @@ Regimen (Vritta) uses a dual Firebase architecture:
 
 2. **Server-Side & Admin CLI (Firebase Admin SDK v14.5)**:
    - Configured in `web/src/lib/server/firebase-admin.js` via server-only credentials (`FIREBASE_SERVICE_ACCOUNT_KEY` or `GOOGLE_APPLICATION_CREDENTIALS`).
-   - Executes in:
-     - The protected Next.js Route Handler (`web/src/app/api/schedule/personal/route.js`) to cryptographically verify Firebase Auth ID tokens with revocation checks (`checkRevoked: true`) and enforce strict authorization for `manishborikar92@gmail.com`.
-     - The standalone administrative Node.js CLI script (`scripts/fetch-personal-schedule.mjs`) to perform direct, offline synchronization of personalized routines directly to Firestore.
-   - Bypasses client security rules to perform privileged operations, strictly scoped to the authorized user's UID.
+   - Executes in the standalone administrative Node.js CLI script (`scripts/fetch-personal-schedule.mjs`, run via `npm run schedule:fetch-personal`) to perform direct synchronization of personalized routines directly to the `/habits` collection in Cloud Firestore.
+   - Bypasses client security rules to perform privileged operations, strictly scoped to `manishborikar92@gmail.com` (`f5qe4PMQoLYJcuT5ZA5eUdkj1Ue2`).
 
 ```mermaid
 flowchart TD
@@ -30,12 +28,7 @@ flowchart TD
         AuthUser["Authenticated User Session<br/>(Google Sign-In)"]
     end
 
-    subgraph Vercel Production / Preview Environment
-        RouteHandler["Next.js Route Handler<br/>POST /api/schedule/personal"]
-        VercelSecret["Vercel Sensitive Env Var<br/>FIREBASE_SERVICE_ACCOUNT_KEY"]
-    end
-
-    subgraph Local Development Machine
+    subgraph Local Development & CLI Environment
         LocalDev["Next.js Dev Server (localhost:3000)<br/>Reads web/.env.local"]
         LocalCLI["CLI: npm run schedule:fetch-personal<br/>Explicitly loads web/.env.local"]
         ExtCred["External Credential Store<br/>%USERPROFILE%/.credentials/regimen-e32a8-firebase-adminsdk.json"]
@@ -43,21 +36,16 @@ flowchart TD
 
     subgraph Google Cloud & Firebase Backend
         GCP_IAM["Google Cloud IAM Service Account"]
-        FirebaseAuth["Firebase Authentication<br/>(Token Verification & User Records)"]
+        FirebaseAuth["Firebase Authentication<br/>(User Records & UID Resolution)"]
         Firestore["Cloud Firestore<br/>(/habits Collection)"]
     end
 
     WebClient -->|Public Client Auth| FirebaseAuth
-    RouteHandler -->|verifyIdToken(token, checkRevoked: true)| FirebaseAuth
-    VercelSecret -->|In-Memory JSON String| RouteHandler
-    RouteHandler -->|Privileged Sync Scoped to UID| Firestore
-
-    ExtCred -->|GOOGLE_APPLICATION_CREDENTIALS| LocalDev
+    AuthUser -->|Owner Read/Write via Rules| Firestore
     ExtCred -->|GOOGLE_APPLICATION_CREDENTIALS| LocalCLI
-    LocalDev --> RouteHandler
-    LocalCLI -->|Direct Offline Sync| Firestore
     LocalCLI -->|getUserByEmail| FirebaseAuth
-    GCP_IAM -.->|Authorizes| VercelSecret
+    LocalCLI -->|Privileged Sync Scoped to UID| Firestore
+    GCP_IAM -.->|Authorizes| LocalCLI
     GCP_IAM -.->|Authorizes| ExtCred
 ```
 

@@ -5,10 +5,9 @@
  * 
  * Data Integrity Guarantees:
  * - Scoped strictly to the provided userId.
- * - Stored in dedicated 'personalRoutines' collection, keeping generic web UI isolated.
- * - Idempotent upserts based on deterministic document IDs ({userId}_{stableKey}).
+ * - Stored in the authoritative 'habits' collection under deterministic document IDs ({userId}_{stableKey}).
  * - Preserves user customizations (custom times, frequencies, checklists, notes).
- * - Migrates and removes any legacy personal routines from the public 'habits' collection.
+ * - Leaves custom user habits in 'habits' intact.
  * - Never touches or resets /dailyLogs collection (historical completions & streaks preserved).
  */
 
@@ -17,10 +16,10 @@ import { MANISH_PERSONAL_ROUTINES } from './personal-schedule.js';
 
 /**
  * Synchronize personalized routine preset for a verified user.
- * Writes to 'personalRoutines' collection and ensures clean isolation from the public 'habits' collection.
+ * Writes to 'habits' collection under deterministic document IDs ({userId}_{stableKey}).
  * 
  * @param {string} userId - The verified Firebase user UID
- * @returns {Promise<{ success: boolean, syncedCount: number, docIds: string[], migratedCount: number }>}
+ * @returns {Promise<{ success: boolean, syncedCount: number, docIds: string[] }>}
  */
 export async function syncPersonalSchedule(userId) {
   if (!userId || typeof userId !== 'string') {
@@ -31,26 +30,27 @@ export async function syncPersonalSchedule(userId) {
     throw new Error('Firebase Admin Firestore is not initialized. Check server credentials.');
   }
 
-  // 1. Query existing personal routines from personalRoutines collection
-  const personalSnap = await adminDb.collection('personalRoutines').where('userId', '==', userId).get();
+  // 1. Query existing personal routines from personalRoutines collection (to migrate/preserve any customizations)
   const existingByStableKey = new Map();
-  personalSnap.forEach(doc => {
+  try {
+    const personalSnap = await adminDb.collection('personalRoutines').where('userId', '==', userId).get();
+    personalSnap.forEach(doc => {
+      const data = doc.data();
+      if (data.stableKey) {
+        existingByStableKey.set(data.stableKey, { id: doc.id, ...data });
+      }
+    });
+  } catch (err) {
+    // Non-fatal if personalRoutines does not exist
+    console.warn('[Sync] Note: Could not query personalRoutines (skipped):', err.message);
+  }
+
+  // 2. Query existing habits from 'habits' collection to prioritize current active customizations
+  const habitsSnap = await adminDb.collection('habits').where('userId', '==', userId).get();
+  habitsSnap.forEach(doc => {
     const data = doc.data();
     if (data.stableKey) {
       existingByStableKey.set(data.stableKey, { id: doc.id, ...data });
-    }
-  });
-
-  // 2. Query legacy habits to migrate any existing customizations and clean up from public habits
-  const habitsSnap = await adminDb.collection('habits').where('userId', '==', userId).get();
-  const legacyHabitDocsToDelete = [];
-  habitsSnap.forEach(doc => {
-    const data = doc.data();
-    if (data.stableKey && data.stableKey.startsWith('canonical_')) {
-      legacyHabitDocsToDelete.push(doc.ref);
-      if (!existingByStableKey.has(data.stableKey)) {
-        existingByStableKey.set(data.stableKey, { id: doc.id, ...data });
-      }
     }
   });
 
@@ -60,7 +60,7 @@ export async function syncPersonalSchedule(userId) {
 
   for (const routine of MANISH_PERSONAL_ROUTINES) {
     const docId = `${userId}_${routine.stableKey}`;
-    const docRef = adminDb.collection('personalRoutines').doc(docId);
+    const docRef = adminDb.collection('habits').doc(docId);
     docIds.push(docId);
 
     const existing = existingByStableKey.get(routine.stableKey);
@@ -68,6 +68,8 @@ export async function syncPersonalSchedule(userId) {
     if (existing) {
       // Reconcile system metadata while strictly preserving user customizations
       const updatedData = {
+        id: docId,
+        stableKey: routine.stableKey,
         title: routine.title,
         category: routine.category,
         completionMethod: routine.completionMethod,
@@ -107,18 +109,12 @@ export async function syncPersonalSchedule(userId) {
     }
   }
 
-  // 3. Clean up legacy personal routines from 'habits' collection so public web UI only sees generic habits
-  for (const legacyRef of legacyHabitDocsToDelete) {
-    batch.delete(legacyRef);
-  }
-
-  // Commit all writes and cleanup atomically in a single batch
+  // Commit all writes atomically in a single batch (non-destructive: does not delete other habits or daily logs)
   await batch.commit();
 
   return {
     success: true,
     syncedCount: MANISH_PERSONAL_ROUTINES.length,
     docIds,
-    migratedCount: legacyHabitDocsToDelete.length,
   };
 }
