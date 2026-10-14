@@ -31,7 +31,7 @@ flowchart TD
     subgraph Local Development & CLI Environment
         LocalDev["Next.js Dev Server (localhost:3000)<br/>Reads web/.env.local"]
         LocalCLI["CLI: npm run schedule:fetch-personal<br/>Explicitly loads web/.env.local"]
-        ExtCred["External Credential Store<br/>%USERPROFILE%/.credentials/regimen-e32a8-firebase-adminsdk.json"]
+        ExtCred["External Credential Store<br/>%USERPROFILE%/.credentials/vritta-app-firebase-adminsdk.json"]
     end
 
     subgraph Google Cloud & Firebase Backend
@@ -79,7 +79,7 @@ Store the Firebase service-account JSON file in your personal Windows user profi
    ```
 3. Move or place your Firebase Admin SDK service account key file there:
    ```
-   C:\Users\<YourUsername>\.credentials\regimen-e32a8-firebase-adminsdk.json
+   C:\Users\<YourUsername>\.credentials\vritta-app-firebase-adminsdk.json
    ```
 4. Verify file permissions: Ensure only your Windows user account has read access to this directory.
 
@@ -104,7 +104,7 @@ Next.js automatically loads `web/.env.local` for the local development server (`
    ```
 3. Add the pointer to your external service-account file using **forward slashes**:
    ```env
-   GOOGLE_APPLICATION_CREDENTIALS="C:/Users/<YourUsername>/.credentials/regimen-e32a8-firebase-adminsdk.json"
+   GOOGLE_APPLICATION_CREDENTIALS="C:/Users/<YourUsername>/.credentials/vritta-app-firebase-adminsdk.json"
    ```
    *(Replace `<YourUsername>` with your Windows user name, e.g., `manis`)*.
 
@@ -181,7 +181,7 @@ Open `http://localhost:3000` and test Google Sign-In.
 | Symptom / Error | Root Cause | Solution |
 | :--- | :--- | :--- |
 | `[Error] Firebase Admin credentials are not configured.` | Missing or mistyped `GOOGLE_APPLICATION_CREDENTIALS` in `web/.env.local`. | Verify path in `web/.env.local`. Ensure it points to the external JSON file with forward slashes. |
-| `ENOENT: no such file or directory` | The credential file path does not exist on disk. | Verify that `C:/Users/<username>/.credentials/regimen-e32a8-firebase-adminsdk.json` exists and is readable. |
+| `ENOENT: no such file or directory` | The credential file path does not exist on disk. | Verify that `C:/Users/<username>/.credentials/vritta-app-firebase-adminsdk.json` exists and is readable. |
 | `[Error] No user record found in Firebase Auth for manishborikar92@gmail.com` | User has not logged into the project yet. | Sign in to the local or hosted application once with Google using `manishborikar92@gmail.com` to provision the auth record. |
 | `auth/invalid-credential` or `Unexpected token in JSON` | The service-account JSON file is corrupted or incomplete. | Re-download the service account key from Google Cloud Console / Firebase Console. |
 
@@ -205,7 +205,7 @@ Vercel serverless functions run in ephemeral container environments where local 
 ### Step 4.2: Step-by-Step Vercel Configuration
 
 1. **Copy the Entire JSON Content**:
-   - Open your external service-account key (`C:\Users\<username>\.credentials\regimen-e32a8-firebase-adminsdk.json`) in a secure text editor.
+   - Open your external service-account key (`C:\Users\<username>\.credentials\vritta-app-firebase-adminsdk.json`) in a secure text editor.
    - Copy the entire JSON object string, including curly braces `{ ... }`.
 
 2. **Navigate to Project Settings on Vercel**:
@@ -335,7 +335,7 @@ Service account keys should be rotated periodically (e.g., every 90 or 180 days)
    - Go to [Firebase Console](https://console.firebase.google.com/) > Project Settings > **Service accounts**.
    - Click **Generate new private key** > Download new JSON file.
 2. **Update External Local File**:
-   - Place the new file in `C:\Users\<username>\.credentials\regimen-e32a8-firebase-adminsdk.json`.
+   - Place the new file in `C:\Users\<username>\.credentials\vritta-app-firebase-adminsdk.json`.
 3. **Update Vercel Sensitive Environment Variable**:
    - Open Vercel Project Settings > Environment Variables > Edit `FIREBASE_SERVICE_ACCOUNT_KEY`.
    - Paste the new JSON content > Click **Save**.
