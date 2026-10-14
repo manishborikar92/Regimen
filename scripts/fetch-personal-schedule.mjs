@@ -79,8 +79,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`[Success] Verified user: ${userRecord.displayName || 'Manish'} (UID: ${userRecord.uid})`);
-  console.log('\n[Sync] Synchronizing 6 personalized routines to Cloud Firestore...');
+  console.log('\n[Sync] Synchronizing 6 personalized routines to Cloud Firestore (/personalRoutines)...');
 
   try {
     const result = await syncPersonalSchedule(userRecord.uid);
@@ -90,9 +89,9 @@ async function main() {
       console.log(`  ✓ ${routine.title.padEnd(30)} [${routine.category}] (ID: ${userRecord.uid}_${routine.stableKey})`);
     }
 
-    console.log('\n[Integrity Guarantees Applied]');
+    console.log('\n[Integrity & Isolation Guarantees Applied]');
+    console.log('  • Persisted in dedicated /personalRoutines collection (isolated from public web UI)');
     console.log('  • User customizations preserved (custom times, notes, frequencies)');
-    console.log('  • Routine stable keys isolated from generic foundation routines');
     console.log('  • Custom user habits preserved');
     console.log('  • Daily completion history and streak logs (/dailyLogs) unmodified\n');
   } catch (syncErr) {

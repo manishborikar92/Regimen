@@ -172,4 +172,88 @@ describe('Customization Preservation & Data Integrity Logic', () => {
     assert.equal(reconciled.seedOrigin, 'personal_preset');
     assert.equal(reconciled.title, workbookRoutine.title, 'Must reconcile canonical title');
   });
+
+  it('should guarantee coexistence between foundation routines, personal routines, and custom habits', () => {
+    const userId = 'user_test_456';
+    const foundationDocIds = DEFAULT_ROUTINES.map(r => `${userId}_${r.stableKey}`);
+    const personalDocIds = MANISH_PERSONAL_ROUTINES.map(r => `${userId}_${r.stableKey}`);
+    const customDocId = `${userId}_custom_meditation_123`;
+
+    // Ensure completely disjoint ID sets
+    const foundationSet = new Set(foundationDocIds);
+    for (const pId of personalDocIds) {
+      assert.ok(!foundationSet.has(pId), `Conflict: ${pId} overlaps with foundation routine IDs`);
+    }
+
+    assert.ok(!foundationSet.has(customDocId));
+    assert.ok(!personalDocIds.includes(customDocId));
+  });
+});
+
+describe('Phase 5 Architecture Simplification, Dead Code Removal & Quarantine', () => {
+  it('should verify that PresetSelectorModal and /api/schedule routes are completely removed', async () => {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const srcDir = path.resolve(__dirname, '../src');
+
+    const removedPaths = [
+      path.join(srcDir, 'components/habits/PresetSelectorModal.js'),
+      path.join(srcDir, 'app/api/schedule'),
+    ];
+
+    for (const p of removedPaths) {
+      assert.ok(!fs.existsSync(p), `Removed file/directory must NOT exist: ${p}`);
+    }
+  });
+
+  it('should verify client components and hooks never import personal schedule or removed modals', async () => {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const srcDir = path.resolve(__dirname, '../src');
+
+    const clientFiles = [
+      path.join(srcDir, 'app/(protected)/habits/page.js'),
+      path.join(srcDir, 'app/(protected)/dashboard/page.js'),
+      path.join(srcDir, 'hooks/use-habits.js'),
+      path.join(srcDir, 'contexts/DataContext.js'),
+      path.join(srcDir, 'components/habits/index.js'),
+    ];
+
+    for (const filePath of clientFiles) {
+      assert.ok(fs.existsSync(filePath), `Client file must exist: ${filePath}`);
+      const content = fs.readFileSync(filePath, 'utf-8');
+
+      assert.ok(!content.includes('PresetSelectorModal'), `Forbidden PresetSelectorModal reference in ${filePath}`);
+      assert.ok(!content.includes('syncPersonalPreset'), `Forbidden syncPersonalPreset reference in ${filePath}`);
+      assert.ok(!content.includes('/api/schedule'), `Forbidden /api/schedule route reference in ${filePath}`);
+      assert.ok(!content.includes('personal-schedule'), `Forbidden personal-schedule module import in ${filePath}`);
+      assert.ok(!content.includes('MANISH_PERSONAL_ROUTINES'), `Forbidden MANISH_PERSONAL_ROUTINES reference in ${filePath}`);
+      assert.ok(!content.includes('Norman Lewis'), `Proprietary book author found in client file: ${filePath}`);
+    }
+  });
+
+  it('should verify firestore.rules disables client writes to personalRoutines', async () => {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const rulesPath = path.resolve(__dirname, '../firestore.rules');
+
+    assert.ok(fs.existsSync(rulesPath), `firestore.rules must exist at ${rulesPath}`);
+    const rulesContent = fs.readFileSync(rulesPath, 'utf-8');
+
+    assert.ok(rulesContent.includes('match /personalRoutines/{routineId}'), 'Must declare personalRoutines match rule');
+    assert.ok(rulesContent.includes('allow write: if false;'), 'Must forbid all client writes to personalRoutines');
+    assert.ok(rulesContent.includes('resource.data.userId == request.auth.uid'), 'Must restrict reads to owner');
+  });
 });

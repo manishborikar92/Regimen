@@ -15,9 +15,10 @@ import {
 import { TopNav } from '@/components/ui';
 import { formatDate } from '@/utils/date-helpers';
 import { BRAND } from '@/lib/constants/brand';
-import { Sparkles, Compass, CheckCircle2 } from 'lucide-react';
+import { Compass, CheckCircle2 } from 'lucide-react';
 
 export default function DashboardPage() {
+
   const {
     habits,
     todaysHabits,
@@ -226,9 +227,9 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => seedHabits()}
-              className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-xs sm:text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-sm"
+              className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-xs sm:text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-sm mx-auto"
             >
-              Load Routines
+              Load Recommended Routines
             </button>
           </div>
         ) : todaysHabits.length === 0 ? (

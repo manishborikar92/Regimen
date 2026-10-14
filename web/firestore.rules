@@ -74,6 +74,15 @@ service cloud.firestore {
       }
     }
 
+    // =============================================
+    // PersonalRoutines: Isolated storage for personalized schedules
+    // Client write is disabled (managed exclusively via Admin SDK CLI)
+    // =============================================
+    match /personalRoutines/{routineId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow write: if false;
+    }
+
     // Deny all other access by default
   }
 }

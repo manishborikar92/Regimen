@@ -84,7 +84,7 @@ function WorkbookCard({ habit, isCompleted, progress = {}, onUpdateProgress }) {
                 Anytime
               </span>
               <span className="text-xs text-indigo-700 font-semibold bg-indigo-50 px-2 py-0.5 rounded-md">
-                Word Power Made Easy
+                {habit.metadata?.bookTitle || 'Workbook'}
               </span>
             </div>
 
@@ -226,7 +226,7 @@ function WorkbookCard({ habit, isCompleted, progress = {}, onUpdateProgress }) {
             aria-expanded={isExpanded}
           >
             <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
-            {isExpanded ? 'Hide Study Guidelines' : 'Show Word Power Made Easy Guidelines'}
+            {isExpanded ? 'Hide Study Guidelines' : 'Show Study Guidelines'}
           </button>
 
           {isExpanded && (

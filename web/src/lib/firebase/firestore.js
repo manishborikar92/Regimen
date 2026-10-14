@@ -162,18 +162,52 @@ export async function seedHabitsForUser(userId, seedData) {
 
     const promises = seedData.map(async (habit, index) => {
         // Deterministic document ID based on stableKey or index
-        const key = habit.stableKey || `canonical_${index + 1}`;
+        const key = habit.stableKey || `routine_${index + 1}`;
         const docId = `${userId}_${key}`;
         const habitRef = doc(db, 'habits', docId);
 
-        const dataToSave = {
-            ...habit,
-            id: docId,
-            userId,
-            updatedAt: serverTimestamp(),
-        };
+        // Fetch existing habit document to preserve user customizations
+        const existingSnap = await getDoc(habitRef);
+        let dataToSave;
 
-        // merge: true preserves any custom fields or local progress
+        if (existingSnap.exists()) {
+            const existing = existingSnap.data();
+            dataToSave = {
+                title: habit.title,
+                category: habit.category,
+                completionMethod: habit.completionMethod,
+                instructions: habit.instructions,
+                isSystemSeed: true,
+                seedOrigin: habit.seedOrigin || 'foundation_preset',
+                userId,
+                updatedAt: serverTimestamp(),
+                // Preserve user customizations
+                time: existing.time ?? habit.time,
+                timingType: existing.timingType ?? habit.timingType,
+                preferredPeriod: existing.preferredPeriod !== undefined ? existing.preferredPeriod : habit.preferredPeriod,
+                relativeTiming: existing.relativeTiming !== undefined ? existing.relativeTiming : habit.relativeTiming,
+                frequency: Array.isArray(existing.frequency) && existing.frequency.length > 0 ? existing.frequency : habit.frequency,
+                order: existing.order ?? habit.order,
+                checklistItems: Array.isArray(existing.checklistItems) && existing.checklistItems.length > 0
+                    ? existing.checklistItems
+                    : habit.checklistItems,
+                metadata: {
+                    ...(habit.metadata || {}),
+                    ...(existing.metadata || {}),
+                },
+            };
+        } else {
+            dataToSave = {
+                ...habit,
+                id: docId,
+                userId,
+                seedOrigin: habit.seedOrigin || 'foundation_preset',
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+            };
+        }
+
+        // merge: true preserves any extra custom fields
         await setDoc(habitRef, dataToSave, { merge: true });
         return docId;
     });

@@ -5,8 +5,6 @@ import { Check, Calendar, TrendingUp, Sparkles, BookOpen, Activity, Headphones, 
 import { useData } from '@/contexts/DataContext';
 import { TopNav } from '@/components/ui';
 import { getDateString, getDaysAgo, getDayOfWeek, formatDate } from '@/utils/date-helpers';
-import { MOVEMENT_SCHEDULE } from '@/lib/fixtures/exercise-plan';
-import { OSHO_LIBRARY } from '@/lib/fixtures/osho-library';
 import { BRAND } from '@/lib/constants/brand';
 
 // Map day names to Monday-based column index (0=Mon, 6=Sun)
@@ -241,7 +239,7 @@ export default function AnalyticsPage() {
                       <BookOpen className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-gray-900">Word Power Made Easy</p>
+                      <p className="text-xs font-bold text-gray-900">English Vocabulary Workbook</p>
                       <p className="text-2xs text-gray-500">English vocabulary workbook sessions</p>
                     </div>
                   </div>

@@ -84,7 +84,7 @@ export default function HabitsPage() {
             onClick={handleSeedHabits}
             disabled={seeding}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-50 rounded-xl text-xs font-semibold transition-colors disabled:opacity-50 shadow-2xs flex-shrink-0"
-            title="Idempotently load or update routines without deleting custom routines"
+            title="Idempotently load or update foundation routines without deleting custom routines"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${seeding ? 'animate-spin' : ''}`} />
             <span>{seeding ? 'Syncing...' : 'Sync Routines'}</span>
