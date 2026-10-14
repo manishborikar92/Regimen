@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%" fill="none" role="img" aria-label="Guiding Sutra — Approved Brand Mark">
+  <desc>Guiding Sutra: The Authoritative Brand Logo. A continuous monoline ribbon loop representing the unbroken thread connecting physical health, language study, contemplative listening, and personal reflection.</desc>
+  
+  <!-- Continuous Harmonious Thread Loop (Precision Cubic Bezier) -->
+  <path
+    d="M 68 132 C 44 132 40 100 68 84 C 92 70 108 130 132 116 C 160 100 156 68 132 68 C 108 68 92 128 68 132 Z"
+    stroke="currentColor"
+    stroke-width="14"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Central Anchor Balance Dot -->
+  <circle
+    cx="100"
+    cy="100"
+    r="9"
+    fill="#D97706"
+  />
+</svg>

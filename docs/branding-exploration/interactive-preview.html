@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" data-palette="juniper">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VRITTA / ANUVRITTA — Interactive Palette &amp; Brand Exploration</title>
+  <style>
+    /* ========================================================
+       Live CSS Variables for 9 Distinct Palettes
+       ======================================================== */
+    
+    /* 1. Restorative Juniper (Default) */
+    [data-palette="juniper"][data-theme="light"] {
+      --bg-canvas: #f8fafc; --bg-surface: #ffffff; --bg-subtle: #f1f5f9;
+      --border-subtle: #e2e8f0; --border-strong: #cbd5e1;
+      --text-primary: #0f172a; --text-secondary: #475569; --text-muted: #64748b;
+      --accent-primary: #0f766e; --accent-hover: #115e59; --accent-muted: #ccfbf1; --accent-amber: #d97706;
+      --card-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    [data-palette="juniper"][data-theme="dark"] {
+      --bg-canvas: #090d16; --bg-surface: #111827; --bg-subtle: #1f2937;
+      --border-subtle: #1e293b; --border-strong: #334155;
+      --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+      --accent-primary: #14b8a6; --accent-hover: #2dd4bf; --accent-muted: #134e4a; --accent-amber: #f59e0b;
+      --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+    }
+
+    /* 2. Nordic Spruce & Sandstone */
+    [data-palette="spruce"][data-theme="light"] {
+      --bg-canvas: #f7f9f6; --bg-surface: #ffffff; --bg-subtle: #edf2ec;
+      --border-subtle: #e3e8e2; --border-strong: #ccd4ca;
+      --text-primary: #121c14; --text-secondary: #425245; --text-muted: #728576;
+      --accent-primary: #1b4332; --accent-hover: #2d6a4f; --accent-muted: #e8f0ec; --accent-amber: #c68b59;
+      --card-shadow: 0 1px 3px rgba(27,67,50,0.06);
+    }
+    [data-palette="spruce"][data-theme="dark"] {
+      --bg-canvas: #0c140f; --bg-surface: #132018; --bg-subtle: #1c2e23;
+      --border-subtle: #1e3024; --border-strong: #2f4536;
+      --text-primary: #f2f5f3; --text-secondary: #8f9e92; --text-muted: #5f7063;
+      --accent-primary: #52b788; --accent-hover: #74c69d; --accent-muted: #1e382b; --accent-amber: #e0a96d;
+      --card-shadow: 0 4px 8px -1px rgba(0,0,0,0.4);
+    }
+
+    /* 3. Kyoto Sumi & Vermilion */
+    [data-palette="sumi"][data-theme="light"] {
+      --bg-canvas: #fafafa; --bg-surface: #ffffff; --bg-subtle: #f4f4f5;
+      --border-subtle: #e4e4e7; --border-strong: #d4d4d8;
+      --text-primary: #09090b; --text-secondary: #52525b; --text-muted: #71717a;
+      --accent-primary: #18181b; --accent-hover: #27272a; --accent-muted: #e4e4e7; --accent-amber: #c2410c;
+      --card-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    [data-palette="sumi"][data-theme="dark"] {
+      --bg-canvas: #0a0a0b; --bg-surface: #141416; --bg-subtle: #1e1e22;
+      --border-subtle: #27272a; --border-strong: #3f3f46;
+      --text-primary: #fafafa; --text-secondary: #a1a1aa; --text-muted: #71717a;
+      --accent-primary: #fafafa; --accent-hover: #e4e4e7; --accent-muted: #27272a; --accent-amber: #fb923c;
+      --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
+    }
+
+    /* 4. Terracotta Clay & Olive */
+    [data-palette="terracotta"][data-theme="light"] {
+      --bg-canvas: #fbf9f7; --bg-surface: #ffffff; --bg-subtle: #f5efe6;
+      --border-subtle: #eae4df; --border-strong: #d8cec5;
+      --text-primary: #1e1610; --text-secondary: #54463c; --text-muted: #857469;
+      --accent-primary: #c2593f; --accent-hover: #a6442c; --accent-muted: #f8eae6; --accent-amber: #4d6a42;
+      --card-shadow: 0 1px 3px rgba(194,89,63,0.06);
+    }
+    [data-palette="terracotta"][data-theme="dark"] {
+      --bg-canvas: #141210; --bg-surface: #1e1a17; --bg-subtle: #292420;
+      --border-subtle: #2f2924; --border-strong: #453d37;
+      --text-primary: #faf6f2; --text-secondary: #a69588; --text-muted: #706256;
+      --accent-primary: #e07a5f; --accent-hover: #f4977e; --accent-muted: #3a2721; --accent-amber: #81b29a;
+      --card-shadow: 0 4px 8px -1px rgba(0,0,0,0.4);
+    }
+
+    /* 5. Prussian Navy & Desert Ochre */
+    [data-palette="navy"][data-theme="light"] {
+      --bg-canvas: #f8fafc; --bg-surface: #ffffff; --bg-subtle: #f1f5f9;
+      --border-subtle: #e2e8f0; --border-strong: #cbd5e1;
+      --text-primary: #0b132b; --text-secondary: #3a4b6e; --text-muted: #64748b;
+      --accent-primary: #1e3a5f; --accent-hover: #152a47; --accent-muted: #e2e8f0; --accent-amber: #d97706;
+      --card-shadow: 0 1px 3px rgba(30,58,95,0.06);
+    }
+    [data-palette="navy"][data-theme="dark"] {
+      --bg-canvas: #0a0f1d; --bg-surface: #11182e; --bg-subtle: #19223e;
+      --border-subtle: #1e294b; --border-strong: #2f3d6b;
+      --text-primary: #f8fafc; --text-secondary: #8e9cbf; --text-muted: #5e6c8e;
+      --accent-primary: #60a5fa; --accent-hover: #93c5fd; --accent-muted: #1e294b; --accent-amber: #fbbf24;
+      --card-shadow: 0 4px 8px -1px rgba(0,0,0,0.5);
+    }
+
+    /* 6. Titanium Monolith & Lapis */
+    [data-palette="titanium"][data-theme="light"] {
+      --bg-canvas: #f9fafb; --bg-surface: #ffffff; --bg-subtle: #f3f4f6;
+      --border-subtle: #e5e7eb; --border-strong: #d1d5db;
+      --text-primary: #111827; --text-secondary: #4b5563; --text-muted: #6b7280;
+      --accent-primary: #2563eb; --accent-hover: #1d4ed8; --accent-muted: #eff6ff; --accent-amber: #d97706;
+      --card-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    [data-palette="titanium"][data-theme="dark"] {
+      --bg-canvas: #030712; --bg-surface: #0b0f19; --bg-subtle: #151c2c;
+      --border-subtle: #1f2937; --border-strong: #374151;
+      --text-primary: #f9fafb; --text-secondary: #9ca3af; --text-muted: #6b7280;
+      --accent-primary: #3b82f6; --accent-hover: #60a5fa; --accent-muted: #1e293b; --accent-amber: #f59e0b;
+      --card-shadow: 0 4px 8px -1px rgba(0,0,0,0.6);
+    }
+
+    /* 7. Dusk Fig & Soft Sage */
+    [data-palette="fig"][data-theme="light"] {
+      --bg-canvas: #faf5ff; --bg-surface: #ffffff; --bg-subtle: #f3e8ff;
+      --border-subtle: #ede5f5; --border-strong: #dacce8;
+      --text-primary: #190f26; --text-secondary: #534666; --text-muted: #7b6c91;
+      --accent-primary: #6b21a8; --accent-hover: #581c87; --accent-muted: #f3e8ff; --accent-amber: #059669;
+      --card-shadow: 0 1px 3px rgba(107,33,168,0.06);
+    }
+    [data-palette="fig"][data-theme="dark"] {
+      --bg-canvas: #0f0a19; --bg-surface: #181226; --bg-subtle: #241c38;
+      --border-subtle: #281f3b; --border-strong: #3d3057;
+      --text-primary: #f5f0fa; --text-secondary: #a193b5; --text-muted: #6d6082;
+      --accent-primary: #c084fc; --accent-hover: #d8b4fe; --accent-muted: #2d1b46; --accent-amber: #34d399;
+      --card-shadow: 0 4px 8px -1px rgba(0,0,0,0.5);
+    }
+
+    /* 8. Modernist Zinc & Signal Amber */
+    [data-palette="zinc"][data-theme="light"] {
+      --bg-canvas: #ffffff; --bg-surface: #f4f4f5; --bg-subtle: #e4e4e7;
+      --border-subtle: #e4e4e7; --border-strong: #d4d4d8;
+      --text-primary: #09090b; --text-secondary: #52525b; --text-muted: #71717a;
+      --accent-primary: #09090b; --accent-hover: #27272a; --accent-muted: #d4d4d8; --accent-amber: #d97706;
+      --card-shadow: none;
+    }
+    [data-palette="zinc"][data-theme="dark"] {
+      --bg-canvas: #09090b; --bg-surface: #18181b; --bg-subtle: #27272a;
+      --border-subtle: #27272a; --border-strong: #3f3f46;
+      --text-primary: #fafafa; --text-secondary: #a1a1aa; --text-muted: #71717a;
+      --accent-primary: #fafafa; --accent-hover: #e4e4e7; --accent-muted: #3f3f46; --accent-amber: #f59e0b;
+      --card-shadow: none;
+    }
+
+    /* 9. Botanical Moss & Copper */
+    [data-palette="moss"][data-theme="light"] {
+      --bg-canvas: #f7f8f5; --bg-surface: #ffffff; --bg-subtle: #edf0ea;
+      --border-subtle: #e1e6dd; --border-strong: #c8d1c2;
+      --text-primary: #121a11; --text-secondary: #475444; --text-muted: #748570;
+      --accent-primary: #2d5a27; --accent-hover: #21431d; --accent-muted: #e5ece2; --accent-amber: #b85d19;
+      --card-shadow: 0 1px 3px rgba(45,90,39,0.06);
+    }
+    [data-palette="moss"][data-theme="dark"] {
+      --bg-canvas: #0d130c; --bg-surface: #141f13; --bg-subtle: #1d2c1c;
+      --border-subtle: #1f2e1e; --border-strong: #324830;
+      --text-primary: #f4f7f2; --text-secondary: #94a690; --text-muted: #647560;
+      --accent-primary: #68a357; --accent-hover: #82bd71; --accent-muted: #223520; --accent-amber: #e88c48;
+      --card-shadow: 0 4px 8px -1px rgba(0,0,0,0.5);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      transition: background-color 0.2s ease, color 0.2s ease;
+      line-height: 1.5;
+      padding-bottom: 80px;
+    }
+
+    header {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--card-shadow);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand-mark-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-name {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .controls-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .pill-select-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    select {
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .theme-toggle-btn {
+      padding: 6px 14px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .theme-toggle-btn:hover {
+      background: var(--border-subtle);
+    }
+
+    .container {
+      max-width: 1140px;
+      margin: 28px auto;
+      padding: 0 20px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      border: none;
+      background: transparent;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      color: var(--accent-primary);
+      border-bottom-color: var(--accent-primary);
+    }
+
+    .section-view { display: none; }
+    .section-view.active { display: block; }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .section-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    /* Live Interactive Dashboard Simulation */
+    .sim-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .sim-card-active {
+      border: 1.5px solid var(--accent-primary);
+    }
+
+    .sim-btn {
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: var(--accent-primary);
+      color: #ffffff;
+      border: none;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+    .sim-btn:active {
+      transform: scale(0.97);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .badge-accent {
+      background: var(--accent-muted);
+      color: var(--accent-primary);
+    }
+    .badge-amber {
+      background: rgba(217, 119, 6, 0.15);
+      color: var(--accent-amber);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      text-align: left;
+    }
+    th {
+      font-weight: 700;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .svg-wrapper {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      overflow: auto;
+    }
+    .svg-wrapper img, .svg-wrapper svg {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Live Sticky Header -->
+  <header>
+    <div class="brand-mark-area">
+      <!-- Live Rendered Guiding Sutra Mark -->
+      <svg viewBox="0 0 200 200" width="36" height="36" fill="none">
+        <path d="M 68 132 C 44 132 40 100 68 84 C 92 70 108 130 132 116 C 160 100 156 68 132 68 C 108 68 92 128 68 132 Z" stroke="var(--accent-primary)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="100" cy="100" r="11" fill="var(--accent-amber)"/>
+      </svg>
+      <div>
+        <div class="brand-name">VRITTA <span style="font-size:12px; font-weight:500; opacity:0.6;">(or ANUVRITTA)</span></div>
+        <div class="brand-sub">GUIDING SUTRA IDENTITY • 9 PALETTE ENGINE</div>
+      </div>
+    </div>
+
+    <!-- Live Controls: Palette & Theme -->
+    <div class="controls-group">
+      <div class="pill-select-wrapper">
+        <span style="color:var(--text-muted);">Palette:</span>
+        <select id="paletteSelect" onchange="changePalette(this.value)">
+          <option value="juniper">1. Restorative Juniper &amp; Amber</option>
+          <option value="spruce">2. Nordic Spruce &amp; Sandstone</option>
+          <option value="sumi">3. Kyoto Sumi &amp; Vermilion</option>
+          <option value="terracotta">4. Terracotta Clay &amp; Olive</option>
+          <option value="navy">5. Prussian Navy &amp; Ochre</option>
+          <option value="titanium">6. Titanium Monolith &amp; Lapis</option>
+          <option value="fig">7. Dusk Fig &amp; Soft Sage</option>
+          <option value="zinc">8. Modernist Zinc &amp; Signal Amber</option>
+          <option value="moss">9. Botanical Moss &amp; Copper</option>
+        </select>
+      </div>
+
+      <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ / 🌙 Toggle Light/Dark</button>
+    </div>
+  </header>
+
+  <!-- Content Container -->
+  <main class="container">
+    
+    <!-- Tab Navigation -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" onclick="showTab('tab-live-ui')">1. Live Interactive UI Simulation</button>
+      <button class="tab-btn" onclick="showTab('tab-palette-matrix')">2. 9 Palettes Specification</button>
+      <button class="tab-btn" onclick="showTab('tab-comparison-sheet')">3. Side-by-Side Comparison Sheet</button>
+      <button class="tab-btn" onclick="showTab('tab-logo-specs')">4. Finalized Guiding Sutra Mark</button>
+      <button class="tab-btn" onclick="showTab('tab-domain-matrix')">5. Verified Name &amp; Vercel Subdomain</button>
+    </nav>
+
+    <!-- TAB 1: LIVE INTERACTIVE UI SIMULATION -->
+    <section id="tab-live-ui" class="section-view active">
+      <div class="card">
+        <h2 class="section-title">Live Application Simulation</h2>
+        <p class="section-sub">Use the top controls to switch between all 9 palettes and Light/Dark modes in real time. Notice how the Guiding Sutra mark, session chips, cards, and buttons adapt seamlessly.</p>
+
+        <!-- Rhythm Banner -->
+        <div class="sim-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <div style="width:40px; height:40px; border-radius:10px; background:rgba(217,119,6,0.15); display:flex; align-items:center; justify-content:center; font-size:18px;">🔥</div>
+            <div>
+              <div style="font-weight:700; font-size:14px;">14-Day Consistency Cadence</div>
+              <div style="font-size:12px; color:var(--text-muted);">4 of 6 activities completed today. Sunday planned rest is protected.</div>
+            </div>
+          </div>
+          <span class="badge badge-accent" style="font-size:12px; padding:6px 12px;">67% Completed</span>
+        </div>
+
+        <!-- Section: Daytime Flexible -->
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin:18px 0 8px 4px; letter-spacing:0.06em;">Flexible Cadence (Anytime)</div>
+        
+        <!-- Norman Lewis Card -->
+        <div class="sim-card">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <span class="badge badge-accent">English Learning</span>
+              <span style="font-size:11px; color:var(--text-muted); margin-left:8px;">Word Power Made Easy • Norman Lewis</span>
+              <div style="font-weight:700; font-size:15px; margin-top:6px;">Practice English Workbook</div>
+              <div style="font-size:12px; color:var(--text-muted);">Daily target: 2 completed sessions. Review previous day's work first.</div>
+            </div>
+            <button class="sim-btn" onclick="logWorkbook()">+ Complete Session</button>
+          </div>
+          <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+            <span class="badge" id="s1-badge" style="background:var(--accent-muted); color:var(--accent-primary);">Session 1 ✓</span>
+            <span class="badge" id="s2-badge" style="background:var(--bg-subtle); color:var(--text-muted); border:1px solid var(--border-subtle);">Session 2 ○</span>
+            <span style="font-size:11px; color:var(--text-muted); margin-left:8px;">Previous work review verified ✓</span>
+          </div>
+        </div>
+
+        <!-- Osho Discourse Card -->
+        <div class="sim-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <span class="badge badge-amber">Listening &amp; Awareness</span>
+              <span style="font-size:11px; color:var(--text-muted); margin-left:8px;">Group 1: Overcoming Fear and Anxiety</span>
+              <div style="font-weight:700; font-size:15px; margin-top:6px;">Main Mrityu Sikhata Hun</div>
+              <div style="font-size:12px; color:var(--text-muted);">Discourse series in Hindi • 15 talks catalog</div>
+            </div>
+            <button class="sim-btn" style="background:var(--bg-subtle); color:var(--text-primary); border:1px solid var(--border-subtle);">Library ↗</button>
+          </div>
+        </div>
+
+        <!-- Section: Afternoon Movement -->
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin:18px 0 8px 4px; letter-spacing:0.06em;">Afternoon Cadence (Movement &amp; Strength)</div>
+        
+        <!-- Movement Protocol Card -->
+        <div class="sim-card sim-card-active">
+          <div style="display:flex; justify-content:space-between;">
+            <div>
+              <span class="badge badge-accent">Movement &amp; Strength</span>
+              <span style="font-size:11px; color:var(--text-muted); margin-left:8px;">Week 2 of 12 • Wednesday: Strength &amp; Posture</span>
+              <div style="font-weight:700; font-size:15px; margin-top:6px;">12-Week Body Restoration Protocol</div>
+              <div style="font-size:12px; color:var(--text-muted);">Duration: ~30 min. Warm-up, 3 main progressive exercises, and cool-down.</div>
+            </div>
+          </div>
+          <div style="margin-top:12px; background:var(--bg-subtle); padding:10px 14px; border-radius:10px; font-size:12px; display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+            <div>✓ <strong>Sit-to-Stand:</strong> 2 sets × 10 reps (1m rest)</div>
+            <div>✓ <strong>Incline Push-Up:</strong> 2 sets × 8 reps</div>
+            <div>○ <strong>Glute Bridge:</strong> 2 sets × 10 reps</div>
+            <div>○ <strong>Cool-down:</strong> Chest &amp; Hip flexor stretch</div>
+          </div>
+        </div>
+
+        <!-- Section: Before Bed -->
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin:18px 0 8px 4px; letter-spacing:0.06em;">Before Bed Cadence</div>
+        <div class="sim-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-weight:700; font-size:15px;">Read Books (30 Minutes)</div>
+            <div style="font-size:12px; color:var(--text-muted);">Relaxing bedtime reading • No phone screens before sleep</div>
+          </div>
+          <button class="sim-btn">Start Timer ⏱</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: 9 PALETTES SPECIFICATION -->
+    <section id="tab-palette-matrix" class="section-view">
+      <div class="card">
+        <h2 class="section-title">9 Researched Palette Specifications</h2>
+        <p class="section-sub">Comprehensive semantic token architecture, design inspiration, and WCAG 2.2 AA audit.</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Palette Name</th>
+              <th>Aesthetic Character</th>
+              <th>Primary Token (Light / Dark)</th>
+              <th>Accent &amp; Contrast</th>
+              <th>Personality Match</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1. Restorative Juniper</strong></td>
+              <td>Organic healing, botanical vitality</td>
+              <td><code>#0F766E</code> / <code>#14B8A6</code></td>
+              <td>Warm Amber (15.8:1 AAA)</td>
+              <td>Balanced health &amp; steady habits</td>
+            </tr>
+            <tr>
+              <td><strong>2. Nordic Spruce</strong></td>
+              <td>Boreal wilderness, birch stone</td>
+              <td><code>#1B4332</code> / <code>#52B788</code></td>
+              <td>Birch Sandstone (16.1:1 AAA)</td>
+              <td>Deep quiet &amp; lowest eye strain</td>
+            </tr>
+            <tr>
+              <td><strong>3. Kyoto Sumi</strong></td>
+              <td>Zen calligraphy &amp; vermilion shrine</td>
+              <td><code>#18181B</code> / <code>#F4F4F5</code></td>
+              <td>Temple Vermilion (18.2:1 AAA)</td>
+              <td>Osho study &amp; high editorial poise</td>
+            </tr>
+            <tr>
+              <td><strong>4. Terracotta Clay</strong></td>
+              <td>Warm Mediterranean clay &amp; olive</td>
+              <td><code>#C2593F</code> / <code>#E07A5F</code></td>
+              <td>Grove Olive (15.2:1 AAA)</td>
+              <td>Embodied physical recovery</td>
+            </tr>
+            <tr>
+              <td><strong>5. Prussian Navy</strong></td>
+              <td>Nighttime library, hardcover book</td>
+              <td><code>#1E3A5F</code> / <code>#60A5FA</code></td>
+              <td>Desert Ochre (16.5:1 AAA)</td>
+              <td>Norman Lewis &amp; bedtime reading</td>
+            </tr>
+            <tr>
+              <td><strong>6. Titanium Monolith</strong></td>
+              <td>Architectural precision, Rams clarity</td>
+              <td><code>#2563EB</code> / <code>#3B82F6</code></td>
+              <td>Titanium Steel (16.8:1 AAA)</td>
+              <td>Engineered progressive systems</td>
+            </tr>
+            <tr>
+              <td><strong>7. Dusk Fig &amp; Sage</strong></td>
+              <td>Twilight introspective calm</td>
+              <td><code>#6B21A8</code> / <code>#C084FC</code></td>
+              <td>Soft Mint (15.6:1 AAA)</td>
+              <td>Evening reflection &amp; de-stressing</td>
+            </tr>
+            <tr>
+              <td><strong>8. Modernist Zinc</strong></td>
+              <td>Pure monochrome, zero fluff</td>
+              <td><code>#09090B</code> / <code>#FAFAFA</code></td>
+              <td>Signal Amber (18.5:1 AAA)</td>
+              <td>High discipline, zero distraction</td>
+            </tr>
+            <tr>
+              <td><strong>9. Botanical Moss</strong></td>
+              <td>Verdant conservatory &amp; copper</td>
+              <td><code>#2D5A27</code> / <code>#68A357</code></td>
+              <td>Burnished Copper (16.3:1 AAA)</td>
+              <td>Organic growth of habits over time</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 3: SIDE-BY-SIDE COMPARISON SHEET -->
+    <section id="tab-comparison-sheet" class="section-view">
+      <div class="card">
+        <h2 class="section-title">Visual Comparison Sheet</h2>
+        <p class="section-sub">Rendered side-by-side using the approved Guiding Sutra mark across real application components.</p>
+        
+        <div class="svg-wrapper">
+          <img src="./05-ui-ux-mockups/palette-comparison-sheet.svg" alt="Palette Comparison Sheet">
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: FINALIZED GUIDING SUTRA LOGO -->
+    <section id="tab-logo-specs" class="section-view">
+      <div class="card">
+        <h2 class="section-title">Finalized Mark: The Guiding Sutra (Approved)</h2>
+        <p class="section-sub">An unbroken continuous ribbon loop connecting physical vitality, intellectual study, contemplative listening, and reflection.</p>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:18px; margin-bottom:20px;">
+          <!-- Master -->
+          <div style="background:var(--bg-subtle); padding:20px; border-radius:12px; text-align:center;">
+            <div style="width:80px; height:80px; margin:0 auto 12px auto;">
+              <svg viewBox="0 0 200 200" fill="none">
+                <path d="M 68 132 C 44 132 40 100 68 84 C 92 70 108 130 132 116 C 160 100 156 68 132 68 C 108 68 92 128 68 132 Z" stroke="var(--accent-primary)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="100" cy="100" r="9" fill="var(--accent-amber)"/>
+              </svg>
+            </div>
+            <strong>Master Vector Mark</strong>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Dynamic currentColor stroke</div>
+          </div>
+
+          <!-- Micro Favicon -->
+          <div style="background:var(--bg-subtle); padding:20px; border-radius:12px; text-align:center;">
+            <div style="width:48px; height:48px; margin:16px auto; background:var(--accent-primary); border-radius:12px; display:flex; align-items:center; justify-content:center;">
+              <svg viewBox="0 0 200 200" width="34" height="34" fill="none">
+                <path d="M 68 132 C 44 132 40 100 68 84 C 92 70 108 130 132 116 C 160 100 156 68 132 68 C 108 68 92 128 68 132 Z" stroke="#FFFFFF" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="100" cy="100" r="14" fill="var(--accent-amber)"/>
+              </svg>
+            </div>
+            <strong>Micro-Scale Favicon</strong>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Optically thickened 20px stroke</div>
+          </div>
+
+          <!-- Header Lockup -->
+          <div style="background:var(--bg-subtle); padding:20px; border-radius:12px; text-align:center;">
+            <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin:22px auto;">
+              <svg viewBox="0 0 200 200" width="32" height="32" fill="none">
+                <path d="M 68 132 C 44 132 40 100 68 84 C 92 70 108 130 132 116 C 160 100 156 68 132 68 C 108 68 92 128 68 132 Z" stroke="var(--accent-primary)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="100" cy="100" r="11" fill="var(--accent-amber)"/>
+              </svg>
+              <span style="font-weight:800; font-size:18px; letter-spacing:0.14em;">VRITTA</span>
+            </div>
+            <strong>TopNav Lockup</strong>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Paired with typography</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: DOMAIN & NAME MATRIX -->
+    <section id="tab-domain-matrix" class="section-view">
+      <div class="card">
+        <h2 class="section-title">Verified Domain &amp; Subdomain Feasibility</h2>
+        <p class="section-sub">Network-verified status across Vercel edge deployment targets.</p>
+
+        <div style="margin-bottom:20px;">
+          <h3 style="font-size:15px; font-weight:700; margin-bottom:8px; color:var(--accent-primary);">VRITTA (Fallback / Preferred Baseline)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Vercel Subdomain Target</th>
+                <th>Network Verification Status</th>
+                <th>Viability &amp; Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>vritta.vercel.app</code></td>
+                <td><span style="color:#e11d48; font-weight:700;">❌ Taken (HTTP 200)</span></td>
+                <td>Existing third-party deployment active</td>
+              </tr>
+              <tr style="background:var(--bg-subtle);">
+                <td><strong><code>myvritta.vercel.app</code></strong></td>
+                <td><span style="color:#059669; font-weight:700;">✅ Available (HTTP 404)</span></td>
+                <td><strong>Recommended Vercel target for VRITTA</strong></td>
+              </tr>
+              <tr>
+                <td><code>myvritta.vercel.app</code></td>
+                <td><span style="color:#059669; font-weight:700;">✅ Available (HTTP 404)</span></td>
+                <td>Warm personal companion domain</td>
+              </tr>
+              <tr>
+                <td><code>vrittaroutine.vercel.app</code></td>
+                <td><span style="color:#059669; font-weight:700;">✅ Available (HTTP 404)</span></td>
+                <td>Descriptive routine domain</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <h3 style="font-size:15px; font-weight:700; margin-bottom:8px; color:var(--accent-primary);">10 New Candidate Proposals</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Candidate Name</th>
+                <th>Sanskrit / Root Meaning</th>
+                <th>Verified Vercel Subdomain</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background:var(--bg-subtle);">
+                <td><strong>1. ANUVRITTA 🏆</strong></td>
+                <td>Continuous rhythm; abiding in cadence without friction</td>
+                <td><strong style="color:#059669;">anuvritta.vercel.app (404 AVAILABLE)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>2. SWADHYAY</strong></td>
+                <td>Intentional self-study &amp; noble literature inquiry</td>
+                <td><strong style="color:#059669;">swadhyay.vercel.app (404 AVAILABLE)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>3. CHARYAM</strong></td>
+                <td>Mindful conduct &amp; noble daily practice path</td>
+                <td><strong style="color:#059669;">charyam.vercel.app (404 AVAILABLE)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>4. SAMYAMA</strong></td>
+                <td>Quiet integration of physical and mental focus</td>
+                <td><strong style="color:#059669;">samyama.vercel.app (404 AVAILABLE)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>5. SAHAJA</strong></td>
+                <td>Effortless, natural, spontaneous flow without strain</td>
+                <td><strong style="color:#059669;">sahaja-routine.vercel.app (404 AVAILABLE)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>6. RITUM</strong></td>
+                <td>Harmonious cycle of day, night &amp; seasons</td>
+                <td><strong style="color:#059669;">ritum-routine.vercel.app (404 AVAILABLE)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>7. AVRITI</strong></td>
+                <td>Rhythmic recurrence, gentle return to center</td>
+                <td><strong style="color:#059669;">avriti-app.vercel.app (404 AVAILABLE)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>8. DINAM</strong></td>
+                <td>Daily presence, each day as a complete unit</td>
+                <td><strong style="color:#059669;">dinam-app.vercel.app (404 AVAILABLE)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>9. PRANIDHI</strong></td>
+                <td>Dedicated, unhurried application of mind</td>
+                <td><strong style="color:#059669;">pranidhi-app.vercel.app (404 AVAILABLE)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>10. SANCTUM</strong></td>
+                <td>Private haven for personal cultivation &amp; health</td>
+                <td><strong style="color:#059669;">sanctum-routine.vercel.app (404 AVAILABLE)</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    function changePalette(paletteKey) {
+      document.documentElement.setAttribute('data-palette', paletteKey);
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+    }
+
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    let sessions = 1;
+    function logWorkbook() {
+      sessions = sessions === 1 ? 2 : 1;
+      const s2 = document.getElementById('s2-badge');
+      if (sessions === 2) {
+        s2.style.background = 'var(--accent-muted)';
+        s2.style.color = 'var(--accent-primary)';
+        s2.textContent = 'Session 2 ✓';
+      } else {
+        s2.style.background = 'var(--bg-subtle)';
+        s2.style.color = 'var(--text-muted)';
+        s2.textContent = 'Session 2 ○';
+      }
+    }
+  </script>
+</body>
+</html>

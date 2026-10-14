@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 750" width="100%" height="100%" fill="none" role="img" aria-label="Mockup: Clean Login &amp; Onboarding Screen">
+  <defs>
+    <style>
+      .font-sans { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+      .brand-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 800; font-size: 36px; letter-spacing: -0.03em; fill: #0F172A; text-anchor: middle; }
+      .tagline { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 500; font-size: 15px; fill: #64748B; text-anchor: middle; }
+      .feature-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; font-size: 13px; fill: #0F172A; }
+      .feature-desc { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 500; font-size: 11px; fill: #64748B; line-height: 1.4; }
+    </style>
+  </defs>
+
+  <rect width="800" height="750" fill="#F8FAFC" />
+
+  <!-- Clean Minimalist Header Accent -->
+  <rect x="0" y="0" width="800" height="4" fill="#0F766E" />
+
+  <!-- Central Card Container -->
+  <g transform="translate(180, 50)">
+    <!-- Main Logo Mark (Vector Silhouette, Zero AI Glow Blobs) -->
+    <g transform="translate(170, 0)">
+      <rect width="100" height="100" rx="26" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5" />
+      <g transform="translate(10, 10) scale(0.40)">
+        <path d="M 68 132 C 44 132 40 100 68 84 C 92 70 108 130 132 116 C 160 100 156 68 132 68 C 108 68 92 128 68 132 Z" stroke="#0F766E" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        <circle cx="100" cy="100" r="10" fill="#D97706" />
+      </g>
+    </g>
+
+    <!-- Brand Typography -->
+    <text x="220" y="142" class="brand-title">VRITTA</text>
+    <text x="220" y="166" class="tagline">Personal Routine Companion</text>
+    <text x="220" y="186" class="tagline" font-size="13" fill="#94A3B8">A calm, flexible space for mindful consistency and physical restoration.</text>
+
+    <!-- Google Sign-In Action -->
+    <g transform="translate(80, 214)">
+      <rect width="280" height="48" rx="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5" />
+      <!-- Google Logo Mark -->
+      <g transform="translate(24, 14)">
+        <path fill="#4285F4" d="M19.6 10.2c0-.7-.06-1.3-.17-1.9H10v3.8h5.4c-.2 1.2-.9 2.2-1.9 2.9v2.4h3.1c1.8-1.7 2.9-4.2 2.9-7.2z"/>
+        <path fill="#34A853" d="M10 20c2.7 0 5-1 6.7-2.6l-3.1-2.4c-.9.6-2 .9-3.6.9-2.7 0-5-1.8-5.8-4.3H1v2.5C2.7 17.6 6.1 20 10 20z"/>
+        <path fill="#FBBC05" d="M4.2 11.6c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V5.1H1C.3 6.5 0 8.2 0 9.6s.4 3.1 1 4.5l3.2-2.5z"/>
+        <path fill="#EA4335" d="M10 3.9c1.5 0 2.8.5 3.9 1.5l2.9-2.9C15 1 12.7 0 10 0 6.1 0 2.7 2.4 1 5.1l3.2 2.5c.8-2.5 3.1-3.7 5.8-3.7z"/>
+      </g>
+      <text x="145" y="30" font-family="-apple-system, sans-serif" font-weight="700" font-size="13" fill="#0F172A" text-anchor="middle">Continue with Google</text>
+    </g>
+
+    <!-- Security & Privacy Assurance -->
+    <text x="220" y="286" font-family="-apple-system, sans-serif" font-weight="500" font-size="11" fill="#64748B" text-anchor="middle">🔒 Private &amp; account-isolated • Zero public tracking</text>
+
+    <!-- 4 Philosophy Pillars Grid -->
+    <g transform="translate(0, 310)">
+      <!-- Pillar 1 -->
+      <rect x="0" y="0" width="210" height="90" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1" />
+      <text x="16" y="26" class="feature-title">Habit Architecture</text>
+      <text x="16" y="44" class="feature-desc">Meaningful daily activities organized by life area, not rigid clock times.</text>
+
+      <!-- Pillar 2 -->
+      <rect x="230" y="0" width="210" height="90" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1" />
+      <text x="16" y="26" class="feature-title">Movement &amp; Strength</text>
+      <text x="16" y="44" class="feature-desc">12-week body restoration protocol with built-in, protected rest days.</text>
+
+      <!-- Pillar 3 -->
+      <rect x="0" y="104" width="210" height="90" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1" />
+      <text x="16" y="26" class="feature-title">Deep Listening</text>
+      <text x="16" y="44" class="feature-desc">Curated 30-discourse Osho catalog across awareness and confidence.</text>
+
+      <!-- Pillar 4 -->
+      <rect x="230" y="104" width="210" height="90" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1" />
+      <text x="16" y="26" class="feature-title">Private Reflection</text>
+      <text x="16" y="44" class="feature-desc">Personal diary with structured prompts for insights, feelings, and next steps.</text>
+    </g>
+  </g>
+</svg>

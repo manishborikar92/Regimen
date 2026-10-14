@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 100" width="100%" height="100%" fill="none" role="img" aria-label="Guiding Sutra — Header Wordmark Lockup">
+  <defs>
+    <style>
+      .brand-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 800; font-size: 24px; letter-spacing: 0.16em; fill: #0F172A; }
+      .brand-sub { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 600; font-size: 11px; letter-spacing: 0.05em; fill: #64748B; }
+    </style>
+  </defs>
+
+  <!-- Container -->
+  <rect width="460" height="100" rx="18" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5" />
+
+  <!-- Logo Icon Container (36px scaled) -->
+  <g transform="translate(24, 18)">
+    <rect width="64" height="64" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" />
+    <g transform="translate(6, 6) scale(0.26)">
+      <path
+        d="M 68 132 C 44 132 40 100 68 84 C 92 70 108 130 132 116 C 160 100 156 68 132 68 C 108 68 92 128 68 132 Z"
+        stroke="#0F766E"
+        stroke-width="16"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <circle cx="100" cy="100" r="11" fill="#D97706" />
+    </g>
+  </g>
+
+  <!-- Typographic Wordmark -->
+  <text x="106" y="48" class="brand-text">VRITTA</text>
+  <text x="106" y="68" class="brand-sub">PERSONAL ROUTINE COMPANION</text>
+</svg>

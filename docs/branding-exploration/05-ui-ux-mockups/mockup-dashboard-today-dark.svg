@@ -1,0 +1,204 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1100" width="100%" height="100%" fill="none" role="img" aria-label="Mockup: Today Dashboard (Dark Mode)">
+  <defs>
+    <style>
+      .font-sans { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+      .header-title-dark { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 800; font-size: 19px; letter-spacing: -0.02em; fill: #F8FAFC; }
+      .text-xs-dark { font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+      .text-sm-dark { font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+      .text-base-dark { font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; fill: #F8FAFC; }
+      .text-muted-dark { fill: #94A3B8; font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 500; }
+      .period-title-dark { font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; fill: #94A3B8; letter-spacing: 0.08em; text-transform: uppercase; }
+    </style>
+  </defs>
+
+  <!-- Canvas Background (Deep Obsidian) -->
+  <rect width="800" height="1100" fill="#090D16" />
+
+  <!-- TopNav Header Bar (Dark Surface) -->
+  <g transform="translate(0, 0)">
+    <rect width="800" height="70" fill="#111827" stroke="#1E293B" stroke-width="1" />
+    <g transform="translate(100, 16)">
+      <!-- Approved Logo: Guiding Sutra Lockup (Dark) -->
+      <g transform="translate(0, 4) scale(0.22)">
+        <path d="M 68 132 C 44 132 40 100 68 84 C 92 70 108 130 132 116 C 160 100 156 68 132 68 C 108 68 92 128 68 132 Z" stroke="#14B8A6" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        <circle cx="100" cy="100" r="11" fill="#F59E0B" />
+      </g>
+      <text x="46" y="22" class="header-title-dark">VRITTA</text>
+      <text x="46" y="36" class="text-xs-dark" fill="#94A3B8" font-weight="500">Wednesday, 14 October 2026</text>
+
+      <!-- Theme Mode Pill (Active Dark) -->
+      <g transform="translate(440, 4)">
+        <rect width="84" height="32" rx="16" fill="#1F2937" stroke="#334155" stroke-width="1" />
+        <!-- Sun icon -->
+        <circle cx="20" cy="16" r="4" fill="#64748B" />
+        <!-- Moon icon (Active Dark) -->
+        <path d="M 42 12 A 6 6 0 0 0 48 18 A 6 6 0 1 1 42 12" fill="#2DD4BF" />
+        <!-- Auto / System icon -->
+        <circle cx="68" cy="16" r="4" stroke="#64748B" stroke-width="1.5" fill="none" />
+      </g>
+
+      <!-- User Avatar -->
+      <g transform="translate(540, 4)">
+        <rect width="32" height="32" rx="16" fill="#134E4A" stroke="#2DD4BF" stroke-width="1.5" />
+        <text x="16" y="21" class="text-xs-dark" font-weight="700" fill="#2DD4BF" text-anchor="middle">M</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Centered Content Column -->
+  <g transform="translate(100, 90)">
+
+    <!-- 1. Rhythm & Streak Banner -->
+    <g transform="translate(0, 0)">
+      <rect width="600" height="76" rx="18" fill="#111827" stroke="#1E293B" stroke-width="1" />
+      <g transform="translate(20, 16)">
+        <rect width="44" height="44" rx="12" fill="#78350F" opacity="0.4" stroke="#B45309" stroke-width="1" />
+        <path d="M 22 10 C 22 10 28 17 28 22 C 28 26 25 30 22 30 C 19 30 16 26 16 22 C 16 17 22 10 22 10 Z" fill="#F59E0B" />
+        <circle cx="22" cy="24" r="3" fill="#FDE68A" />
+      </g>
+      <text x="78" y="32" class="text-base-dark">14-Day Consistency Cadence</text>
+      <text x="78" y="50" class="text-muted-dark">4 of 6 activities completed today. Planned rest observed on Sunday.</text>
+      <!-- Rhythm Pill -->
+      <rect x="500" y="24" width="76" height="28" rx="14" fill="#134E4A" />
+      <text x="538" y="42" class="text-xs-dark" font-weight="700" fill="#2DD4BF" text-anchor="middle">67% Done</text>
+    </g>
+
+    <!-- 2. Today's Period: Flexible / Daytime -->
+    <g transform="translate(0, 96)">
+      <text x="4" y="0" class="period-title-dark">Flexible Cadence (Anytime)</text>
+
+      <!-- Activity 1: Workbook Card -->
+      <g transform="translate(0, 12)">
+        <rect width="600" height="110" rx="16" fill="#111827" stroke="#1E293B" stroke-width="1" />
+        <g transform="translate(18, 16)">
+          <rect width="118" height="22" rx="11" fill="#1E3A8A" opacity="0.5" stroke="#3B82F6" stroke-width="1" />
+          <text x="59" y="15" class="text-xs-dark" font-weight="700" fill="#60A5FA" text-anchor="middle">English Learning</text>
+        </g>
+        <text x="146" y="31" class="text-muted-dark" font-size="11">Word Power Made Easy • Norman Lewis</text>
+        
+        <text x="18" y="60" class="text-base-dark" font-size="15">Practice English Workbook</text>
+        <text x="18" y="78" class="text-muted-dark">Target: 2 sessions daily. Complete previous work revision first.</text>
+
+        <!-- Progress Pills -->
+        <g transform="translate(18, 88)">
+          <rect width="88" height="22" rx="6" fill="#064E3B" />
+          <text x="44" y="15" class="text-xs-dark" font-weight="700" fill="#34D399" text-anchor="middle">Session 1 ✓</text>
+
+          <rect x="96" y="0" width="88" height="22" rx="6" fill="#1F2937" stroke="#334155" stroke-width="1" />
+          <text x="140" y="15" class="text-xs-dark" font-weight="600" fill="#94A3B8" text-anchor="middle">Session 2 ○</text>
+
+          <text x="200" y="15" class="text-xs-dark" fill="#34D399" font-weight="600">Revision verified ✓</text>
+        </g>
+
+        <!-- Active Trigger -->
+        <rect x="520" y="38" width="60" height="34" rx="10" fill="#0F766E" />
+        <text x="550" y="59" class="text-xs-dark" font-weight="700" fill="#F8FAFC" text-anchor="middle">+ Log</text>
+      </g>
+
+      <!-- Activity 2: Listen to Osho Card -->
+      <g transform="translate(0, 134)">
+        <rect width="600" height="96" rx="16" fill="#111827" stroke="#1E293B" stroke-width="1" />
+        <g transform="translate(18, 16)">
+          <rect width="134" height="22" rx="11" fill="#78350F" opacity="0.4" stroke="#D97706" stroke-width="1" />
+          <text x="67" y="15" class="text-xs-dark" font-weight="700" fill="#FBBF24" text-anchor="middle">Listening &amp; Awareness</text>
+        </g>
+        <text x="162" y="31" class="text-muted-dark" font-size="11">Group 1: Overcoming Fear and Anxiety</text>
+        
+        <text x="18" y="58" class="text-base-dark" font-size="15">Main Mrityu Sikhata Hun</text>
+        <text x="18" y="76" class="text-muted-dark">Discourse series in Hindi • 15 talks archive</text>
+
+        <rect x="420" y="34" width="76" height="28" rx="8" fill="#1F2937" stroke="#334155" stroke-width="1" />
+        <text x="458" y="52" class="text-xs-dark" font-weight="600" fill="#94A3B8" text-anchor="middle">Library ↗</text>
+
+        <circle cx="550" cy="48" r="16" fill="#059669" />
+        <path d="M 544 48 L 548 52 L 556 44" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" fill="none" />
+      </g>
+
+      <!-- Activity 3: Speaking Practice -->
+      <g transform="translate(0, 242)">
+        <rect width="600" height="80" rx="16" fill="#111827" stroke="#1E293B" stroke-width="1" />
+        <g transform="translate(18, 16)">
+          <rect width="100" height="22" rx="11" fill="#0C4A6E" opacity="0.5" stroke="#0284C7" stroke-width="1" />
+          <text x="50" y="15" class="text-xs-dark" font-weight="700" fill="#38BDF8" text-anchor="middle">Communication</text>
+        </g>
+        <text x="18" y="56" class="text-base-dark" font-size="15">Practice English Speaking</text>
+        <text x="190" y="56" class="text-muted-dark">Spoken dialogue with ChatGPT • Completed</text>
+
+        <circle cx="550" cy="40" r="16" fill="#059669" />
+        <path d="M 544 40 L 548 44 L 556 36" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" fill="none" />
+      </g>
+    </g>
+
+    <!-- 3. Afternoon Period: Movement Plan -->
+    <g transform="translate(0, 442)">
+      <text x="4" y="0" class="period-title-dark">Afternoon Cadence (Movement &amp; Strength)</text>
+      
+      <g transform="translate(0, 12)">
+        <rect width="600" height="180" rx="16" fill="#111827" stroke="#134E4A" stroke-width="1.5" />
+        <g transform="translate(18, 16)">
+          <rect width="138" height="22" rx="11" fill="#134E4A" stroke="#14B8A6" stroke-width="1" />
+          <text x="69" y="15" class="text-xs-dark" font-weight="700" fill="#2DD4BF" text-anchor="middle">Movement &amp; Strength</text>
+        </g>
+        <text x="166" y="31" class="text-muted-dark" font-size="11">Week 2 of 12 • Wednesday: Strength &amp; Posture</text>
+
+        <text x="18" y="60" class="text-base-dark" font-size="16">12-Week Body Restoration Protocol</text>
+        <text x="18" y="78" class="text-muted-dark">Target: ~30 minutes. Warm-up (5 min), Main sets (20 min), Cool-down (5 min).</text>
+
+        <g transform="translate(18, 92)">
+          <rect width="564" height="68" rx="10" fill="#1F2937" stroke="#334155" stroke-width="1" />
+          <text x="16" y="24" class="text-xs-dark" font-weight="700" fill="#F8FAFC">1. Sit-to-Stand: <tspan font-weight="500" fill="#94A3B8">2 sets × 8–12 reps (1m rest)</tspan></text>
+          <text x="16" y="44" class="text-xs-dark" font-weight="700" fill="#F8FAFC">2. Incline Push-Up: <tspan font-weight="500" fill="#94A3B8">2 sets × 6–10 reps</tspan></text>
+          <text x="280" y="24" class="text-xs-dark" font-weight="700" fill="#F8FAFC">3. Glute Bridge: <tspan font-weight="500" fill="#94A3B8">2 sets × 10–12 reps</tspan></text>
+          <text x="280" y="44" class="text-xs-dark" font-weight="700" fill="#F8FAFC">4. Cool-down: <tspan font-weight="500" fill="#94A3B8">Chest, Hip Flexor, Child's Pose</tspan></text>
+        </g>
+      </g>
+    </g>
+
+    <!-- 4. Before Bed Period: Reading & Reflection -->
+    <g transform="translate(0, 656)">
+      <text x="4" y="0" class="period-title-dark">Before Bed Cadence</text>
+
+      <g transform="translate(0, 12)">
+        <rect width="600" height="86" rx="16" fill="#111827" stroke="#1E293B" stroke-width="1" />
+        <g transform="translate(18, 16)">
+          <rect width="90" height="22" rx="11" fill="#312E81" opacity="0.5" stroke="#6366F1" stroke-width="1" />
+          <text x="45" y="15" class="text-xs-dark" font-weight="700" fill="#A5B4FC" text-anchor="middle">Night Reading</text>
+        </g>
+        <text x="18" y="58" class="text-base-dark" font-size="15">Read Books (30 Minutes)</text>
+        <text x="180" y="58" class="text-muted-dark">Unwind before sleep • No screens</text>
+
+        <rect x="510" y="28" width="70" height="32" rx="8" fill="#1F2937" stroke="#334155" stroke-width="1" />
+        <text x="545" y="48" class="text-xs-dark" font-weight="700" fill="#F8FAFC" text-anchor="middle">Start ⏱</text>
+      </g>
+
+      <g transform="translate(0, 110)">
+        <rect width="600" height="86" rx="16" fill="#111827" stroke="#1E293B" stroke-width="1" />
+        <g transform="translate(18, 16)">
+          <rect width="108" height="22" rx="11" fill="#881337" opacity="0.4" stroke="#E11D48" stroke-width="1" />
+          <text x="54" y="15" class="text-xs-dark" font-weight="700" fill="#FB7185" text-anchor="middle">Private Diary</text>
+        </g>
+        <text x="18" y="58" class="text-base-dark" font-size="15">Maintain Reflective Diary</text>
+        <text x="186" y="58" class="text-muted-dark">Record insights, feelings, and assumptions • Private</text>
+
+        <rect x="500" y="28" width="80" height="32" rx="8" fill="#0F766E" />
+        <text x="540" y="48" class="text-xs-dark" font-weight="700" fill="#F8FAFC" text-anchor="middle">Reflect ✍</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Bottom Navigation Bar (Dark Surface) -->
+  <g transform="translate(0, 1036)">
+    <rect width="800" height="64" fill="#111827" stroke="#1E293B" stroke-width="1" />
+    <g transform="translate(250, 12)">
+      <!-- Tab 1: Today (Active) -->
+      <rect x="0" y="0" width="80" height="40" rx="12" fill="#134E4A" />
+      <text x="40" y="25" class="text-xs-dark" font-weight="700" fill="#2DD4BF" text-anchor="middle">Today</text>
+
+      <!-- Tab 2: Routine -->
+      <text x="150" y="25" class="text-xs-dark" font-weight="600" fill="#94A3B8" text-anchor="middle">Routine</text>
+
+      <!-- Tab 3: Insights -->
+      <text x="260" y="25" class="text-xs-dark" font-weight="600" fill="#94A3B8" text-anchor="middle">Insights</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%" fill="none" role="img" aria-label="Guiding Sutra — Dark Theme Adapter">
+  <desc>Guiding Sutra Dark Theme: Rendered against deep obsidian canvas with luminous nocturnal clarity.</desc>
+  <rect width="200" height="200" rx="44" fill="#111827" stroke="#1E293B" stroke-width="2" />
+  
+  <g transform="translate(0, 0)">
+    <path
+      d="M 68 132 C 44 132 40 100 68 84 C 92 70 108 130 132 116 C 160 100 156 68 132 68 C 108 68 92 128 68 132 Z"
+      stroke="#14B8A6"
+      stroke-width="14"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <circle cx="100" cy="100" r="9" fill="#F59E0B" />
+  </g>
+</svg>
