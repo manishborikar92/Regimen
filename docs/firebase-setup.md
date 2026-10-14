@@ -381,6 +381,28 @@ firebase use <project-alias-or-id>
 
 ---
 
+### 6.6 Routine Seeding Architecture, Permissions & Idempotency Rules
+
+Regimen enforces strict segregation between public foundation routine loading and administrative personal schedule management:
+
+#### 1. Foundation Routine Seeding (Client Web SDK)
+- **Sole Entry Point**: The "Load Recommended Routines" action is available **exclusively on the Routine Manager page (`/habits`)**.
+- **Strict Zero-Routine Guard**: The action is rendered **only when the authenticated account has zero routines or habits** (`habits.length === 0`).
+- **Permanent Hiding**: Once any routine exists (generic foundation routine, CLI-seeded personal routine, or custom user-created habit), the button is completely removed from the DOM.
+- **Other Pages Protected**: The Dashboard (`/dashboard`) and all other application pages contain zero seeding buttons or banners. When a user has zero habits on the Dashboard, an informative link (`Open Routine Manager`) directs them to `/habits`.
+- **Loading State Flash Prevention**: Both Dashboard and Routine Manager pages return `<LoadingSpinner />` while the initial Firestore snapshot listener is in flight (`if (loading)`), preventing any momentary flash of the empty state or button.
+- **UI Concurrency Protection**: Rapid double-clicking or concurrent triggers are blocked by an in-flight guard (`isSeedingRef = useRef(false)`), disabling the button and changing its label to `Loading Routines...`.
+- **Firestore Service Idempotency**: In `web/src/lib/firebase/firestore.js`, `seedHabitsForUser(userId, seedData)` queries existing routines for the user and verifies `if (!existingSnap.empty) return existingSnap.docs.map(doc => doc.id);`. If routines already exist, the function exits immediately without writing or overwriting records. Deterministic document IDs (`${userId}_${stableKey}`) guarantee that even concurrent initial writes target the exact same Firestore paths without creating duplicate documents.
+- **Failure Resilience**: If seeding fails (e.g., offline or network error), an error toast is presented, `isSeedingRef` is reset in the `finally` block, and the button remains active for the user to retry.
+
+#### 2. Personalized Schedule Synchronization (Admin SDK CLI)
+- **Admin Privilege**: Personalized routines (Word Power Made Easy, 12-Week Progressive Movement Plan, 30-Discourse Osho Library, etc.) are synchronized exclusively through the CLI script `scripts/fetch-personal-schedule.mjs` (`npm run schedule:fetch-personal`).
+- **Direct Collection Target**: Upserts directly into `/habits` using Admin SDK credentials (`adminDb.collection('habits')`).
+- **Customization Preservation**: The sync engine reconciles system metadata with deterministic IDs (`${userId}_${routine.stableKey}`) while preserving user customizations (time, timing type, preferred period, relative timing, custom frequencies, checklist additions, and metadata).
+- **Zero Client UI Exposure**: No personalized schedule modals, buttons, or client sync APIs exist in the web application bundle.
+
+---
+
 ## 7. Change Impact Matrix
 
 | Operation | Tool / Location | Deployment Required? | Reversible? | Risk Level |

@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import Link from 'next/link';
 import { useData } from '@/contexts/DataContext';
 import {
   WorkbookCard,
@@ -31,7 +32,6 @@ export default function DashboardPage() {
     toggleHabit,
     updateProgress,
     updateProfile,
-    seedHabits,
   } = useData();
 
   // Group habits by time context: Flexible / Afternoon / Before Bed
@@ -229,13 +229,12 @@ export default function DashboardPage() {
                 Build your daily rhythm by exploring recommended foundation routines or creating custom habits.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => seedHabits()}
-              className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-xs sm:text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-sm mx-auto"
+            <Link
+              href="/habits"
+              className="inline-flex items-center justify-center px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-xs sm:text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-2xs mx-auto"
             >
-              Load Recommended Routines
-            </button>
+              Open Routine Manager
+            </Link>
           </div>
         ) : todaysHabits.length === 0 ? (
           <div className="text-center py-12 px-4 bg-white rounded-2xl border border-gray-100 shadow-2xs space-y-2">

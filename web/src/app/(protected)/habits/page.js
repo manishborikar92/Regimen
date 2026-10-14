@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Pencil, Trash2, Plus, Sparkles, RefreshCw, Compass, Clock } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Pencil, Trash2, Plus, Compass, Clock } from 'lucide-react';
 import { useData, useToast } from '@/contexts';
 import { TopNav, ConfirmDialog, LoadingSpinner } from '@/components/ui';
 import { HabitModal } from '@/components/habits';
@@ -17,6 +17,7 @@ export default function HabitsPage() {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  const isSeedingRef = useRef(false);
 
   const handleSave = async (formData) => {
     try {
@@ -51,22 +52,19 @@ export default function HabitsPage() {
   };
 
   const handleSeedHabits = async () => {
-    // If the user's routines were seeded via CLI, protect them from accidental override
-    const hasPersonalRoutines = habits.some(
-      h => h.seedOrigin === 'personal_preset' || h.stableKey?.startsWith('canonical_')
-    );
-    if (hasPersonalRoutines) {
-      addToast('Personal routines are managed via CLI: npm run schedule:fetch-personal', 'info');
-      return;
-    }
+    // Only permit seeding when user has zero routines or habits
+    if (habits.length > 0 || isSeedingRef.current || seeding) return;
 
+    isSeedingRef.current = true;
     setSeeding(true);
     try {
       await seedHabits();
-      addToast('Foundation routines synced successfully!', 'success');
+      addToast('Foundation routines loaded successfully!', 'success');
     } catch (err) {
-      addToast(err.message || 'Failed to sync foundation routines.', 'error');
+      console.error('Error loading foundation routines:', err);
+      addToast(err.message || 'Failed to load recommended routines. Please try again.', 'error');
     } finally {
+      isSeedingRef.current = false;
       setSeeding(false);
     }
   };
@@ -81,7 +79,7 @@ export default function HabitsPage() {
 
       <main className="max-w-2xl mx-auto px-4 py-5 sm:py-6 space-y-5">
         {/* Helper Banner */}
-        <div className="bg-gradient-to-r from-indigo-50/70 via-white to-teal-50/50 p-4 rounded-2xl border border-indigo-100 flex items-start justify-between gap-3 shadow-2xs">
+        <div className="bg-gradient-to-r from-indigo-50/70 via-white to-teal-50/50 p-4 rounded-2xl border border-indigo-100 shadow-2xs">
           <div className="space-y-1">
             <h3 className="text-xs sm:text-sm font-bold text-gray-900 flex items-center gap-1.5">
               <Compass className="w-4 h-4 text-indigo-600" />
@@ -91,17 +89,6 @@ export default function HabitsPage() {
               Preferred times are soft guidance, never hard deadlines. Categorize by life purpose and priority rather than rigid hours.
             </p>
           </div>
-
-          <button
-            type="button"
-            onClick={handleSeedHabits}
-            disabled={seeding}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-50 rounded-xl text-xs font-semibold transition-colors disabled:opacity-50 shadow-2xs flex-shrink-0"
-            title="Idempotently load or update foundation routines without deleting custom routines"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${seeding ? 'animate-spin' : ''}`} />
-            <span>{seeding ? 'Syncing...' : 'Sync Routines'}</span>
-          </button>
         </div>
 
         {habits.length === 0 ? (
@@ -117,6 +104,7 @@ export default function HabitsPage() {
             </div>
             <div className="flex flex-col sm:flex-row gap-2.5 justify-center items-center">
               <button
+                type="button"
                 onClick={handleSeedHabits}
                 disabled={seeding}
                 className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-xs sm:text-sm font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 shadow-2xs"
@@ -124,6 +112,7 @@ export default function HabitsPage() {
                 {seeding ? 'Loading Routines...' : 'Load Recommended Routines'}
               </button>
               <button
+                type="button"
                 onClick={() => { setEditingHabit(null); setShowModal(true); }}
                 className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl text-xs sm:text-sm font-semibold hover:bg-gray-50 transition-colors"
               >

@@ -157,6 +157,3 @@ export const DEFAULT_ROUTINES = [
     checklistItems: [],
   },
 ];
-
-// Default export for client seed actions
-export const seedHabits = DEFAULT_ROUTINES;

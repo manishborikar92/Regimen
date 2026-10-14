@@ -160,18 +160,14 @@ export async function seedHabitsForUser(userId, seedData) {
     if (!userId) throw new Error('User ID is required to seed routines.');
     if (!Array.isArray(seedData) || seedData.length === 0) return [];
 
-    // Query existing habits for this user in a single request (avoids non-existent getDoc calls)
+    // Query existing habits for this user in a single request
     const existingSnap = await getDocs(getHabitsQuery(userId));
-    const existingByStableKey = new Map();
-    const existingById = new Map();
 
-    existingSnap.forEach(docSnap => {
-        const data = docSnap.data();
-        if (data.stableKey) {
-            existingByStableKey.set(data.stableKey, data);
-        }
-        existingById.set(docSnap.id, data);
-    });
+    // Strict guard: Seeding foundation routines is only permitted when the user has zero routines or habits.
+    // If routines already exist (foundation, personalized, or custom), return early without writing.
+    if (!existingSnap.empty) {
+        return existingSnap.docs.map(docSnap => docSnap.id);
+    }
 
     const promises = seedData.map(async (habit, index) => {
         // Deterministic document ID based on stableKey or index
@@ -179,54 +175,21 @@ export async function seedHabitsForUser(userId, seedData) {
         const docId = `${userId}_${key}`;
         const habitRef = doc(db, 'habits', docId);
 
-        const existing = existingByStableKey.get(key) || existingById.get(docId);
-        let dataToSave;
-
-        if (existing) {
-            dataToSave = {
-                title: habit.title,
-                category: habit.category,
-                completionMethod: habit.completionMethod,
-                instructions: habit.instructions,
-                isSystemSeed: true,
-                seedOrigin: habit.seedOrigin || 'foundation_preset',
-                userId,
-                updatedAt: serverTimestamp(),
-                // Preserve user customizations
-                time: existing.time ?? habit.time ?? 'Flexible',
-                timingType: existing.timingType ?? habit.timingType ?? 'anytime',
-                ...(habit.preferredPeriod !== undefined || existing.preferredPeriod !== undefined
-                    ? { preferredPeriod: existing.preferredPeriod ?? habit.preferredPeriod }
-                    : {}),
-                ...(habit.relativeTiming !== undefined || existing.relativeTiming !== undefined
-                    ? { relativeTiming: existing.relativeTiming ?? habit.relativeTiming }
-                    : {}),
-                frequency: Array.isArray(existing.frequency) && existing.frequency.length > 0 ? existing.frequency : habit.frequency,
-                order: existing.order ?? habit.order,
-                checklistItems: Array.isArray(existing.checklistItems) && existing.checklistItems.length > 0
-                    ? existing.checklistItems
-                    : (habit.checklistItems || []),
-                metadata: {
-                    ...(habit.metadata || {}),
-                    ...(existing.metadata || {}),
-                },
-            };
-        } else {
-            const cleanHabit = {};
-            for (const [k, v] of Object.entries(habit)) {
-                if (v !== undefined) cleanHabit[k] = v;
-            }
-            dataToSave = {
-                ...cleanHabit,
-                id: docId,
-                userId,
-                seedOrigin: habit.seedOrigin || 'foundation_preset',
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp(),
-            };
+        const cleanHabit = {};
+        for (const [k, v] of Object.entries(habit)) {
+            if (v !== undefined) cleanHabit[k] = v;
         }
 
-        // merge: true preserves any extra custom fields
+        const dataToSave = {
+            ...cleanHabit,
+            id: docId,
+            userId,
+            seedOrigin: habit.seedOrigin || 'foundation_preset',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+        };
+
+        // merge: true preserves any extra custom fields if written concurrently
         await setDoc(habitRef, dataToSave, { merge: true });
         return docId;
     });

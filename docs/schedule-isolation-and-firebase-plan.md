@@ -104,7 +104,20 @@ flowchart TD
   - Verified persistence across page reloads and CLI re-execution.
   - Verified unauthorized read and collection query attempts are rejected with `403 Forbidden` (`PERMISSION_DENIED`).
 - **Quality Gates**:
-  - Unit tests: 48 / 48 passing.
+  - Unit tests: 57 / 57 passing across 13 test suites.
   - Linter: 0 errors, 0 warnings.
-  - Production build: Clean compilation with 10 static prerendered routes.
+  - Production build: Clean compilation with 12 static prerendered routes.
   - Client chunks: 0 leaks found.
+
+### Phase 7: Foundation Routine Loading Cleanup & Strict Zero-Routine Guard
+- **Strict UI Architecture**:
+  - The "Load Recommended Routines" action is available **exclusively on the Routine Manager page (`/habits`)**, and **only** when the authenticated account has zero existing routines or habits (`habits.length === 0`).
+  - When one or more routines exist (generic foundation routines, CLI-seeded personal routines, or custom user habits), the default-preset loading button is **permanently hidden**.
+  - All other pages (such as `/dashboard`) contain zero buttons, banners, or actions to seed or synchronize default routines. The Dashboard empty state provides a clean navigation link to `/habits` (`Open Routine Manager`).
+  - Loading State Protection: Empty-state action buttons are never flashed while Firestore is resolving initial data (`if (loading) return <LoadingSpinner />;`).
+- **Idempotency & Concurrency Defenses**:
+  - **UI Layer**: Double-click or rapid multi-click protection via `isSeedingRef = useRef(false)`. Subsequent clicks during an in-flight seeding call return immediately.
+  - **Database Layer**: In `web/src/lib/firebase/firestore.js`, `seedHabitsForUser` enforces `if (!existingSnap.empty) return existingSnap.docs.map(doc => doc.id);`. If the user already has routines, no new documents are inserted and no existing documents are overwritten.
+  - **Deterministic Document IDs**: Documents are created using `${userId}_${stableKey}`, guaranteeing that concurrent operations target identical keys without creating duplicates.
+  - **Dead Code Cleanup**: Removed obsolete `export const seedHabits = DEFAULT_ROUTINES;` alias from `seed-data.js`.
+- **Test Suite**: Authored comprehensive test suite `web/tests/default-routine-loading.test.mjs` verifying all 9 core loading, isolation, idempotency, and error-handling requirements.
