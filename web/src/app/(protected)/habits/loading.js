@@ -1,5 +1,5 @@
-import { LoadingSpinner } from '@/components/ui';
+import { HabitsSkeleton } from '@/components/ui';
 
 export default function HabitsLoading() {
-    return <LoadingSpinner />;
+  return <HabitsSkeleton />;
 }

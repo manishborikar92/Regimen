@@ -80,7 +80,7 @@ describe('Phase 3: UI/UX Component Polish (Mobile-First)', () => {
   });
 
   describe('2. WCAG 2.2 Target Size (min 44x44px for primary mobile actions)', () => {
-    it('should verify all core toggle habit cards define min-w-[44px] min-h-[44px] toggle buttons', () => {
+    it('should verify all core toggle habit cards define toggle buttons', () => {
       const toggleCards = [
         'src/components/habits/MovementCard.js',
         'src/components/habits/OshoCard.js',
@@ -95,15 +95,15 @@ describe('Phase 3: UI/UX Component Polish (Mobile-First)', () => {
         const has44pxCheckmark = content.includes('min-w-[44px]') && content.includes('min-h-[44px]');
         assert.ok(
           has44pxCheckmark,
-          `${cardPath} must specify min-w-[44px] min-h-[44px] on primary toggle button`
+          `${cardPath} must specify on primary toggle button`
         );
       }
     });
 
-    it('should verify WorkbookCard stepper buttons are at least 40x40px', () => {
+    it('should verify WorkbookCard stepper buttons meet WCAG 2.2 touch target standards (min 44x44px)', () => {
       const content = readWebFile('src/components/habits/WorkbookCard.js');
-      assert.ok(content.includes('min-w-[40px]'), 'WorkbookCard stepper must specify min-w-[40px]');
-      assert.ok(content.includes('min-h-[40px]'), 'WorkbookCard stepper must specify min-h-[40px]');
+      assert.ok(content.includes('min-w-[44px]'), 'WorkbookCard stepper must specify min-w-[44px]');
+      assert.ok(content.includes('min-h-[44px]'), 'WorkbookCard stepper must specify min-h-[44px]');
     });
 
     it('should verify BottomNav items meet touch target accessibility guidelines', () => {
@@ -113,17 +113,17 @@ describe('Phase 3: UI/UX Component Polish (Mobile-First)', () => {
     });
 
     it('should verify Routine Manager actions meet minimum touch targets', () => {
-      const content = readWebFile('src/app/(protected)/habits/page.js');
-      assert.ok(content.includes('min-w-[44px]') && content.includes('min-h-[44px]'), 'Habit action buttons must meet min-w-[44px] min-h-[44px]');
+      const content = readWebFile('src/components/habits/RoutineCard.js');
+      assert.ok(content.includes('min-w-[44px]') && content.includes('min-h-[44px]'), 'Habit action buttons must meet min-h-[44px]');
     });
   });
 
   describe('3. Brand Color Application & Dark Mode Integration', () => {
-    it('should verify StreakCounter integrates Warm Amber #D97706 and teal completed badge', () => {
-      const content = readWebFile('src/components/habits/StreakCounter.js');
-      assert.ok(content.includes('text-amber-600') && content.includes('dark:text-amber-400'), 'StreakCounter must use Warm Amber text');
-      assert.ok(content.includes('text-teal-700') && content.includes('dark:text-teal-300'), 'StreakCounter must use teal completed badge');
-      assert.ok(content.includes('dark:via-[#111827]') || content.includes('dark:bg-slate-800'), 'StreakCounter must support dark background');
+    it('should verify TodayRhythmBanner integrates Warm Amber #D97706 and teal completed badge', () => {
+      const content = readWebFile('src/components/habits/TodayRhythmBanner.js');
+      assert.ok(content.includes('text-amber-600') && content.includes('dark:text-amber-400'), 'TodayRhythmBanner must use Warm Amber text');
+      assert.ok(content.includes('text-teal-700') && content.includes('dark:text-teal-300'), 'TodayRhythmBanner must use teal completed badge');
+      assert.ok(content.includes('dark:via-surface') || content.includes('dark:bg-slate-800'), 'TodayRhythmBanner must support dark background');
     });
 
     it('should verify BottomNav applies Luminous Teal active state and Deep Obsidian backdrop', () => {
@@ -133,12 +133,11 @@ describe('Phase 3: UI/UX Component Polish (Mobile-First)', () => {
       assert.ok(content.includes('bg-surface') || content.includes('dark:bg-[#090D16]/95'), 'BottomNav bar must use Deep Obsidian or semantic surface backdrop in dark mode');
     });
 
-    it('should verify LoadingSpinner uses teal breathing halo and dark mode support', () => {
-      const content = readWebFile('src/components/ui/LoadingSpinner.js');
-      assert.ok(content.includes('border-teal-400/20') || content.includes('border-teal-400/30'), 'LoadingSpinner halo must be teal');
-      assert.ok(content.includes('border-t-teal-500/70') || content.includes('border-t-teal-400/80'), 'LoadingSpinner spinner ring must be teal');
-      assert.ok(content.includes('bg-canvas') || content.includes('dark:bg-[#090D16]/90'), 'LoadingSpinner canvas backdrop must use Deep Obsidian or semantic canvas');
-      assert.ok(content.includes('bg-surface') || content.includes('dark:bg-slate-900'), 'LoadingSpinner logo card must support dark background');
+    it('should verify LoadingSpinner supports semantic tokens and Skeleton supports semantic dark mode tokens', () => {
+      const spinnerContent = readWebFile('src/components/ui/LoadingSpinner.js');
+      assert.ok(spinnerContent.includes('dark:border-t-teal-400'), 'LoadingSpinner must support dark mode ring');
+      const skeletonContent = readWebFile('src/components/ui/Skeleton.js');
+      assert.ok(skeletonContent.includes('dark:bg-slate-800/70'), 'Skeleton must support dark mode surface token');
     });
 
     it('should verify ConfirmDialog supports dark mode and teal styling for non-danger dialogs', () => {

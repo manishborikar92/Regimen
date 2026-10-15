@@ -14,7 +14,7 @@ export default function ThemeToggle({ className = '' }) {
   if (!isMounted) {
     return (
       <div
-        className={`w-10 h-10 min-w-[44px] min-h-[44px] ${className}`}
+        className={`w-10 h-10 ${className}`}
         aria-hidden="true"
       />
     );
@@ -28,7 +28,7 @@ export default function ThemeToggle({ className = '' }) {
     <button
       type="button"
       onClick={() => setTheme(nextTheme)}
-      className={`w-10 h-10 min-w-[44px] min-h-[44px] p-2 rounded-xl flex items-center justify-center text-sub hover:text-main hover:bg-surface-subtle transition-colors border border-transparent hover:border-subtle shadow-2xs focus-visible:outline-2 focus-visible:outline-offset-2 ${className}`}
+      className={`w-10 h-10 p-2 rounded-xl flex items-center justify-center text-sub hover:text-main hover:bg-surface-subtle transition-colors border border-transparent hover:border-subtle shadow-2xs focus-visible:outline-2 focus-visible:outline-offset-2 ${className}`}
       aria-label={label}
       title={label}
     >

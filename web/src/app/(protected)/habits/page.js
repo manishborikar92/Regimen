@@ -1,13 +1,10 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Pencil, Trash2, Plus, Compass, Clock } from 'lucide-react';
+import { Plus, Compass } from 'lucide-react';
 import { useData, useToast } from '@/contexts';
-import { TopNav, ConfirmDialog, LoadingSpinner } from '@/components/ui';
-import { HabitModal } from '@/components/habits';
-import { getCategoryConfig } from '@/lib/constants/categories';
-import { getTimingDisplay } from '@/utils/date-helpers';
-import { BRAND } from '@/lib/constants/brand';
+import { ConfirmDialog, HabitsSkeleton } from '@/components/ui';
+import { HabitModal, RoutineCard } from '@/components/habits';
 
 export default function HabitsPage() {
   const { habits, loading, addHabit, updateHabit, deleteHabit, seedHabits } = useData();
@@ -70,16 +67,14 @@ export default function HabitsPage() {
   };
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <HabitsSkeleton />;
   }
 
   return (
     <>
-      <TopNav title="Routine Manager" subtitle="Life Areas & Scheduling" />
-
-      <main className="max-w-2xl mx-auto px-4 py-5 sm:py-6 space-y-5">
+      <main className="max-w-2xl mx-auto px-4 py-5 sm:py-6 space-y-5 pb-32 sm:pb-36">
         {habits.length === 0 ? (
-          <div className="text-center py-12 px-4 bg-surface rounded-2xl border border-subtle shadow-2xs space-y-4">
+          <div className="text-center py-12 px-4 bg-surface rounded-2xl border border-subtle dark:border-stone-800 shadow-2xs space-y-4">
             <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 rounded-2xl flex items-center justify-center mx-auto text-teal-700 dark:text-teal-400 shadow-2xs">
               <Compass className="w-7 h-7" />
             </div>
@@ -101,7 +96,7 @@ export default function HabitsPage() {
               <button
                 type="button"
                 onClick={() => { setEditingHabit(null); setShowModal(true); }}
-                className="px-5 py-2.5 bg-surface border border-subtle text-main rounded-xl text-xs sm:text-sm font-semibold hover:bg-surface-subtle transition-colors shadow-2xs"
+                className="px-5 py-2.5 bg-surface border border-subtle dark:border-stone-700 text-main rounded-xl text-xs sm:text-sm font-semibold hover:bg-surface-subtle transition-colors shadow-2xs"
               >
                 Create Custom Routine
               </button>
@@ -109,96 +104,17 @@ export default function HabitsPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {habits.map((habit) => {
-              const config = getCategoryConfig(habit.category);
-              const timingText = getTimingDisplay(habit);
-              const isPersonal = habit.seedOrigin === 'personal_preset' || habit.stableKey?.startsWith('canonical_');
-              const isFoundation = !isPersonal && Boolean(habit.stableKey || habit.isSystemSeed);
-
-              return (
-                <div
-                  key={habit.id}
-                  className="bg-surface rounded-2xl p-4 sm:p-5 shadow-2xs border border-subtle hover:shadow-sm transition-shadow"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                        <span className={`text-2xs sm:text-xs px-2.5 py-0.5 rounded-full font-medium border ${config.badgeClasses}`}>
-                          {habit.category}
-                        </span>
-
-                        <span className="flex items-center gap-1 text-2xs text-sub bg-surface-subtle border border-subtle px-2 py-0.5 rounded-md font-medium">
-                          <Clock className="w-3 h-3 text-slate-400" />
-                          {timingText}
-                        </span>
-
-                        {isPersonal && (
-                          <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800/60">
-                            Personal
-                          </span>
-                        )}
-
-                        {isFoundation && (
-                          <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-surface-subtle text-sub border border-subtle">
-                            Foundation
-                          </span>
-                        )}
-
-                        <span className="text-2xs text-muted">#{habit.order}</span>
-                      </div>
-
-                      <h3 className="text-sm sm:text-base font-bold text-main">
-                        {habit.title}
-                      </h3>
-
-                      {habit.instructions && (
-                        <p className="text-xs text-sub mt-1 line-clamp-2 leading-relaxed">
-                          {habit.instructions}
-                        </p>
-                      )}
-
-                      {/* Frequency badges */}
-                      <div className="flex flex-wrap gap-1 mt-2.5">
-                        {habit.frequency?.map(day => (
-                          <span
-                            key={day}
-                            className="text-2xs px-2 py-0.5 bg-surface-subtle border border-subtle/60 text-sub rounded-md font-medium"
-                          >
-                            {day}
-                          </span>
-                        ))}
-                      </div>
-
-                      {habit.checklistItems?.length > 0 && (
-                        <p className="text-2xs text-teal-700 dark:text-teal-400 font-medium mt-2">
-                          {habit.checklistItems.length} checklist steps configured
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex gap-1 ml-2 flex-shrink-0">
-                      <button
-                        onClick={() => { setEditingHabit(habit); setShowModal(true); }}
-                        className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-teal-700 dark:hover:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/50 rounded-xl transition-colors"
-                        title="Edit Routine"
-                        aria-label={`Edit ${habit.title}`}
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => setDeleteConfirm(habit.id)}
-                        className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl transition-colors"
-                        title="Delete Routine"
-                        aria-label={`Delete ${habit.title}`}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {habits.map((habit) => (
+              <RoutineCard
+                key={habit.id}
+                habit={habit}
+                onEdit={(h) => {
+                  setEditingHabit(h);
+                  setShowModal(true);
+                }}
+                onDelete={(id) => setDeleteConfirm(id)}
+              />
+            ))}
           </div>
         )}
       </main>
@@ -209,7 +125,7 @@ export default function HabitsPage() {
         onConfirm={() => handleDelete(deleteConfirm)}
         title="Delete Routine?"
         message="This routine will be removed from your upcoming schedule. Historical logs and past completions are safely preserved."
-        confirmText="Delete Routine"
+        confirmText="Delete"
         isDanger={true}
         isLoading={isDeleting}
       />
@@ -223,13 +139,15 @@ export default function HabitsPage() {
         />
       )}
 
-      {/* Floating Add Routine Button */}
-      <div className="fixed bottom-20 left-0 right-3 pointer-events-none z-40">
+      {/* Floating Add Routine Button — elevated above BottomNav with zero card collision */}
+      <div className="fixed bottom-22 sm:bottom-24 left-0 right-0 pointer-events-none z-40">
         <div className="max-w-2xl mx-auto px-4 flex justify-end">
           <button
+            type="button"
             onClick={() => { setEditingHabit(null); setShowModal(true); }}
-            className="w-13 h-13 min-w-[52px] min-h-[52px] bg-teal-700 dark:bg-teal-600 text-white rounded-full shadow-lg hover:bg-teal-800 dark:hover:bg-teal-500 transition-all hover:scale-105 flex items-center justify-center pointer-events-auto shadow-teal-700/30"
+            className="w-13 h-13 min-w-[52px] min-h-[52px] bg-teal-700 dark:bg-teal-600 text-white rounded-full shadow-lg hover:bg-teal-800 dark:hover:bg-teal-500 transition-all hover:scale-105 active:scale-95 flex items-center justify-center pointer-events-auto shadow-teal-700/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
             aria-label="Add Routine"
+            title="Add Routine"
           >
             <Plus className="w-6 h-6" />
           </button>

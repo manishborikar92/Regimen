@@ -1,5 +1,5 @@
-import { LoadingSpinner } from '@/components/ui';
+import { AnalyticsSkeleton } from '@/components/ui';
 
 export default function AnalyticsLoading() {
-    return <LoadingSpinner />;
+  return <AnalyticsSkeleton />;
 }

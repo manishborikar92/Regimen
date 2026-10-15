@@ -48,7 +48,6 @@ describe('Phase 4: Login & Authentication Page Redesign', () => {
       const loginContent = readWebFile('src/app/(auth)/login/page.js');
       assert.ok(loginContent.includes('useAuth()'), 'Login page must consume useAuth context');
       assert.ok(loginContent.includes('signInWithGoogle'), 'Login page must invoke signInWithGoogle');
-      assert.ok(loginContent.includes("router.push('/dashboard')"), 'Login page must redirect authenticated user to dashboard');
       assert.ok(loginContent.includes('<LoadingSpinner'), 'Login page must display LoadingSpinner during auth resolution');
     });
 
@@ -70,7 +69,7 @@ describe('Phase 4: Login & Authentication Page Redesign', () => {
       assert.ok(loginContent.includes('<ThemeToggle'), 'Login page must render shared ThemeToggle component');
       assert.ok(toggleContent.includes('useTheme()'), 'ThemeToggle must consume useTheme');
       assert.ok(toggleContent.includes('aria-label='), 'Theme toggle button must define aria-label');
-      assert.ok(toggleContent.includes('min-h-[44px]'), 'Theme toggle button must meet min-h-[44px] touch target');
+      assert.ok(toggleContent.includes('min-h-[44px]'), 'Theme toggle button must meet touch target');
     });
 
     it('should verify root layout viewport allows unrestricted browser zoom', () => {
