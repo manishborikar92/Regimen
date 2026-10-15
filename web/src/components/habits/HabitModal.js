@@ -222,13 +222,13 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
                         key={t.id}
                         type="button"
                         onClick={() => setFormData(prev => ({ ...prev, timingType: t.id }))}
-                        className={`min-h-[46px] p-2 sm:p-2.5 rounded-xl font-medium text-left border transition-all flex items-start gap-2 ${
+                        className={`min-h-[46px] p-2 sm:p-2.5 rounded-xl font-medium text-left border transition-all flex items-center gap-2 ${
                           isSelected
                             ? 'bg-teal-700 dark:bg-teal-600 text-white border-teal-700 dark:border-teal-600 shadow-2xs'
                             : 'bg-surface dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-subtle dark:border-slate-700 hover:bg-surface-subtle dark:hover:bg-slate-700/80'
                         }`}
                       >
-                        <Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${isSelected ? 'text-white' : 'text-teal-600 dark:text-teal-400'}`} />
+                        <Icon className={`w-4 h-4 flex-shrink-0 ${isSelected ? 'text-white' : 'text-teal-600 dark:text-teal-400'}`} />
                         <div className="min-w-0 flex-1">
                           <span className="block text-xs font-semibold leading-tight truncate">{t.label}</span>
                           <span className={`block text-2xs leading-tight truncate mt-0.5 ${isSelected ? 'text-teal-100 dark:text-teal-200' : 'text-muted'}`}>
