@@ -79,11 +79,11 @@ export default function TopNav({ title, subtitle }) {
               <div className="relative">
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center gap-2 hover:bg-surface-subtle rounded-xl p-1.5 transition-colors border border-transparent hover:border-subtle"
+                  className="flex items-center gap-2 hover:bg-surface-subtle rounded-xl p-1.5 min-h-[44px] min-w-[44px] justify-center sm:justify-start transition-colors border border-transparent hover:border-subtle focus-visible:outline-2 focus-visible:outline-offset-2"
                   aria-expanded={showProfileMenu}
                   aria-label="Profile menu"
                 >
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-accent-subtle/40 border border-subtle flex items-center justify-center text-xs font-bold text-accent">
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-accent-subtle/40 border border-subtle flex items-center justify-center text-xs font-bold text-accent flex-shrink-0">
                     {user.photoURL ? (
                       <Image
                         src={user.photoURL}
@@ -129,10 +129,10 @@ export default function TopNav({ title, subtitle }) {
                           setShowProfileMenu(false);
                           setShowLogoutModal(true);
                         }}
-                        className="w-full text-left px-3.5 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors flex items-center gap-2"
+                        className="w-full text-left px-3.5 py-2.5 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors flex items-center gap-2 min-h-[44px]"
                         role="menuitem"
                       >
-                        <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
+                        <LogOut className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                         Sign Out
                       </button>
                     </div>
@@ -143,7 +143,7 @@ export default function TopNav({ title, subtitle }) {
               <button
                 onClick={handleSignIn}
                 disabled={signingIn}
-                className="flex items-center gap-2 px-3.5 py-1.5 bg-accent hover:bg-accent-hover text-white rounded-xl transition-colors disabled:opacity-50 text-xs font-semibold shadow-2xs"
+                className="flex items-center gap-2 px-3.5 py-2 min-h-[44px] bg-accent hover:bg-accent-hover text-white rounded-xl transition-colors disabled:opacity-50 text-xs font-semibold shadow-2xs"
               >
                 {signingIn ? (
                   <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white/40 border-t-white" />

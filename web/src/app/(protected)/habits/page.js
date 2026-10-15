@@ -80,12 +80,12 @@ export default function HabitsPage() {
       <main className="max-w-2xl mx-auto px-4 py-5 sm:py-6 space-y-5">
         {habits.length === 0 ? (
           <div className="text-center py-12 px-4 bg-surface rounded-2xl border border-subtle shadow-2xs space-y-4">
-            <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 rounded-2xl flex items-center justify-center mx-auto text-teal-700 dark:text-teal-400 text-2xl">
-              📝
+            <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 rounded-2xl flex items-center justify-center mx-auto text-teal-700 dark:text-teal-400 shadow-2xs">
+              <Compass className="w-7 h-7" />
             </div>
             <div className="max-w-sm mx-auto space-y-1.5">
               <h3 className="text-base font-bold text-main">No routines found</h3>
-              <p className="text-xs text-sub">
+              <p className="text-xs text-sub leading-relaxed">
                 Load recommended foundation routines or create your own custom habit.
               </p>
             </div>
@@ -101,7 +101,7 @@ export default function HabitsPage() {
               <button
                 type="button"
                 onClick={() => { setEditingHabit(null); setShowModal(true); }}
-                className="px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs sm:text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                className="px-5 py-2.5 bg-surface border border-subtle text-main rounded-xl text-xs sm:text-sm font-semibold hover:bg-surface-subtle transition-colors shadow-2xs"
               >
                 Create Custom Routine
               </button>
@@ -127,7 +127,7 @@ export default function HabitsPage() {
                           {habit.category}
                         </span>
 
-                        <span className="flex items-center gap-1 text-2xs text-sub bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded-md font-medium">
+                        <span className="flex items-center gap-1 text-2xs text-sub bg-surface-subtle border border-subtle px-2 py-0.5 rounded-md font-medium">
                           <Clock className="w-3 h-3 text-slate-400" />
                           {timingText}
                         </span>
@@ -139,7 +139,7 @@ export default function HabitsPage() {
                         )}
 
                         {isFoundation && (
-                          <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-sub border border-slate-200 dark:border-slate-700">
+                          <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-surface-subtle text-sub border border-subtle">
                             Foundation
                           </span>
                         )}
@@ -162,7 +162,7 @@ export default function HabitsPage() {
                         {habit.frequency?.map(day => (
                           <span
                             key={day}
-                            className="text-2xs px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded font-medium"
+                            className="text-2xs px-2 py-0.5 bg-surface-subtle border border-subtle/60 text-sub rounded-md font-medium"
                           >
                             {day}
                           </span>

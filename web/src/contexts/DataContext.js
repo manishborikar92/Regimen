@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHabits } from '@/hooks/use-habits';
 import { useDailyLogs } from '@/hooks/use-daily-logs';
@@ -66,7 +66,7 @@ export function DataProvider({ children }) {
     return saveUserProfile(user.uid, data);
   }, [user]);
 
-  const value = {
+  const value = useMemo(() => ({
     // State
     habits,
     dailyLogs,
@@ -88,7 +88,26 @@ export function DataProvider({ children }) {
     deleteHabit,
     seedHabits,
     fetchDailyLogs,
-  };
+  }), [
+    habits,
+    dailyLogs,
+    todayLog,
+    todayProgress,
+    userProfile,
+    habitsLoading,
+    error,
+    todaysHabits,
+    todayStats,
+    streak,
+    toggleHabit,
+    updateProgress,
+    updateProfile,
+    addHabit,
+    updateHabit,
+    deleteHabit,
+    seedHabits,
+    fetchDailyLogs,
+  ]);
 
   return (
     <DataContext.Provider value={value}>

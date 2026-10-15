@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useData } from '@/contexts/DataContext';
 import {
@@ -17,6 +17,8 @@ import { TopNav, LoadingSpinner } from '@/components/ui';
 import { formatDate } from '@/utils/date-helpers';
 import { BRAND } from '@/lib/constants/brand';
 import { Compass, CheckCircle2 } from 'lucide-react';
+
+const EMPTY_PROGRESS = Object.freeze({});
 
 export default function DashboardPage() {
 
@@ -61,9 +63,9 @@ export default function DashboardPage() {
   }, [todaysHabits]);
 
   // Helper to render the appropriate activity-specific card
-  const renderHabitCard = (habit) => {
+  const renderHabitCard = useCallback((habit) => {
     const isCompleted = todayLog.includes(habit.id);
-    const progress = todayProgress[habit.id] || {};
+    const progress = todayProgress[habit.id] || EMPTY_PROGRESS;
 
     const key = habit.stableKey || habit.id;
     const method = habit.completionMethod || '';
@@ -164,7 +166,7 @@ export default function DashboardPage() {
         onToggle={toggleHabit}
       />
     );
-  };
+  }, [todayLog, todayProgress, userProfile, updateProgress, toggleHabit, updateProfile]);
 
   const allCompletedToday = todayStats.total > 0 && todayStats.completed >= todayStats.total;
 

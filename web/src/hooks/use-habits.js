@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { onSnapshot } from 'firebase/firestore';
 import {
     getHabitsQuery,
@@ -60,10 +60,12 @@ export function useHabits(user) {
     }, [user]);
 
     // Today's habits filtered by active day of week (or everyday if frequency not set)
-    const todaysHabits = habits.filter(habit => {
-        if (!habit.frequency || habit.frequency.length === 0) return true;
-        return habit.frequency.includes(dayOfWeek);
-    });
+    const todaysHabits = useMemo(() => {
+        return habits.filter(habit => {
+            if (!habit.frequency || habit.frequency.length === 0) return true;
+            return habit.frequency.includes(dayOfWeek);
+        });
+    }, [habits, dayOfWeek]);
 
     // Add a new habit
     const addHabit = useCallback(async (habitData) => {
