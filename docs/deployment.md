@@ -3,7 +3,7 @@
 **Document Role:** How-to & Operations Guide (Diátaxis)  
 **Hosting Platform:** Vercel (Edge Network & Serverless)  
 **Production Domain:** `myvritta.vercel.app` (Project: `vritta`)  
-**Production Branch:** `main` (Development Branch: `m/dev`)  
+**Production Branch:** `main` (Development Branch: `dev`)  
 
 ---
 
@@ -17,7 +17,7 @@ Vritta is hosted on Vercel and deployed globally across edge locations:
 
 ```mermaid
 flowchart LR
-    DevBranch["Development Branch<br/>(m/dev)"] -->|Pull Request & Code Review| MainBranch["Production Branch<br/>(main)"]
+    DevBranch["Development Branch<br/>(dev)"] -->|Pull Request & Code Review| MainBranch["Production Branch<br/>(main)"]
     MainBranch -->|Automatic Webhook Trigger| VercelCI["Vercel Build Pipeline<br/>(npm run build)"]
     VercelCI -->|Zero-Downtime Rollout| EdgeProd["Vercel Edge Network<br/>(myvritta.vercel.app)"]
 ```
@@ -69,13 +69,13 @@ git diff --check
 When quality gates pass and release readiness is approved:
 
 ### Step 1: Push Verified Commits to GitHub
-Ensure all local work on `m/dev` is pushed to GitHub:
+Ensure all local work on `dev` is pushed to GitHub:
 ```bash
-git push origin m/dev
+git push origin dev
 ```
 
 ### Step 2: Create and Merge Pull Request
-1. Open a Pull Request on GitHub from `m/dev` into `main`.
+1. Open a Pull Request on GitHub from `dev` into `main`.
 2. Review the final diff, confirming no unexpected file modifications.
 3. Merge the Pull Request into `main`.
 

@@ -52,7 +52,7 @@ docs/
 *Operations & Workflow Guide*
 - Vercel production hosting architecture (`myvritta.vercel.app`, project `vritta`).
 - Environment variable configuration in Vercel.
-- Git branching and release workflow (`m/dev` development branch -> PR / merge to `main` -> automated Vercel build).
+- Git branching and release workflow (`dev` development branch -> PR / merge to `main` -> automated Vercel build).
 - Pre-release local verification checklist.
 - Post-deployment verification checklist and instant rollback protocol.
 
