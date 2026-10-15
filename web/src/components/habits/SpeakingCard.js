@@ -141,7 +141,7 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
             <button
               type="button"
               onClick={handleToggle}
-              className={`w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border-2 flex items-center justify-center transition-all ${
+              className={`w-11 h-11 rounded-full border-2 flex items-center justify-center transition-all ${
                 isCompleted
                   ? 'bg-sky-600 border-sky-600 text-white shadow-xs'
                   : 'border-stone-300 dark:border-stone-600 hover:border-sky-500 text-transparent'
@@ -158,7 +158,7 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
           <button
             type="button"
             onClick={() => setShowNotes(!showNotes)}
-            className="min-h-[44px] py-2 flex items-center gap-1.5 text-xs font-semibold text-sky-700 dark:text-sky-400 hover:text-sky-900 dark:hover:text-sky-300 transition-colors"
+            className="py-2 flex items-center gap-1.5 text-xs font-semibold text-sky-700 dark:text-sky-400 hover:text-sky-900 dark:hover:text-sky-300 transition-colors"
           >
             <PenLine className="w-3.5 h-3.5" />
             <span>{showNotes ? 'Hide conversation notes' : 'Add conversation topics / notes (optional)'}</span>

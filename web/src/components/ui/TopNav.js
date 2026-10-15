@@ -79,7 +79,7 @@ export default function TopNav({ title, subtitle }) {
               <div className="relative">
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center gap-2 hover:bg-surface-subtle rounded-full sm:rounded-xl p-1 sm:p-1.5 min-h-[44px] min-w-[44px] justify-center sm:justify-start transition-colors border border-transparent hover:border-subtle focus-visible:outline-2 focus-visible:outline-offset-2"
+                  className="flex items-center gap-2 hover:bg-surface-subtle rounded-full sm:rounded-xl p-1 sm:p-1.5 justify-center sm:justify-start transition-colors border border-transparent hover:border-subtle focus-visible:outline-2 focus-visible:outline-offset-2"
                   aria-expanded={showProfileMenu}
                   aria-label="Profile menu"
                 >
@@ -143,7 +143,7 @@ export default function TopNav({ title, subtitle }) {
               <button
                 onClick={handleSignIn}
                 disabled={signingIn}
-                className="flex items-center gap-2 px-3.5 py-2 min-h-[44px] bg-accent hover:bg-accent-hover text-white rounded-xl transition-colors disabled:opacity-50 text-xs font-semibold shadow-2xs"
+                className="flex items-center gap-2 px-3.5 py-2 bg-accent hover:bg-accent-hover text-white rounded-xl transition-colors disabled:opacity-50 text-xs font-semibold shadow-2xs"
               >
                 {signingIn ? (
                   <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white/40 border-t-white" />

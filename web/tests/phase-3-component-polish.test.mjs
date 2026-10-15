@@ -80,7 +80,7 @@ describe('Phase 3: UI/UX Component Polish (Mobile-First)', () => {
   });
 
   describe('2. WCAG 2.2 Target Size (min 44x44px for primary mobile actions)', () => {
-    it('should verify all core toggle habit cards define min-w-[44px] min-h-[44px] toggle buttons', () => {
+    it('should verify all core toggle habit cards define toggle buttons', () => {
       const toggleCards = [
         'src/components/habits/MovementCard.js',
         'src/components/habits/OshoCard.js',
@@ -95,7 +95,7 @@ describe('Phase 3: UI/UX Component Polish (Mobile-First)', () => {
         const has44pxCheckmark = content.includes('min-w-[44px]') && content.includes('min-h-[44px]');
         assert.ok(
           has44pxCheckmark,
-          `${cardPath} must specify min-w-[44px] min-h-[44px] on primary toggle button`
+          `${cardPath} must specify on primary toggle button`
         );
       }
     });
@@ -114,7 +114,7 @@ describe('Phase 3: UI/UX Component Polish (Mobile-First)', () => {
 
     it('should verify Routine Manager actions meet minimum touch targets', () => {
       const content = readWebFile('src/components/habits/RoutineCard.js');
-      assert.ok(content.includes('min-w-[44px]') && content.includes('min-h-[44px]'), 'Habit action buttons must meet min-w-[44px] min-h-[44px]');
+      assert.ok(content.includes('min-w-[44px]') && content.includes('min-h-[44px]'), 'Habit action buttons must meet min-h-[44px]');
     });
   });
 

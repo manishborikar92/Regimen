@@ -77,11 +77,11 @@ describe('Phase 3: Habits Routine Manager Redesign & FAB Collision Fix', () => {
   });
 
   describe('3. WCAG 2.2 Touch Target Compliance (min 44x44px)', () => {
-    it('should verify Edit and Delete action buttons meet min-w-[44px] min-h-[44px]', () => {
+    it('should verify Edit and Delete action buttons meet min-h-[44px]', () => {
       const content = readWebFile(routineCardPath);
       assert.ok(
         content.includes('min-w-[44px]') && content.includes('min-h-[44px]'),
-        'RoutineCard action buttons must declare min-w-[44px] min-h-[44px]'
+        'RoutineCard action buttons must declare min-h-[44px]'
       );
       assert.ok(
         content.includes('aria-label={`Edit ${habit.title}`}'),

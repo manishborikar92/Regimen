@@ -72,7 +72,7 @@ function DiaryCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProgre
             <button
               type="button"
               onClick={() => onToggle(habit.id)}
-              className={`w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border-2 flex items-center justify-center transition-all ${
+              className={`w-11 h-11 rounded-full border-2 flex items-center justify-center transition-all ${
                 isCompleted
                   ? 'bg-rose-600 border-rose-600 text-white shadow-xs'
                   : 'border-stone-300 dark:border-stone-600 hover:border-rose-500 text-transparent'
@@ -89,7 +89,7 @@ function DiaryCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProgre
           <button
             type="button"
             onClick={() => setIsEditorOpen(!isEditorOpen)}
-            className="min-h-[44px] py-2 flex items-center justify-between w-full text-xs font-semibold text-rose-700 dark:text-rose-400 hover:text-rose-900 dark:hover:text-rose-300 transition-colors"
+            className="py-2 flex items-center justify-between w-full text-xs font-semibold text-rose-700 dark:text-rose-400 hover:text-rose-900 dark:hover:text-rose-300 transition-colors"
           >
             <span className="flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400" />
@@ -147,7 +147,7 @@ function DiaryCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProgre
                   <button
                     type="button"
                     onClick={handleSaveEntry}
-                    className="min-h-[44px] px-4 py-2.5 bg-rose-600 text-white rounded-lg text-xs font-semibold hover:bg-rose-700 transition-colors shadow-2xs flex items-center justify-center"
+                    className="px-4 py-2.5 bg-rose-600 text-white rounded-lg text-xs font-semibold hover:bg-rose-700 transition-colors shadow-2xs flex items-center justify-center"
                   >
                     Save & Mark Complete
                   </button>

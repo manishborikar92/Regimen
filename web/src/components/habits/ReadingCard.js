@@ -92,7 +92,7 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
             <button
               type="button"
               onClick={() => onToggle(habit.id)}
-              className={`w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border-2 flex items-center justify-center transition-all ${
+              className={`w-11 h-11 rounded-full border-2 flex items-center justify-center transition-all ${
                 isCompleted
                   ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
                   : 'border-stone-300 dark:border-stone-600 hover:border-emerald-500 text-transparent'
@@ -157,7 +157,7 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
               <button
                 type="button"
                 onClick={handleStartTimer}
-                className={`min-h-[44px] px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition-colors whitespace-nowrap shadow-2xs ${
+                className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition-colors whitespace-nowrap shadow-2xs ${
                   timerActive
                     ? 'bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-200 hover:bg-amber-200 dark:hover:bg-amber-900 border border-amber-300/80 dark:border-amber-800/80'
                     : secondsRemaining < TARGET_SECONDS
@@ -184,7 +184,7 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
                 type="button"
                 onClick={handleResetTimer}
                 disabled={secondsRemaining === TARGET_SECONDS && !timerActive}
-                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl text-muted hover:text-main bg-surface border border-subtle hover:bg-surface-subtle flex items-center justify-center transition-colors disabled:opacity-35 disabled:hover:bg-surface disabled:hover:text-muted"
+                className="w-11 h-11 rounded-xl text-muted hover:text-main bg-surface border border-subtle hover:bg-surface-subtle flex items-center justify-center transition-colors disabled:opacity-35 disabled:hover:bg-surface disabled:hover:text-muted"
                 title="Reset Timer"
                 aria-label="Reset Timer"
               >

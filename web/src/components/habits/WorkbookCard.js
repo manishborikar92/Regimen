@@ -123,7 +123,7 @@ function WorkbookCard({ habit, isCompleted, progress = {}, onUpdateProgress }) {
                 type="button"
                 onClick={() => handleSessionChange(sessions - 1)}
                 disabled={sessions <= 0}
-                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-lg font-bold"
+                className="w-11 h-11 rounded-lg flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-lg font-bold"
                 aria-label="Decrease session count"
               >
                 -
@@ -135,7 +135,7 @@ function WorkbookCard({ habit, isCompleted, progress = {}, onUpdateProgress }) {
                 type="button"
                 onClick={() => handleSessionChange(sessions + 1)}
                 disabled={sessions >= 2}
-                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg flex items-center justify-center bg-teal-700 dark:bg-teal-600 text-white hover:bg-teal-800 dark:hover:bg-teal-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-lg font-bold shadow-2xs"
+                className="w-11 h-11 rounded-lg flex items-center justify-center bg-teal-700 dark:bg-teal-600 text-white hover:bg-teal-800 dark:hover:bg-teal-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-lg font-bold shadow-2xs"
                 aria-label="Increase session count"
               >
                 +
@@ -212,7 +212,7 @@ function WorkbookCard({ habit, isCompleted, progress = {}, onUpdateProgress }) {
           <button
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="min-h-[44px] py-2 flex items-center gap-1.5 text-xs font-semibold text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 transition-colors"
+            className="py-2 flex items-center gap-1.5 text-xs font-semibold text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 transition-colors"
             aria-expanded={isExpanded}
           >
             <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />

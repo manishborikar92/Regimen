@@ -157,7 +157,7 @@ function MovementCard({
                 <button
                   type="button"
                   onClick={handleToggleWholeWorkout}
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border-2 flex items-center justify-center transition-all ${
+                  className={`w-11 h-11 rounded-full border-2 flex items-center justify-center transition-all ${
                     isWorkoutComplete
                       ? 'bg-teal-700 dark:bg-teal-600 border-teal-700 dark:border-teal-600 text-white shadow-xs'
                       : 'border-stone-300 dark:border-stone-600 hover:border-teal-500 text-transparent'
@@ -202,7 +202,7 @@ function MovementCard({
                 <button
                   type="button"
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="min-h-[44px] px-2.5 py-1 text-xs text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-semibold flex items-center gap-1 rounded-lg hover:bg-stone-200/50 dark:hover:bg-stone-800/50 transition-colors"
+                  className="px-2.5 py-1 text-xs text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-semibold flex items-center gap-1 rounded-lg hover:bg-stone-200/50 dark:hover:bg-stone-800/50 transition-colors"
                 >
                   <span>{isExpanded ? 'Collapse' : `View all ${currentItems.length} steps`}</span>
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
@@ -333,7 +333,7 @@ function MovementCard({
             <button
               type="button"
               onClick={() => setShowSafetyModal(true)}
-              className="min-h-[44px] text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 flex items-center gap-1.5 font-medium py-2 transition-colors"
+              className="text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 flex items-center gap-1.5 font-medium py-2 transition-colors"
             >
               <HeartPulse className="w-4 h-4 text-rose-500" />
               <span>12-Week Plan, Safety & Stop Signals</span>
@@ -347,7 +347,7 @@ function MovementCard({
               <button
                 type="button"
                 onClick={handleActivatePlan}
-                className="min-h-[44px] text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-semibold underline flex items-center py-2"
+                className="text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-semibold underline flex items-center py-2"
               >
                 Start 12-Week Plan
               </button>

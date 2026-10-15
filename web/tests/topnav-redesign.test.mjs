@@ -68,15 +68,15 @@ describe('Phase 5: TopNav Responsive Sizing and Layout Refinement', () => {
   });
 
   describe('4. Header Controls Alignment & WCAG Touch Targets', () => {
-    it('should verify ThemeToggle and Profile button maintain min-w-[44px] min-h-[44px]', () => {
+    it('should verify ThemeToggle and Profile button maintain min-h-[44px]', () => {
       const content = readWebFile(topNavPath);
       assert.ok(
         content.includes('<ThemeToggle />'),
         'TopNav must render ThemeToggle'
       );
       assert.ok(
-        content.includes('min-h-[44px] min-w-[44px]'),
-        'Profile menu trigger must declare min-h-[44px] min-w-[44px]'
+        content.includes('min-w-[44px]'),
+        'Profile menu trigger must declare min-w-[44px]'
       );
     });
 

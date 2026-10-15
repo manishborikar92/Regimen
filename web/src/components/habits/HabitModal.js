@@ -437,7 +437,7 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
               <button
                 type="button"
                 onClick={() => onDelete(habit.id)}
-                className="min-h-[44px] px-3.5 py-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl text-xs font-semibold transition-colors"
+                className="px-3.5 py-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl text-xs font-semibold transition-colors"
               >
                 Delete
               </button>

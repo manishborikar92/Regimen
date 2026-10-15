@@ -47,7 +47,7 @@ function GenericHabitCard({ habit, isCompleted, onToggle }) {
             <button
               type="button"
               onClick={() => onToggle(habit.id)}
-              className={`w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+              className={`w-11 h-11 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
                 isCompleted
                   ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
                   : 'border-stone-300 dark:border-stone-600 hover:border-emerald-500 text-transparent'
@@ -65,7 +65,7 @@ function GenericHabitCard({ habit, isCompleted, onToggle }) {
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="min-h-[44px] py-2 flex items-center gap-1.5 text-xs font-semibold text-sub hover:text-main transition-colors"
+              className="py-2 flex items-center gap-1.5 text-xs font-semibold text-sub hover:text-main transition-colors"
             >
               <ListChecks className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
               <span>{isExpanded ? 'Hide items' : `Show ${habit.checklistItems.length} checklist items`}</span>

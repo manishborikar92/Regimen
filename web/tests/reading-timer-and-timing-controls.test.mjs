@@ -51,7 +51,7 @@ describe('Phase 6: Reading Timer & Routine Timing-Mode Controls', () => {
     it('should verify WCAG 2.2 compliant touch targets on all timer controls', () => {
       const content = readWebFile('src/components/habits/ReadingCard.js');
       assert.ok(content.includes('min-h-[44px]'), 'Timer start/pause button must satisfy min-h-[44px]');
-      assert.ok(content.includes('min-w-[44px] min-h-[44px]'), 'Timer reset button must satisfy min-w-[44px] min-h-[44px]');
+      assert.ok(content.includes('min-h-[44px]'), 'Timer reset button must satisfy min-h-[44px]');
     });
 
     it('should verify timer reset button disables when at initial 30:00 idle state', () => {

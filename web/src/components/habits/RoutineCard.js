@@ -58,7 +58,7 @@ function RoutineCard({ habit, onEdit, onDelete }) {
           <button
             type="button"
             onClick={() => onEdit?.(habit)}
-            className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-teal-700 dark:hover:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/50 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600"
+            className="p-2.5 flex items-center justify-center text-slate-400 hover:text-teal-700 dark:hover:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/50 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600"
             title="Edit Routine"
             aria-label={`Edit ${habit.title}`}
           >
@@ -67,7 +67,7 @@ function RoutineCard({ habit, onEdit, onDelete }) {
           <button
             type="button"
             onClick={() => onDelete?.(habit.id)}
-            className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+            className="p-2.5 flex items-center justify-center text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
             title="Delete Routine"
             aria-label={`Delete ${habit.title}`}
           >

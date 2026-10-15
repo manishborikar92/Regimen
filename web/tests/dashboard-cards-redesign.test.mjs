@@ -38,7 +38,7 @@ describe('Phase 2: Mobile-First Dashboard Cards Redesign', () => {
   });
 
   describe('2. WCAG 2.2 Touch Target Compliance (min 44x44px for Interactive Controls)', () => {
-    it('should verify primary circular completion buttons meet min-w-[44px] min-h-[44px]', () => {
+    it('should verify primary circular completion buttons meet min-h-[44px]', () => {
       const toggleCards = [
         'src/components/habits/MovementCard.js',
         'src/components/habits/OshoCard.js',
@@ -52,15 +52,15 @@ describe('Phase 2: Mobile-First Dashboard Cards Redesign', () => {
         const content = readWebFile(cardPath);
         assert.ok(
           content.includes('min-w-[44px]') && content.includes('min-h-[44px]'),
-          `${cardPath} must declare min-w-[44px] min-h-[44px] on primary toggle button`
+          `${cardPath} must declare on primary toggle button`
         );
       }
     });
 
-    it('should verify WorkbookCard stepper controls meet min-w-[44px] min-h-[44px]', () => {
+    it('should verify WorkbookCard stepper controls meet min-h-[44px]', () => {
       const content = readWebFile('src/components/habits/WorkbookCard.js');
-      assert.ok(content.includes('min-w-[44px]'), 'WorkbookCard must have min-w-[44px] stepper buttons');
-      assert.ok(content.includes('min-h-[44px]'), 'WorkbookCard must have min-h-[44px] stepper buttons');
+      assert.ok(content.includes('min-w-[44px]'), 'WorkbookCard must have stepper buttons');
+      assert.ok(content.includes('min-h-[44px]'), 'WorkbookCard must have stepper buttons');
     });
 
     it('should verify ReadingCard timer controls meet min-h-[44px]', () => {

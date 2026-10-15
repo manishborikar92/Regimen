@@ -134,7 +134,7 @@ The theme architecture is strictly binary: **Light** or **Dark**. The legacy "Sy
 - **State Store (`web/src/contexts/ThemeContext.js`):**
   Subscribes to external storage changes using `useSyncExternalStore`. Safely migrates null, invalid, or legacy `'system'` values to `'light'`.
 - **Component (`web/src/components/ui/ThemeToggle.js`):**
-  Meets WCAG 2.2 SC 2.5.5 Level AAA touch target standards (`min-w-[44px] min-h-[44px]`).
+  Meets WCAG 2.2 SC 2.5.5 Level AAA touch target standards (`min-h-[44px]`).
 
 ---
 

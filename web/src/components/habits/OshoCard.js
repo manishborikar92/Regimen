@@ -87,7 +87,7 @@ function OshoCard({
               <button
                 type="button"
                 onClick={() => onToggle(habit.id)}
-                className={`w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border-2 flex items-center justify-center transition-all ${
+                className={`w-11 h-11 rounded-full border-2 flex items-center justify-center transition-all ${
                   isCompleted
                     ? 'bg-amber-600 border-amber-600 text-white shadow-xs'
                     : 'border-stone-300 dark:border-stone-600 hover:border-amber-500 text-transparent'
@@ -115,7 +115,7 @@ function OshoCard({
               <button
                 type="button"
                 onClick={() => setShowLibraryModal(true)}
-                className="min-h-[44px] px-3.5 py-2 bg-white dark:bg-stone-800 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 rounded-lg text-xs font-semibold hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors flex items-center justify-center shadow-2xs"
+                className="px-3.5 py-2 bg-white dark:bg-stone-800 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 rounded-lg text-xs font-semibold hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors flex items-center justify-center shadow-2xs"
               >
                 Change Series
               </button>
@@ -143,7 +143,7 @@ function OshoCard({
             <button
               type="button"
               onClick={() => setShowLibraryModal(true)}
-              className="min-h-[44px] py-2 text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300 font-semibold flex items-center gap-1.5 transition-colors"
+              className="py-2 text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300 font-semibold flex items-center gap-1.5 transition-colors"
             >
               <BookOpen className="w-3.5 h-3.5" />
               <span>Explore All 30 Discourse Titles & Links</span>
