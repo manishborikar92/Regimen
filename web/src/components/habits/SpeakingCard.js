@@ -20,17 +20,12 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
 
   return (
     <div
-      className={`relative rounded-xl border border-subtle bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
-        isCompleted ? 'bg-sky-50/20 dark:bg-sky-950/20 border-sky-200 dark:border-sky-800/80' : ''
+      className={`relative rounded-xl border border-t-[3px] bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
+        isCompleted
+          ? 'bg-sky-50/20 dark:bg-sky-950/20 border-sky-200 dark:border-sky-800/80 border-t-sky-500 dark:border-t-sky-400'
+          : 'border-subtle border-t-sky-500 dark:border-t-sky-400'
       }`}
     >
-      {/* Top accent bar */}
-      <div
-        className={`h-1.5 w-full rounded-t-xl bg-gradient-to-r from-sky-500 to-teal-500 dark:from-sky-400 dark:to-teal-400 ${
-          isCompleted ? 'opacity-80' : 'opacity-40'
-        }`}
-      />
-
       <div className="p-4 sm:p-5">
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
@@ -70,7 +65,7 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
             }`}
             aria-label={isCompleted ? 'Mark speaking incomplete' : 'Mark speaking complete'}
           >
-            <Check className="w-5 h-5 text-white" strokeWidth={3} />
+            {isCompleted && <Check className="w-5 h-5 text-white" strokeWidth={3} />}
           </button>
         </div>
 

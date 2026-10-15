@@ -107,23 +107,14 @@ function MovementCard({
   return (
     <>
       <div
-        className={`relative rounded-xl border border-subtle bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
+        className={`relative rounded-xl border border-t-[3px] bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
           isSunday
-            ? 'bg-slate-50/60 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800'
+            ? 'bg-slate-50/60 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 border-t-slate-500 dark:border-t-slate-400'
             : isWorkoutComplete
-            ? 'bg-teal-50/20 dark:bg-teal-950/20 border-teal-200 dark:border-teal-800/80'
-            : ''
+            ? 'bg-teal-50/20 dark:bg-teal-950/20 border-teal-200 dark:border-teal-800/80 border-t-teal-600 dark:border-t-teal-400'
+            : 'border-subtle border-t-teal-600 dark:border-t-teal-400'
         }`}
       >
-        {/* Top accent bar */}
-        <div
-          className={`h-1.5 w-full rounded-t-xl bg-gradient-to-r ${
-            isSunday
-              ? 'from-slate-400 to-teal-600 dark:from-slate-600 dark:to-teal-500'
-              : 'from-teal-500 to-emerald-500'
-          } ${isWorkoutComplete || isSunday ? 'opacity-80' : 'opacity-40'}`}
-        />
-
         <div className="p-4 sm:p-5">
           {/* Header */}
           <div className="flex items-start justify-between gap-3">
@@ -176,7 +167,7 @@ function MovementCard({
                   }`}
                   aria-label={isWorkoutComplete ? 'Mark workout incomplete' : 'Mark workout complete'}
                 >
-                  <Check className="w-5 h-5 text-white" strokeWidth={3} />
+                  {isWorkoutComplete && <Check className="w-5 h-5 text-white" strokeWidth={3} />}
                 </button>
               )}
             </div>

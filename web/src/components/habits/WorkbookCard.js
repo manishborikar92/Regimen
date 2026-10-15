@@ -62,15 +62,12 @@ function WorkbookCard({ habit, isCompleted, progress = {}, onUpdateProgress }) {
 
   return (
     <div
-      className={`relative rounded-xl border border-subtle bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
-        isFullyComplete ? 'bg-teal-50/20 dark:bg-teal-950/20 border-teal-200 dark:border-teal-800/80' : ''
+      className={`relative rounded-xl border border-t-[3px] bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
+        isFullyComplete
+          ? 'bg-teal-50/20 dark:bg-teal-950/20 border-teal-200 dark:border-teal-800/80 border-t-teal-600 dark:border-t-teal-400'
+          : 'border-subtle border-t-teal-600 dark:border-t-teal-400'
       }`}
     >
-      {/* Top accent bar */}
-      <div className={`h-1.5 w-full rounded-t-xl bg-gradient-to-r from-teal-600 to-teal-400 dark:from-teal-500 dark:to-teal-300 ${
-        isFullyComplete ? 'opacity-80' : 'opacity-40'
-      }`} />
-
       <div className="p-4 sm:p-5">
         {/* Header */}
         <div className="flex items-start justify-between gap-3">

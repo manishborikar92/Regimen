@@ -53,17 +53,12 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
 
   return (
     <div
-      className={`relative rounded-xl border border-subtle bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
-        isCompleted ? 'bg-emerald-50/20 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/80' : ''
+      className={`relative rounded-xl border border-t-[3px] bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
+        isCompleted
+          ? 'bg-emerald-50/20 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/80 border-t-emerald-500 dark:border-t-emerald-400'
+          : 'border-subtle border-t-emerald-500 dark:border-t-emerald-400'
       }`}
     >
-      {/* Top accent bar */}
-      <div
-        className={`h-1.5 w-full rounded-t-xl bg-gradient-to-r from-emerald-500 to-teal-500 dark:from-emerald-400 dark:to-teal-400 ${
-          isCompleted ? 'opacity-80' : 'opacity-40'
-        }`}
-      />
-
       <div className="p-4 sm:p-5">
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
@@ -102,7 +97,7 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
             }`}
             aria-label={isCompleted ? 'Mark reading incomplete' : 'Mark reading complete'}
           >
-            <Check className="w-5 h-5 text-white" strokeWidth={3} />
+            {isCompleted && <Check className="w-5 h-5 text-white" strokeWidth={3} />}
           </button>
         </div>
 
