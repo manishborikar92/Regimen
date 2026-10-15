@@ -111,7 +111,7 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-emerald-600" />
             <div>
-              <span className="text-xs text-gray-500 block">Optional 30-Min Reading Timer</span>
+              <span className="text-xs text-gray-500 block">30-Min Reading Timer</span>
               <span className="text-sm font-mono font-bold text-gray-900">{timeFormatted}</span>
             </div>
           </div>
