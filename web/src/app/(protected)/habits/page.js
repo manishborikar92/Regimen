@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { Plus, Compass } from 'lucide-react';
 import { useData, useToast } from '@/contexts';
-import { TopNav, ConfirmDialog, LoadingSpinner } from '@/components/ui';
+import { ConfirmDialog, HabitsSkeleton } from '@/components/ui';
 import { HabitModal, RoutineCard } from '@/components/habits';
 
 export default function HabitsPage() {
@@ -67,13 +67,11 @@ export default function HabitsPage() {
   };
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <HabitsSkeleton />;
   }
 
   return (
     <>
-      <TopNav title="Routine Manager" subtitle="Life Areas & Scheduling" />
-
       <main className="max-w-2xl mx-auto px-4 py-5 sm:py-6 space-y-5 pb-32 sm:pb-36">
         {habits.length === 0 ? (
           <div className="text-center py-12 px-4 bg-surface rounded-2xl border border-subtle dark:border-stone-800 shadow-2xs space-y-4">

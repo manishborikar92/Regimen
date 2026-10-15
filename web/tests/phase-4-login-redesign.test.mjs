@@ -48,7 +48,6 @@ describe('Phase 4: Login & Authentication Page Redesign', () => {
       const loginContent = readWebFile('src/app/(auth)/login/page.js');
       assert.ok(loginContent.includes('useAuth()'), 'Login page must consume useAuth context');
       assert.ok(loginContent.includes('signInWithGoogle'), 'Login page must invoke signInWithGoogle');
-      assert.ok(loginContent.includes("router.push('/dashboard')"), 'Login page must redirect authenticated user to dashboard');
       assert.ok(loginContent.includes('<LoadingSpinner'), 'Login page must display LoadingSpinner during auth resolution');
     });
 

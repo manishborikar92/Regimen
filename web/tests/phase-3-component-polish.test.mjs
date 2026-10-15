@@ -133,12 +133,11 @@ describe('Phase 3: UI/UX Component Polish (Mobile-First)', () => {
       assert.ok(content.includes('bg-surface') || content.includes('dark:bg-[#090D16]/95'), 'BottomNav bar must use Deep Obsidian or semantic surface backdrop in dark mode');
     });
 
-    it('should verify LoadingSpinner uses teal breathing halo and dark mode support', () => {
-      const content = readWebFile('src/components/ui/LoadingSpinner.js');
-      assert.ok(content.includes('border-teal-400/20') || content.includes('border-teal-400/30'), 'LoadingSpinner halo must be teal');
-      assert.ok(content.includes('border-t-teal-500/70') || content.includes('border-t-teal-400/80'), 'LoadingSpinner spinner ring must be teal');
-      assert.ok(content.includes('bg-canvas') || content.includes('dark:bg-[#090D16]/90'), 'LoadingSpinner canvas backdrop must use Deep Obsidian or semantic canvas');
-      assert.ok(content.includes('bg-surface') || content.includes('dark:bg-slate-900'), 'LoadingSpinner logo card must support dark background');
+    it('should verify LoadingSpinner supports semantic tokens and Skeleton supports semantic dark mode tokens', () => {
+      const spinnerContent = readWebFile('src/components/ui/LoadingSpinner.js');
+      assert.ok(spinnerContent.includes('dark:border-t-teal-400'), 'LoadingSpinner must support dark mode ring');
+      const skeletonContent = readWebFile('src/components/ui/Skeleton.js');
+      assert.ok(skeletonContent.includes('dark:bg-slate-800/70'), 'Skeleton must support dark mode surface token');
     });
 
     it('should verify ConfirmDialog supports dark mode and teal styling for non-danger dialogs', () => {

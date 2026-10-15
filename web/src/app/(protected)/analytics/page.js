@@ -3,9 +3,8 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Check, Calendar, TrendingUp, Sparkles, BookOpen, Activity, Headphones, Moon, Award } from 'lucide-react';
 import { useData } from '@/contexts/DataContext';
-import { TopNav, AnalyticsSkeleton } from '@/components/ui';
+import { AnalyticsSkeleton } from '@/components/ui';
 import { getDateString, getDaysAgo, getDayOfWeek, formatDate } from '@/utils/date-helpers';
-import { BRAND } from '@/lib/constants/brand';
 
 // Map day names to Monday-based column index (0=Mon, 6=Sun)
 const DAY_TO_COLUMN = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
@@ -171,39 +170,34 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <>
-      <TopNav title="Insights & Consistency" subtitle="Supportive Rhythm Tracking" />
-
+    <main className="max-w-2xl mx-auto px-4 py-5 sm:py-6 space-y-5">
       {/* Mode Switcher */}
-      <div className="max-w-2xl mx-auto px-4 pt-5 sm:pt-6">
-        <div className="flex bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl">
-          <button
-            type="button"
-            onClick={() => setViewMode('insights')}
-            className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
-              viewMode === 'insights'
-                ? 'bg-white dark:bg-slate-700 text-teal-800 dark:text-teal-300 shadow-2xs'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
-            }`}
-          >
-            Supportive Insights
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode('calendar')}
-            className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
-              viewMode === 'calendar'
-                ? 'bg-white dark:bg-slate-700 text-teal-800 dark:text-teal-300 shadow-2xs'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
-            }`}
-          >
-            30-Day Rhythm Map
-          </button>
-        </div>
+      <div className="flex bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl">
+        <button
+          type="button"
+          onClick={() => setViewMode('insights')}
+          className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
+            viewMode === 'insights'
+              ? 'bg-white dark:bg-slate-700 text-teal-800 dark:text-teal-300 shadow-2xs'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+          }`}
+        >
+          Supportive Insights
+        </button>
+        <button
+          type="button"
+          onClick={() => setViewMode('calendar')}
+          className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
+            viewMode === 'calendar'
+              ? 'bg-white dark:bg-slate-700 text-teal-800 dark:text-teal-300 shadow-2xs'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+          }`}
+        >
+          30-Day Rhythm Map
+        </button>
       </div>
 
-      <main className="max-w-2xl mx-auto px-4 py-5 sm:py-6 space-y-5">
-        {/* VIEW 1: Insights & Domain Progress */}
+      {/* VIEW 1: Insights & Domain Progress */}
         {viewMode === 'insights' && stats && (
           <div className="space-y-4">
             {/* High-level Rhythm Cards */}
@@ -467,6 +461,5 @@ export default function AnalyticsPage() {
           </div>
         )}
       </main>
-    </>
   );
 }

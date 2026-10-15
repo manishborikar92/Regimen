@@ -24,7 +24,7 @@ describe('Default / Foundation Routine Loading Architecture & UI Rules', () => {
     // Helper to evaluate what UI is rendered based on current state
     render() {
       if (this.loading) {
-        return { view: 'LoadingSpinner', buttonVisible: false };
+        return { view: 'HabitsSkeleton', buttonVisible: false };
       }
 
       if (this.habits.length === 0) {
@@ -145,18 +145,19 @@ describe('Default / Foundation Routine Loading Architecture & UI Rules', () => {
   it('Requirement 5: Loading state - Verify button is not displayed while Firestore is loading', () => {
     const pageLoadingEmpty = new HabitsPageModel({ initialHabits: [], initialLoading: true });
     const viewEmpty = pageLoadingEmpty.render();
-    assert.equal(viewEmpty.view, 'LoadingSpinner');
+    assert.equal(viewEmpty.view, 'HabitsSkeleton');
     assert.equal(viewEmpty.buttonVisible, false, 'Button must not flash while Firestore is loading (empty)');
 
     const pageLoadingPopulated = new HabitsPageModel({ initialHabits: [{ id: '1' }], initialLoading: true });
     const viewPopulated = pageLoadingPopulated.render();
-    assert.equal(viewPopulated.view, 'LoadingSpinner');
+    assert.equal(viewPopulated.view, 'HabitsSkeleton');
     assert.equal(viewPopulated.buttonVisible, false, 'Button must not display while Firestore is loading (populated)');
 
-    // Verify HabitsPage source guards rendering with if (loading) return <LoadingSpinner />;
+    // Verify HabitsPage source guards rendering with if (loading) return <HabitsSkeleton />;
     const habitsPagePath = path.join(srcDir, 'app/(protected)/habits/page.js');
     const source = fs.readFileSync(habitsPagePath, 'utf-8');
-    assert.ok(source.includes('if (loading) {\n    return <LoadingSpinner />;'), 'Source must return LoadingSpinner early');
+    assert.ok(source.replace(/\r\n/g, '\n').includes('if (loading) {\n    return <HabitsSkeleton />;'), 'Source must return HabitsSkeleton early');
+    assert.ok(!source.includes('LoadingSpinner'), 'Source must not contain obsolete LoadingSpinner');
   });
 
   // 6. Successful seeding

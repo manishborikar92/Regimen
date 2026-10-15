@@ -13,8 +13,7 @@ import {
   GenericHabitCard,
   TodayRhythmBanner,
 } from '@/components/habits';
-import { TopNav, DashboardSkeleton } from '@/components/ui';
-import { formatDate } from '@/utils/date-helpers';
+import { DashboardSkeleton } from '@/components/ui';
 import { BRAND } from '@/lib/constants/brand';
 import { Compass } from 'lucide-react';
 
@@ -173,10 +172,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <>
-      <TopNav title={BRAND.name} subtitle={formatDate()} />
-
-      <main className="max-w-2xl mx-auto px-4 py-5 sm:py-6 space-y-5">
+    <main className="max-w-2xl mx-auto px-4 py-5 sm:py-6 space-y-5">
         {/* Unified Today's Rhythm Banner */}
         <TodayRhythmBanner />
 
@@ -274,6 +270,5 @@ export default function DashboardPage() {
           </div>
         )}
       </main>
-    </>
   );
 }
