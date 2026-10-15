@@ -1,50 +1,87 @@
-# dependencies
+# Logs and debug files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+firebase-debug.log*
+firebase-debug.*.log*
+.pnpm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Dependencies and package managers
 node_modules/
 .pnp
 .pnp.*
+.npm/
+.pnpm-store/
+.yarn-integrity
+
+# Yarn Berry
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
 
-# testing
-coverage/
-
-# next.js
+# Build and compiled output
 .next/
 out/
-
-# production
 build/
+*.tsbuildinfo
+next-env.d.ts
 
-# misc
-.DS_Store
-*.pem
-Thumbs.db
+# Test coverage and instrumentation
+coverage/
+.nyc_output/
+lib-cov/
+.grunt/
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
+# Package archives and native modules
+*.tgz
+.lock-wscript
 
-# env files
+# Caches
+.firebase/
+.dataconnect/
+.eslintcache
+.eslintcache*
+.node_repl_history
+
+# Environment variables
+# Keep secrets out of version control.
+# Commit only sanitized example environment files.
 .env*
 !.env.local.example
 
-# Firebase Admin SDK Service Account Keys
+# Firebase configuration
+# Uncomment the following line if each developer should configure
+# their own Firebase project instead of sharing .firebaserc.
+# .firebaserc
+
+# Firebase Admin SDK service account keys
 *firebase-adminsdk*.json
 *-adminsdk-*.json
 service-account*.json
 
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# IDE
+# IDE and editor files
 .vscode/
 .idea/
+
+# Deployment platforms
+.vercel/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Certificates and private keys
+*.pem
+
+# Legacy dependency directories
+bower_components/
