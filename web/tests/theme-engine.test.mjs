@@ -39,7 +39,8 @@ describe('Phase 1: VRITTA Design Tokens & Theme Engine', () => {
   // 1. BRAND METADATA & TOKEN VALUES
   // =========================================================================
   describe('Brand Configuration & Semantic Tokens', () => {
-    it('should declare authoritative VRITTA brand name and Restorative Juniper primary tokens', () => {
+    it('should declare authoritative Vritta brand name and Restorative Juniper primary tokens', () => {
+      assert.equal(BRAND.name, 'Vritta');
       assert.equal(BRAND.name.toUpperCase(), 'VRITTA');
       assert.equal(BRAND.themeColor, '#14B8A6'); // Luminous Teal primary brand swatch
       assert.equal(BRAND.brandColors.deepObsidian, '#090D16');

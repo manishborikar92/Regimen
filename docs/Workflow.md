@@ -18,8 +18,8 @@ This document describes the development workflow for the Routine Tracker applica
 
 ```bash
 # 1. Clone the repository
-git clone <repo-url>
-cd Regimen
+git clone https://github.com/manishborikar92/Vritta.git
+cd Vritta # (Or cd Regimen prior to Phase 8 local folder rename)
 
 # 2. Navigate to the web directory
 cd web

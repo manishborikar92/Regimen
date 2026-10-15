@@ -9,7 +9,7 @@
 
 ## 1. Overview & Architecture Boundary
 
-Regimen (Vritta) uses a dual Firebase architecture:
+Vritta uses a dual Firebase architecture:
 
 1. **Client-Side (Firebase Web SDK v12.7)**:
    - Configured in `web/src/lib/firebase/config.js` via public environment variables prefixed with `NEXT_PUBLIC_FIREBASE_*`.
@@ -209,7 +209,7 @@ Vercel serverless functions run in ephemeral container environments where local 
    - Copy the entire JSON object string, including curly braces `{ ... }`.
 
 2. **Navigate to Project Settings on Vercel**:
-   - Go to [Vercel Dashboard](https://vercel.com) > Select project **Regimen** (or `regimen-web`).
+   - Go to [Vercel Dashboard](https://vercel.com) > Select project **vritta**.
    - Click **Settings** > Select **Environment Variables** in the left sidebar.
 
 3. **Add `FIREBASE_SERVICE_ACCOUNT_KEY`**:
@@ -283,9 +283,9 @@ A common security anti-pattern is assigning broad administrative roles or confus
   - The default service account created by Firebase Console has the `Firebase Admin SDK Administrator Service Agent` (`roles/firebase.sdkAdminServiceAgent`) role.
   - While functional, it has broad administrative capabilities across the Firebase project.
 - **Production Runtime Best Practice (Principle of Least Privilege)**:
-  - If a dedicated service account is provisioned for production runtime synchronization, it requires **only the exact permissions** needed for Regimen's runtime operations.
+  - If a dedicated service account is provisioned for production runtime synchronization, it requires **only the exact permissions** needed for Vritta's runtime operations.
 
-### Minimal Required IAM Roles for Regimen Runtime
+### Minimal Required IAM Roles for Vritta Runtime
 
 | Firebase / GCP Service | Required Runtime Operations | Recommended IAM Role | Role Identifier |
 | :--- | :--- | :--- | :--- |
@@ -366,12 +366,12 @@ If adding new auth providers in the future:
 ---
 
 ### 6.5 Multi-Project Environment Segregation (Staging vs Production)
-If separating preview and production into distinct Firebase projects (e.g., `regimen-staging` vs `regimen-prod`):
+If separating preview and production into distinct Firebase projects (e.g., `vritta-staging` vs `vritta-app`):
 
 | Environment | Firebase Project ID | Client Config (`NEXT_PUBLIC_FIREBASE_*`) | Vercel Environment Scope |
 | :--- | :--- | :--- | :--- |
 | **Local Dev** | `vritta-app` (or staging) | Defined in `web/.env.local` | Local only |
-| **Preview Branches** | `regimen-staging` | Configured in Vercel Project Settings | Scoped to **Preview** |
+| **Preview Branches** | `vritta-staging` | Configured in Vercel Project Settings | Scoped to **Preview** |
 | **Production** | `vritta-app` (prod) | Configured in Vercel Project Settings | Scoped to **Production** |
 
 To switch environments in the Firebase CLI:
@@ -383,7 +383,7 @@ firebase use <project-alias-or-id>
 
 ### 6.6 Routine Seeding Architecture, Permissions & Idempotency Rules
 
-Regimen enforces strict segregation between public foundation routine loading and administrative personal schedule management:
+Vritta enforces strict segregation between public foundation routine loading and administrative personal schedule management:
 
 #### 1. Foundation Routine Seeding (Client Web SDK)
 - **Sole Entry Point**: The "Load Recommended Routines" action is available **exclusively on the Routine Manager page (`/habits`)**.

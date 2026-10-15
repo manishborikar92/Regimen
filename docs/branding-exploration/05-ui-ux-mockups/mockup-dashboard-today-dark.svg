@@ -23,7 +23,7 @@
         <path d="M 68 132 C 44 132 40 100 68 84 C 92 70 108 130 132 116 C 160 100 156 68 132 68 C 108 68 92 128 68 132 Z" stroke="#14B8A6" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none" />
         <circle cx="100" cy="100" r="11" fill="#F59E0B" />
       </g>
-      <text x="46" y="22" class="header-title-dark">VRITTA</text>
+      <text x="46" y="22" class="header-title-dark">Vritta</text>
       <text x="46" y="36" class="text-xs-dark" fill="#94A3B8" font-weight="500">Wednesday, 14 October 2026</text>
 
       <!-- Theme Mode Pill (Active Dark) -->

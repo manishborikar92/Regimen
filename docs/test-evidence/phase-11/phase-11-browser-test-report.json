@@ -1,0 +1,63 @@
+{
+  "timestamp": "2026-10-15T07:44:21.206Z",
+  "url": "http://localhost:3011/login",
+  "documentTitle": "Vritta — Personal Routine Companion",
+  "brandHeading": "Vritta",
+  "manifest": {
+    "name": "Vritta — Personal Routine Companion",
+    "short_name": "Vritta",
+    "description": "A calm, flexible personal routine companion for mindful consistency.",
+    "icons": [
+      {
+        "src": "/web-app-manifest-192x192.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "maskable"
+      },
+      {
+        "src": "/web-app-manifest-512x512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "maskable"
+      }
+    ],
+    "theme_color": "#090D16",
+    "background_color": "#090D16",
+    "display": "standalone"
+  },
+  "viewportsAudited": [
+    {
+      "viewport": "1280px",
+      "theme": "light",
+      "filename": "login-1280px-light.png",
+      "scrollWidth": 1280,
+      "clientWidth": 1280,
+      "hasOverflow": false
+    },
+    {
+      "viewport": "1280px",
+      "theme": "dark",
+      "filename": "login-1280px-dark.png",
+      "scrollWidth": 1280,
+      "clientWidth": 1280,
+      "hasOverflow": false
+    },
+    {
+      "viewport": "375px",
+      "theme": "light",
+      "filename": "login-375px-light.png",
+      "scrollWidth": 375,
+      "clientWidth": 375,
+      "hasOverflow": false
+    },
+    {
+      "viewport": "375px",
+      "theme": "dark",
+      "filename": "login-375px-dark.png",
+      "scrollWidth": 375,
+      "clientWidth": 375,
+      "hasOverflow": false
+    }
+  ],
+  "allChecksPassed": true
+}

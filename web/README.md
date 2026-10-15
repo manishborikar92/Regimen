@@ -1,43 +1,46 @@
-# Regimen — Daily Routine Tracker
+# Vritta — Personal Routine Companion (Web Application)
 
-Regimen is a modern Progressive Web Application (PWA) designed to help you track your daily habits, build streaks, and visualize your progress over time. Built with Next.js, React, and Firebase, it features a clean, responsive UI with robust offline support.
+Vritta (वृत्त) is a modern Progressive Web Application (PWA) designed to foster mindful consistency, physical recovery, language mastery, and intellectual reflection through a tightly curated set of daily practices. Built with Next.js 16, React 19, and Firebase, it features a clean, responsive mobile-first UI with robust offline support and Restorative Juniper design tokens.
 
 ## Features
 
-- **Habit Tracking**: Create, edit, and delete daily habits with customizable categories and schedules.
-- **Streak Counters**: See your consistency with real-time streak calculations.
-- **Analytics Dashboard**: Visualize your performance over the last 30 days with a calendar heatmap and detailed statistics.
-- **Offline Support**: Log your habits even without an internet connection. Your data syncs automatically with Firebase when you're back online.
-- **Google Authentication**: Quick and secure sign-in process.
-- **Accessibility**: Thoughtfully designed with proper ARIA attributes and keyboard navigability.
-- **Responsive UI**: Looks great and functions flawlessly on both desktop and mobile devices.
+- **Routine Architecture**: Mindful daily routines grouped into Flexible, Afternoon Movement, and Before Bed practices.
+- **Physical Conditioning & Recovery**: Weekday-adaptive movement schedules (workout, walk, active rest) with explicit Sunday recovery.
+- **Workbook & Practice Tracking**: Multi-step session tracking with partial progress indicators.
+- **Contemplative Focus**: Integrated 30-entry Osho Listening catalog and bedtime reading timer.
+- **Streak & Rhythm**: Real-time consistency calculations that respect planned rest days without guilt mechanics.
+- **Analytics & Insights**: 30-day activity heatmap and weekly consistency metrics.
+- **Offline-First Persistence**: Firestore offline persistence ensures seamless operation even without connectivity.
+- **Authoritative Identity**: Guiding Sutra monoline mark, Deep Obsidian and Luminous Teal palette, zero-flash theme engine.
+- **Accessibility**: Built to WCAG 2.2 Level AA / AAA standards with >= 44px touch targets.
 
 ## Tech Stack
 
 - **Framework**: [Next.js](https://nextjs.org/) (App Router, React 19)
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
-- **Database & Auth**: [Firebase](https://firebase.google.com/) (Firestore, Authentication)
+- **Database & Auth**: [Firebase](https://firebase.google.com/) (Firestore, Authentication, Admin SDK)
 - **Icons**: [Lucide React](https://lucide.dev/)
 
 ## Architecture Overview
 
-Regimen uses a modular, professional-grade architectural structure:
-- **`src/app`**: Next.js App Router for all application routing, including separate route groups for `(auth)` and `(protected)` areas. Server middleware protects routes appropriately.
+Vritta uses a modular, professional-grade architectural structure:
+- **`src/app`**: Next.js App Router for all application routing, including separate route groups for `(auth)` and `(protected)` areas.
 - **`src/hooks`**: Domain-specific logic encapsulated safely out of the UI. Hook boundaries exist for `useHabits`, `useDailyLogs`, `useStreak`, and `useAnalytics`.
-- **`src/components/ui`**: Base presentation components and centralized reusable layout pieces (e.g. `TopNav`, `ConfirmDialog`, `LoadingSpinner`).
-- **`src/lib/firebase`**: All remote data source access and setup is cleanly isolated away from component logic.
-- **`src/contexts`**: Standard React Contexts for application-wide scoped state, like authentication and toast notifications.
+- **`src/components/ui`**: Base presentation components and centralized reusable layout pieces (e.g. `TopNav`, `BottomNav`, `ConfirmDialog`, `LoadingSpinner`, `Logo`).
+- **`src/lib/firebase`**: Client and server Firebase access cleanly isolated from component logic.
+- **`src/contexts`**: Standard React Contexts for application-wide scoped state (`AuthContext`, `DataContext`, `ThemeContext`, `ToastContext`).
 
 ## Local Development Setup
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/manishborikar92/Regimen.git
+   git clone https://github.com/manishborikar92/Vritta.git
    ```
 
 2. **Navigate to the web directory:**
    ```bash
-   cd Regimen/web
+   cd Vritta/web
+   # (Or cd Regimen/web prior to Phase 8 local folder rename)
    ```
 
 3. **Install dependencies:**
@@ -46,7 +49,7 @@ Regimen uses a modular, professional-grade architectural structure:
    ```
 
 4. **Environment Configuration:**
-   Create a `.env.local` file in `Regimen/web/` and add your Firebase configuration:
+   Create a `.env.local` file in `web/` and add your Firebase configuration:
    ```env
    NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com

@@ -1,12 +1,12 @@
 # Personal Routine Companion: Standalone Product Brief
 
 **Prepared:** 14 October 2026  
-**Current application name:** Regimen  
-**Document purpose:** This is the complete, standalone product brief for redesigning and improving the existing personal routine web app. It contains the product intent, routine content, seed-data requirements, UX expectations, safety constraints, and acceptance criteria. All product requirements needed for implementation are included below; the existing repository is the authority for technical architecture.
+**Current application name:** Vritta (formerly Regimen)  
+**Document purpose:** This is the complete, standalone product brief for redesigning and improving the personal routine web app. It contains the product intent, routine content, seed-data requirements, UX expectations, safety constraints, and acceptance criteria. All product requirements needed for implementation are included below; the existing repository is the authority for technical architecture.
 
 ## 1. Mission and outcomes
 
-Turn the current Regimen application into a polished, mobile-first personal routine companion for Manish. The app should make a small set of meaningful daily activities easier to follow, track, and improve over time. The goal is not to make every minute of the day rigid. Completion, consistency, flexibility, and clarity matter more than exact-minute scheduling.
+Turn the application (branded Vritta, formerly Regimen) into a polished, mobile-first personal routine companion for Manish. The app should make a small set of meaningful daily activities easier to follow, track, and improve over time. The goal is not to make every minute of the day rigid. Completion, consistency, flexibility, and clarity matter more than exact-minute scheduling.
 
 The work includes understanding the existing codebase, revising the information architecture and scheduling model, seeding the correct routine data, improving Today, routine management, and Insights, replacing the visible product identity and logo, and adding reliable tests. Improve the existing app rather than rewriting it without cause.
 
@@ -23,7 +23,7 @@ Success means:
 
 ## 2. Product and current-app context
 
-The existing web app is branded **Regimen** and has three main areas: **Today**, **Habits**, and **Analytics**. It is primarily used on a phone. The Today experience displays the date and activity cards with category labels, completion controls, and expandable instructions. The Habits area supports creating and editing activities. The existing habit editor includes a title, time, category, instructions, active weekdays, optional checklist items, and display order.
+The web app is branded **Vritta** (migrated from legacy Regimen) and has three main areas: **Today**, **Habits**, and **Analytics**. It is primarily used on a phone. The Today experience displays the date and activity cards with category labels, completion controls, and expandable instructions. The Habits area supports creating and editing activities. The existing habit editor includes a title, time, category, instructions, active weekdays, optional checklist items, and display order.
 
 The current design is overly centered on exact clock times and uses scheduling concepts as categories. Redesign the concepts as well as the visuals:
 
@@ -302,7 +302,7 @@ Show useful trends such as planned activities completed, partial workbook progre
 
 ### 5.5 Brand and logo
 
-Replace the Regimen display identity with a coherent, short, memorable name suited to a calm, practical personal-growth companion. The agent should choose a reversible provisional display name and explain it in the final report. If it is useful to launch publicly, external research may be used to check obvious name conflicts; do not present that as legal trademark clearance.
+The display identity has been established as **Vritta** (replacing the legacy Regimen identity), a coherent, short, memorable name suited to a calm, practical personal-growth companion. In Sanskrit, Vritta signifies conduct, regular cadence, rhythmic observance, and the cyclical pattern of daily life.
 
 Create a crisp, custom SVG or other scalable vector logo that works in the header, favicon, and app icon. Do not use a generic emoji as the main logo. Centralize brand name, logo, colors, icons, and design tokens. Update all in-app references and safe app metadata consistently. Do **not** rename the repository, change a production domain, alter a deployment project, or change any other irreversible external identifier without explicit authorization.
 

@@ -2,7 +2,7 @@
 
 **Date:** 14 October 2026  
 **Document version:** 1.0.0  
-**Authority:** Follows `docs/regimen_project_brief.md` as the authoritative product specification.
+**Authority:** Follows `docs/vritta_project_brief.md` as the authoritative product specification.
 
 ---
 
@@ -64,7 +64,7 @@ The existing application is a Next.js 16 (App Router) mobile-first Progressive W
 ## 4. Implementation Phases
 
 ### Phase 1: Baseline & Discovery (Complete)
-- [x] Read `docs/regimen_project_brief.md` completely.
+- [x] Read `docs/vritta_project_brief.md` completely.
 - [x] Inspect full codebase structure, Firebase configuration, contexts, hooks, and UI components.
 - [x] Execute lint and build audits.
 - [x] Establish provisional brand *Vritta* and verify collision-free status.
