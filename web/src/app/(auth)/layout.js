@@ -1,13 +1,11 @@
-'use client';
-
 /**
  * Layout for authentication routes (login, etc.)
- * Minimal layout without BottomNav.
+ * Minimal layout without BottomNav, styled with semantic canvas tokens.
  */
 export default function AuthLayout({ children }) {
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-            {children}
-        </div>
-    );
+  return (
+    <div className="min-h-screen bg-canvas text-main transition-colors">
+      {children}
+    </div>
+  );
 }

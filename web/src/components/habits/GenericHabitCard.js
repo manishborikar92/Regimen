@@ -13,7 +13,7 @@ function GenericHabitCard({ habit, isCompleted, onToggle }) {
 
   return (
     <div
-      className={`relative rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#111827] shadow-sm transition-all duration-200 hover:shadow-md ${
+      className={`relative rounded-xl border border-subtle bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
         isCompleted ? 'bg-slate-50/70 dark:bg-slate-900/60 opacity-80' : ''
       }`}
     >
@@ -27,18 +27,18 @@ function GenericHabitCard({ habit, isCompleted, onToggle }) {
               <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium border ${config.badgeClasses}`}>
                 {habit.category}
               </span>
-              <span className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
+              <span className="flex items-center gap-1 text-xs text-sub bg-surface-subtle px-2 py-0.5 rounded-md border border-subtle">
                 <Clock className="w-3 h-3 text-slate-400" />
                 {timingText}
               </span>
             </div>
 
-            <h3 className={`text-base font-bold text-slate-900 dark:text-slate-100 ${isCompleted ? 'line-through text-slate-400 dark:text-slate-500' : ''}`}>
+            <h3 className={`text-base font-bold text-main ${isCompleted ? 'line-through text-muted' : ''}`}>
               {habit.title}
             </h3>
 
             {habit.instructions && (
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1 whitespace-pre-line leading-relaxed">
+              <p className="text-xs sm:text-sm text-sub mt-1 whitespace-pre-line leading-relaxed">
                 {habit.instructions}
               </p>
             )}
@@ -60,11 +60,11 @@ function GenericHabitCard({ habit, isCompleted, onToggle }) {
 
         {/* Expandable Checklist Items */}
         {hasChecklist && (
-          <div className="mt-3 pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
+          <div className="mt-3 pt-2 border-t border-subtle">
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center gap-1 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+              className="flex items-center gap-1 text-xs font-medium text-sub hover:text-main"
             >
               <ListChecks className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
               <span>{isExpanded ? 'Hide items' : `Show ${habit.checklistItems.length} checklist items`}</span>
@@ -72,7 +72,7 @@ function GenericHabitCard({ habit, isCompleted, onToggle }) {
             </button>
 
             {isExpanded && (
-              <ul className="mt-2 space-y-1.5 text-xs text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700">
+              <ul className="mt-2 space-y-1.5 text-xs text-sub bg-surface-subtle p-2.5 rounded-lg border border-subtle">
                 {habit.checklistItems.map((item, index) => (
                   <li key={index} className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300 flex items-center justify-center text-2xs font-bold">

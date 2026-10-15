@@ -32,7 +32,7 @@ export default function ConfirmDialog({
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={!isLoading ? onClose : undefined} />
 
             <div
-                className="relative bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200"
+                className="relative bg-surface border border-subtle rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200"
                 role="dialog"
                 aria-labelledby="dialog-title"
                 aria-describedby="dialog-description"
@@ -42,10 +42,10 @@ export default function ConfirmDialog({
                     <div className={`mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-4 ${isDanger ? 'bg-red-100 text-red-600 dark:bg-red-950/50 dark:text-red-400' : 'bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-300'}`}>
                         {isDanger ? <AlertTriangle className="w-6 h-6" /> : <Info className="w-6 h-6" />}
                     </div>
-                    <h3 id="dialog-title" className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">
+                    <h3 id="dialog-title" className="text-lg font-bold text-main mb-2">
                         {title}
                     </h3>
-                    <p id="dialog-description" className="text-sm text-slate-600 dark:text-slate-300">
+                    <p id="dialog-description" className="text-sm text-sub">
                         {message}
                     </p>
                 </div>
@@ -54,7 +54,7 @@ export default function ConfirmDialog({
                     <button
                         onClick={onClose}
                         disabled={isLoading}
-                        className="flex-1 px-4 py-2.5 min-h-[44px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+                        className="flex-1 px-4 py-2.5 min-h-[44px] bg-surface-subtle text-sub rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
                     >
                         {cancelText}
                     </button>

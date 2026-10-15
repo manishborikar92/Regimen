@@ -15,7 +15,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-[#090D16]/95 backdrop-blur-md border-t border-slate-200/90 dark:border-slate-800/90 pb-safe z-50 transition-colors"
+      className="fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur-md border-t border-subtle/90 pb-safe z-50 transition-colors"
       aria-label="Main navigation"
     >
       <div className="max-w-md mx-auto flex justify-around px-2 py-1.5">

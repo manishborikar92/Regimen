@@ -25,7 +25,7 @@ export default function Logo({ className = "w-8 h-8", title = "VRITTA Logo: The 
       {/* Continuous Harmonious Thread Loop (Bezier Precision) */}
       <path
         d="M 68 132 C 44 132 40 100 68 84 C 92 70 108 130 132 116 C 160 100 156 68 132 68 C 108 68 92 128 68 132 Z"
-        className="stroke-[var(--color-accent-primary,#0F766E)] dark:stroke-[var(--color-brand-primary,#14B8A6)] transition-colors"
+        className="stroke-accent transition-colors"
         strokeWidth="13"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -36,7 +36,7 @@ export default function Logo({ className = "w-8 h-8", title = "VRITTA Logo: The 
         cx="100"
         cy="100"
         r="8"
-        className="fill-[var(--color-warm-accent,#D97706)] transition-colors"
+        className="fill-brand-amber transition-colors"
       />
     </svg>
   );

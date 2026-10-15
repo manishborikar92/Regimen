@@ -107,7 +107,7 @@ function MovementCard({
   return (
     <>
       <div
-        className={`relative rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#111827] shadow-sm transition-all duration-200 hover:shadow-md ${
+        className={`relative rounded-xl border border-subtle bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
           isSunday
             ? 'bg-slate-50/60 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800'
             : isWorkoutComplete
@@ -143,7 +143,7 @@ function MovementCard({
                 </span>
               </div>
 
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <h3 className="text-base sm:text-lg font-bold text-main flex items-center gap-2">
                 {isSunday ? (
                   <Moon className="w-5 h-5 text-teal-700 dark:text-teal-400 flex-shrink-0" />
                 ) : isWalkDay ? (
@@ -154,7 +154,7 @@ function MovementCard({
                 {habit.title}
               </h3>
 
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+              <p className="text-xs sm:text-sm text-sub mt-1">
                 {scheduleForToday.target} • Preferred in the afternoon, but anytime today counts.
               </p>
             </div>
@@ -338,9 +338,9 @@ function MovementCard({
       {/* Safety & Progression Modal */}
       {showSafetyModal && (
         <div className="fixed inset-0 bg-black/60 dark:bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#111827] rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-5 border border-slate-200 dark:border-slate-800 shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+          <div className="bg-surface rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-5 border border-subtle shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-subtle">
+              <h3 className="text-lg font-bold text-main flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5 text-rose-600" />
                 Movement Safety & 12-Week Plan
               </h3>

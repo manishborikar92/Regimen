@@ -27,7 +27,7 @@ export function useHabits(user) {
 
     // Real-time listener for user's habits
     useEffect(() => {
-        if (!user || user.uid?.startsWith('preview-')) {
+        if (!user) {
             if (isInitialMount.current) {
                 isInitialMount.current = false;
                 Promise.resolve().then(() => setLoading(false));

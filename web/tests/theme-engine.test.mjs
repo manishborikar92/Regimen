@@ -321,27 +321,43 @@ describe('Phase 1: VRITTA Design Tokens & Theme Engine', () => {
         'Must declare @custom-variant dark for Tailwind v4 class mode'
       );
 
-      // Dynamic @theme mappings
-      assert.ok(cssContent.includes('--color-canvas: var(--color-bg-canvas);'), 'Must map canvas in @theme');
-      assert.ok(cssContent.includes('--color-surface: var(--color-bg-surface);'), 'Must map surface in @theme');
-      assert.ok(cssContent.includes('--color-text-main: var(--color-text-primary);'), 'Must map text-main in @theme');
-      assert.ok(cssContent.includes('--color-text-sub: var(--color-text-secondary);'), 'Must map text-sub in @theme');
+      // Dynamic @theme inline mappings (non-self-referential runtime variable bindings)
+      assert.ok(
+        cssContent.includes('--color-canvas: var(--vritta-canvas);') || cssContent.includes('--color-canvas: var(--color-bg-canvas);'),
+        'Must map canvas in @theme'
+      );
+      assert.ok(
+        cssContent.includes('--color-surface: var(--vritta-surface);') || cssContent.includes('--color-surface: var(--color-bg-surface);'),
+        'Must map surface in @theme'
+      );
+      assert.ok(
+        cssContent.includes('--color-text-main: var(--vritta-text-main);') || cssContent.includes('--color-text-main: var(--color-text-primary);'),
+        'Must map text-main in @theme'
+      );
+      assert.ok(
+        cssContent.includes('--color-text-sub: var(--vritta-text-sub);') || cssContent.includes('--color-text-sub: var(--color-text-secondary);'),
+        'Must map text-sub in @theme'
+      );
+      assert.ok(
+        cssContent.includes('--color-brand-primary: var(--vritta-brand-primary);'),
+        'Must map brand-primary to distinct runtime variable without self-reference'
+      );
 
       // Runtime tokens in :root
-      assert.ok(cssContent.includes('--color-bg-canvas: #f8fafc;'), 'Must define light canvas #f8fafc in :root');
-      assert.ok(cssContent.includes('--color-bg-surface: #ffffff;'), 'Must define light card in :root');
-      assert.ok(cssContent.includes('--color-brand-primary: #14b8a6;'), 'Must define core brand primary in :root');
-      assert.ok(cssContent.includes('--color-brand-obsidian: #090d16;'), 'Must define core brand obsidian in :root');
-      assert.ok(cssContent.includes('--color-brand-amber: #d97706;'), 'Must define core brand amber in :root');
-      assert.ok(cssContent.includes('--color-accent-primary: #0f766e;'), 'Must define accessible teal variant in :root');
-      assert.ok(cssContent.includes('--color-warm-accent: #d97706;'), 'Must define core warm accent in :root');
+      assert.ok(cssContent.includes('--vritta-canvas: #f8fafc;') || cssContent.includes('--color-bg-canvas: #f8fafc;'), 'Must define light canvas #f8fafc in :root');
+      assert.ok(cssContent.includes('--vritta-surface: #ffffff;') || cssContent.includes('--color-bg-surface: #ffffff;'), 'Must define light card in :root');
+      assert.ok(cssContent.includes('--vritta-brand-primary: #14b8a6;') || cssContent.includes('--color-brand-primary: #14b8a6;'), 'Must define core brand primary in :root');
+      assert.ok(cssContent.includes('--vritta-brand-obsidian: #090d16;') || cssContent.includes('--color-brand-obsidian: #090d16;'), 'Must define core brand obsidian in :root');
+      assert.ok(cssContent.includes('--vritta-brand-amber: #d97706;') || cssContent.includes('--color-brand-amber: #d97706;'), 'Must define core brand amber in :root');
+      assert.ok(cssContent.includes('--vritta-accent: #0f766e;') || cssContent.includes('--color-accent-primary: #0f766e;'), 'Must define accessible teal variant in :root');
+      assert.ok(cssContent.includes('--vritta-warm-accent: #d97706;') || cssContent.includes('--color-warm-accent: #d97706;'), 'Must define core warm accent in :root');
 
       // Runtime tokens in .dark
-      assert.ok(cssContent.includes('--color-bg-canvas: #090d16;'), 'Must define dark canvas in .dark');
-      assert.ok(cssContent.includes('--color-bg-surface: #111827;'), 'Must define dark card in .dark');
-      assert.ok(cssContent.includes('--color-accent-primary: #14b8a6;'), 'Must define dark brand accent in .dark');
-      assert.ok(cssContent.includes('--color-warm-accent: #d97706;'), 'Must define dark warm accent in .dark');
-      assert.ok(cssContent.includes('--color-text-muted: #8092a5;'), 'Must define accessible dark muted text in .dark');
+      assert.ok(cssContent.includes('--vritta-canvas: #090d16;') || cssContent.includes('--color-bg-canvas: #090d16;'), 'Must define dark canvas in .dark');
+      assert.ok(cssContent.includes('--vritta-surface: #111827;') || cssContent.includes('--color-bg-surface: #111827;'), 'Must define dark card in .dark');
+      assert.ok(cssContent.includes('--vritta-accent: #14b8a6;') || cssContent.includes('--color-accent-primary: #14b8a6;'), 'Must define dark brand accent in .dark');
+      assert.ok(cssContent.includes('--vritta-warm-accent: #d97706;') || cssContent.includes('--color-warm-accent: #d97706;'), 'Must define dark warm accent in .dark');
+      assert.ok(cssContent.includes('--vritta-text-muted: #8092a5;') || cssContent.includes('--color-text-muted: #8092a5;'), 'Must define accessible dark muted text in .dark');
 
       // Reduced motion media query
       assert.ok(
@@ -364,6 +380,11 @@ describe('Phase 1: VRITTA Design Tokens & Theme Engine', () => {
 
       // ThemeProvider wrapping
       assert.ok(layoutContent.includes('<ThemeProvider>'), 'Must wrap application shell in ThemeProvider');
+
+      // Viewport accessibility (WCAG 2.2 SC 1.4.4 & ACT Rule b4f0c3)
+      assert.ok(layoutContent.includes('export const viewport'), 'Must export separate viewport object');
+      assert.ok(!layoutContent.includes('maximumScale'), 'Must not restrict browser zoom with maximumScale');
+      assert.ok(!layoutContent.includes('userScalable'), 'Must not disable browser pinch-to-zoom with userScalable');
     });
 
     it('should verify TopNav.js provides accessible 3-state theme controls with full WAI-ARIA and keyboard navigation', () => {

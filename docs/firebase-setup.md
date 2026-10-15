@@ -95,9 +95,9 @@ Next.js automatically loads `web/.env.local` for the local development server (`
 2. Ensure public Firebase Web configuration variables are present:
    ```env
    NEXT_PUBLIC_FIREBASE_API_KEY="AIzaSyB-Jl7nSWKkLq9TG1BrD_S8qLW8gcM4ARo"
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="regimen-e32a8.firebaseapp.com"
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID="regimen-e32a8"
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="regimen-e32a8.firebasestorage.app"
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="vritta-app.firebaseapp.com"
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID="vritta-app"
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="vritta-app.firebasestorage.app"
    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="19741273143"
    NEXT_PUBLIC_FIREBASE_APP_ID="1:19741273143:web:f239f511f41849f62123b2"
    NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID="G-YVD3B80SB6"
@@ -223,7 +223,7 @@ Vercel serverless functions run in ephemeral container environments where local 
    Ensure the following public variables are configured for Production and Preview:
    - `NEXT_PUBLIC_FIREBASE_API_KEY`
    - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
-   - `NEXT_PUBLIC_FIREBASE_PROJECT_ID` (`regimen-e32a8`)
+   - `NEXT_PUBLIC_FIREBASE_PROJECT_ID` (`vritta-app`)
    - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
    - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
    - `NEXT_PUBLIC_FIREBASE_APP_ID`
@@ -309,7 +309,7 @@ When adding collections, updating field validations, or adjusting authorization 
    ```
 3. **Deploy security rules to Firebase**:
    ```powershell
-   firebase deploy --only firestore:rules --project regimen-e32a8
+   firebase deploy --only firestore:rules --project vritta-app
    ```
 4. **Impact**: Security rule deployments take effect **immediately** across all clients without requiring an application rebuild or Vercel redeployment.
 
@@ -321,7 +321,7 @@ If a query requires a composite index:
 1. **Update `web/firestore.indexes.json`**.
 2. **Deploy indexes via Firebase CLI**:
    ```powershell
-   firebase deploy --only firestore:indexes --project regimen-e32a8
+   firebase deploy --only firestore:indexes --project vritta-app
    ```
 3. **Impact**: Firebase builds the index in the background (typically 2–5 minutes). Queries using the index will succeed once index status changes from `BUILDING` to `ENABLED`.
 
@@ -370,9 +370,9 @@ If separating preview and production into distinct Firebase projects (e.g., `reg
 
 | Environment | Firebase Project ID | Client Config (`NEXT_PUBLIC_FIREBASE_*`) | Vercel Environment Scope |
 | :--- | :--- | :--- | :--- |
-| **Local Dev** | `regimen-e32a8` (or staging) | Defined in `web/.env.local` | Local only |
+| **Local Dev** | `vritta-app` (or staging) | Defined in `web/.env.local` | Local only |
 | **Preview Branches** | `regimen-staging` | Configured in Vercel Project Settings | Scoped to **Preview** |
-| **Production** | `regimen-e32a8` (prod) | Configured in Vercel Project Settings | Scoped to **Production** |
+| **Production** | `vritta-app` (prod) | Configured in Vercel Project Settings | Scoped to **Production** |
 
 To switch environments in the Firebase CLI:
 ```powershell

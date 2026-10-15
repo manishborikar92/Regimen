@@ -20,7 +20,7 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
 
   return (
     <div
-      className={`relative rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#111827] shadow-sm transition-all duration-200 hover:shadow-md ${
+      className={`relative rounded-xl border border-subtle bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
         isCompleted ? 'bg-sky-50/20 dark:bg-sky-950/20 border-sky-200 dark:border-sky-800/80' : ''
       }`}
     >
@@ -39,7 +39,7 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
               <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium border ${config.badgeClasses}`}>
                 {habit.category}
               </span>
-              <span className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
+              <span className="flex items-center gap-1 text-xs text-sub bg-surface-subtle px-2 py-0.5 rounded-md border border-subtle">
                 <Clock className="w-3 h-3 text-slate-400" />
                 Anytime
               </span>
@@ -49,12 +49,12 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
               </span>
             </div>
 
-            <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <h3 className="text-base sm:text-lg font-bold text-main flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-sky-600 dark:text-sky-400 flex-shrink-0" />
               {habit.title}
             </h3>
 
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-sub mt-1">
               Practise speaking English with ChatGPT voice. Flexible duration—focus on natural conversation.
             </p>
           </div>
@@ -75,7 +75,7 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
         </div>
 
         {/* Optional Notes Toggle */}
-        <div className="mt-3 pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
+        <div className="mt-3 pt-2 border-t border-subtle">
           <button
             type="button"
             onClick={() => setShowNotes(!showNotes)}

@@ -53,7 +53,7 @@ function OshoCard({
   return (
     <>
       <div
-        className={`relative rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#111827] shadow-sm transition-all duration-200 hover:shadow-md ${
+        className={`relative rounded-xl border border-subtle bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
           isCompleted ? 'bg-amber-50/20 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/80' : ''
         }`}
       >
@@ -72,7 +72,7 @@ function OshoCard({
                 <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium border ${config.badgeClasses}`}>
                   {habit.category}
                 </span>
-                <span className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
+                <span className="flex items-center gap-1 text-xs text-sub bg-surface-subtle px-2 py-0.5 rounded-md border border-subtle">
                   <Clock className="w-3 h-3 text-slate-400" />
                   Anytime
                 </span>
@@ -81,12 +81,12 @@ function OshoCard({
                 </span>
               </div>
 
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <h3 className="text-base sm:text-lg font-bold text-main flex items-center gap-2">
                 <Headphones className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
                 {habit.title}
               </h3>
 
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+              <p className="text-xs sm:text-sm text-sub mt-1">
                 Listen daily for awareness and self-inquiry. Series progress is separate from daily completion.
               </p>
             </div>
@@ -113,14 +113,14 @@ function OshoCard({
                 <span className="text-2xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider">
                   Active Series
                 </span>
-                <span className="text-2xs px-1.5 py-0.2 bg-white dark:bg-slate-800 rounded border border-amber-200 dark:border-amber-800/60 text-amber-900 dark:text-amber-200 font-medium">
+                <span className="text-2xs px-1.5 py-0.2 bg-surface rounded border border-amber-200 dark:border-amber-800/60 text-amber-900 dark:text-amber-200 font-medium">
                   {activeSeries.language}
                 </span>
               </div>
-              <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+              <p className="text-xs sm:text-sm font-bold text-main truncate">
                 {activeSeries.order}. {activeSeries.title}
               </p>
-              <p className="text-2xs text-slate-600 dark:text-slate-400 line-clamp-1">
+              <p className="text-2xs text-sub line-clamp-1">
                 {activeSeries.theme}
               </p>
               <div className="text-xs text-amber-900 dark:text-amber-300 font-semibold pt-1">

@@ -181,13 +181,13 @@ export default function DashboardPage() {
         <StreakCounter />
 
         {/* Today's Progress Banner */}
-        <div className="bg-white dark:bg-[#111827] rounded-2xl p-4 sm:p-5 shadow-2xs border border-slate-200/80 dark:border-slate-800/80 transition-colors">
+        <div className="bg-surface rounded-2xl p-4 sm:p-5 shadow-2xs border border-subtle transition-colors">
           <div className="flex items-center justify-between mb-2.5">
             <div>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-sub uppercase tracking-wider">
                 Today&apos;s Rhythm
               </span>
-              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 mt-0.5">
+              <p className="text-sm font-semibold text-main mt-0.5">
                 {todayStats.completed} of {todayStats.total} planned activities completed
               </p>
             </div>
@@ -219,13 +219,13 @@ export default function DashboardPage() {
 
         {/* Empty state: If no habits exist in account */}
         {habits.length === 0 ? (
-          <div className="text-center py-12 px-4 bg-white dark:bg-[#111827] rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-4">
+          <div className="text-center py-12 px-4 bg-surface rounded-2xl border border-subtle shadow-2xs space-y-4">
             <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 rounded-2xl flex items-center justify-center mx-auto text-teal-700 dark:text-teal-400 shadow-2xs">
               <Compass className="w-7 h-7" />
             </div>
             <div className="max-w-sm mx-auto space-y-1.5">
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Welcome to {BRAND.name}</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              <h3 className="text-base font-bold text-main">Welcome to {BRAND.name}</h3>
+              <p className="text-xs text-sub leading-relaxed">
                 Build your daily rhythm by exploring recommended foundation routines or creating custom habits.
               </p>
             </div>
@@ -237,9 +237,9 @@ export default function DashboardPage() {
             </Link>
           </div>
         ) : todaysHabits.length === 0 ? (
-          <div className="text-center py-12 px-4 bg-white dark:bg-[#111827] rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-2">
-            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">No activities scheduled for today.</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Enjoy your unscheduled day! Take rest and recharge.</p>
+          <div className="text-center py-12 px-4 bg-surface rounded-2xl border border-subtle shadow-2xs space-y-2">
+            <p className="text-sm font-bold text-main">No activities scheduled for today.</p>
+            <p className="text-xs text-sub">Enjoy your unscheduled day! Take rest and recharge.</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -247,7 +247,7 @@ export default function DashboardPage() {
             {groupedHabits.anytime.length > 0 && (
               <section className="space-y-3">
                 <div className="flex items-center gap-2 px-1">
-                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-sub uppercase tracking-wider">
                     Flexible / Anytime
                   </span>
                   <div className="h-px bg-slate-200 dark:bg-slate-800 flex-1" />
@@ -292,7 +292,7 @@ export default function DashboardPage() {
             {groupedHabits.other.length > 0 && (
               <section className="space-y-3">
                 <div className="flex items-center gap-2 px-1">
-                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-sub uppercase tracking-wider">
                     Additional Routines
                   </span>
                   <div className="h-px bg-slate-200 dark:bg-slate-800 flex-1" />

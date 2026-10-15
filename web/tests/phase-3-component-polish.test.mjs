@@ -130,27 +130,27 @@ describe('Phase 3: UI/UX Component Polish (Mobile-First)', () => {
       const content = readWebFile('src/components/ui/BottomNav.js');
       assert.ok(content.includes('text-teal-700') && content.includes('dark:text-teal-300'), 'BottomNav active text must be teal');
       assert.ok(content.includes('bg-teal-50') && content.includes('dark:bg-teal-950/60'), 'BottomNav active background must be teal');
-      assert.ok(content.includes('dark:bg-[#090D16]/95'), 'BottomNav bar must use Deep Obsidian #090D16 backdrop in dark mode');
+      assert.ok(content.includes('bg-surface') || content.includes('dark:bg-[#090D16]/95'), 'BottomNav bar must use Deep Obsidian or semantic surface backdrop in dark mode');
     });
 
     it('should verify LoadingSpinner uses teal breathing halo and dark mode support', () => {
       const content = readWebFile('src/components/ui/LoadingSpinner.js');
       assert.ok(content.includes('border-teal-400/20') || content.includes('border-teal-400/30'), 'LoadingSpinner halo must be teal');
       assert.ok(content.includes('border-t-teal-500/70') || content.includes('border-t-teal-400/80'), 'LoadingSpinner spinner ring must be teal');
-      assert.ok(content.includes('dark:bg-[#090D16]/90'), 'LoadingSpinner canvas backdrop must use Deep Obsidian');
-      assert.ok(content.includes('dark:bg-slate-900'), 'LoadingSpinner logo card must support dark background');
+      assert.ok(content.includes('bg-canvas') || content.includes('dark:bg-[#090D16]/90'), 'LoadingSpinner canvas backdrop must use Deep Obsidian or semantic canvas');
+      assert.ok(content.includes('bg-surface') || content.includes('dark:bg-slate-900'), 'LoadingSpinner logo card must support dark background');
     });
 
     it('should verify ConfirmDialog supports dark mode and teal styling for non-danger dialogs', () => {
       const content = readWebFile('src/components/ui/ConfirmDialog.js');
-      assert.ok(content.includes('dark:bg-slate-900'), 'ConfirmDialog card must support dark mode');
+      assert.ok(content.includes('bg-surface') || content.includes('dark:bg-slate-900'), 'ConfirmDialog card must support dark mode');
       assert.ok(content.includes('bg-teal-100') && content.includes('bg-teal-600'), 'ConfirmDialog non-danger must use teal');
       assert.ok(content.includes('min-h-[44px]'), 'ConfirmDialog buttons must satisfy 44px touch target');
     });
 
     it('should verify protected layout container applies Deep Obsidian in dark mode', () => {
       const content = readWebFile('src/app/(protected)/layout.js');
-      assert.ok(content.includes('dark:bg-[#090D16]'), 'Protected layout container must use Deep Obsidian in dark mode');
+      assert.ok(content.includes('bg-canvas') || content.includes('dark:bg-[#090D16]'), 'Protected layout container must use Deep Obsidian or semantic canvas in dark mode');
     });
 
     it('should verify all major views implement comprehensive dark mode surfaces and borders', () => {

@@ -7,29 +7,38 @@
    Maps semantic design tokens to dynamic CSS variables.
    Generates utility classes: bg-canvas, text-main, text-sub, border-subtle, etc.
    ======================================== */
-@theme {
-  --color-canvas: var(--color-bg-canvas);
-  --color-surface: var(--color-bg-surface);
-  --color-subtle: var(--color-bg-subtle);
+/* ========================================
+   Tailwind CSS v4 Utility Theme Tokens
+   Maps semantic design tokens to dynamic CSS variables using @theme inline.
+   Referencing variables at runtime: https://tailwindcss.com/docs/theme#referencing-other-variables
+   Generates utility classes: bg-canvas, text-main, text-sub, border-subtle, etc.
+   ======================================== */
+@theme inline {
+  --color-canvas: var(--vritta-canvas);
+  --color-surface: var(--vritta-surface);
+  --color-surface-subtle: var(--vritta-surface-subtle);
 
-  --color-border-subtle: var(--color-border-subtle);
-  --color-border-strong: var(--color-border-strong);
+  --color-main: var(--vritta-text-main);
+  --color-sub: var(--vritta-text-sub);
+  --color-text-main: var(--vritta-text-main);
+  --color-text-sub: var(--vritta-text-sub);
+  --color-muted: var(--vritta-text-muted);
+  --color-dim: var(--vritta-text-muted);
 
-  --color-text-main: var(--color-text-primary);
-  --color-text-sub: var(--color-text-secondary);
-  --color-text-dim: var(--color-text-muted);
+  --color-subtle: var(--vritta-border-subtle);
+  --color-strong: var(--vritta-border-strong);
 
-  --color-brand: var(--color-accent-primary);
-  --color-brand-hover: var(--color-accent-hover);
-  --color-brand-subtle: var(--color-accent-subtle);
+  --color-brand-primary: var(--vritta-brand-primary);
+  --color-brand-obsidian: var(--vritta-brand-obsidian);
+  --color-brand-amber: var(--vritta-brand-amber);
 
-  --color-brand-primary: var(--color-brand-primary);
-  --color-brand-obsidian: var(--color-brand-obsidian);
-  --color-brand-amber: var(--color-brand-amber);
+  --color-accent: var(--vritta-accent);
+  --color-accent-hover: var(--vritta-accent-hover);
+  --color-accent-subtle: var(--vritta-accent-subtle);
 
-  --color-rhythm: var(--color-warm-accent);
-  --color-rhythm-subtle: var(--color-warm-subtle);
-  --color-warm-text: var(--color-warm-text);
+  --color-warm-accent: var(--vritta-warm-accent);
+  --color-warm-text: var(--vritta-warm-text);
+  --color-warm-subtle: var(--vritta-warm-subtle);
 }
 
 /* ========================================
@@ -37,52 +46,79 @@
    ======================================== */
 
 :root {
-  /* Surfaces & Canvas */
-  --color-bg-canvas: #f8fafc;        /* Misty Slate canvas */
-  --color-bg-surface: #ffffff;       /* Pure Porcelain card surface */
-  --color-bg-subtle: #f1f5f9;        /* Slate 100 input / badge background */
+  /* Surfaces & Canvas — Distinct runtime variables */
+  --vritta-canvas: #f8fafc;        /* Misty Slate canvas */
+  --vritta-surface: #ffffff;       /* Pure Porcelain card surface */
+  --vritta-surface-subtle: #f1f5f9; /* Slate 100 input / badge background */
 
-  /* Backwards compatibility aliases for existing components */
+  /* Borders */
+  --vritta-border-subtle: #e2e8f0;    /* Slate 200 border */
+  --vritta-border-strong: #cbd5e1;    /* Slate 300 border */
+
+  /* Text & Content (WCAG AA & AAA compliant) */
+  --vritta-text-main: #0f172a;     /* Deep Charcoal Slate (17.85:1 on surface, 17.06:1 on canvas) */
+  --vritta-text-sub: #475569;      /* Slate 600 (7.58:1 on surface, 7.24:1 on canvas) */
+  --vritta-text-muted: #64748b;    /* Slate 500 (4.76:1 on surface, 4.55:1 on canvas) */
+
+  /* Core Brand Swatches (Approved & Locked) */
+  --vritta-brand-primary: #14b8a6;   /* Core Luminous Teal */
+  --vritta-brand-obsidian: #090d16;  /* Core Deep Obsidian */
+  --vritta-brand-amber: #d97706;     /* Core Warm Amber */
+
+  /* Brand Accent — Accessible Deep Teal variant for light text & stroke */
+  --vritta-accent: #0f766e;        /* Juniper/Teal-700 (5.47:1 on surface, 5.23:1 on canvas) */
+  --vritta-accent-hover: #115e59;  /* Deepened Juniper */
+  --vritta-accent-subtle: #ccfbf1; /* Juniper 100 tint */
+
+  /* Warm Rhythm Accent — Core Warm Amber Swatch */
+  --vritta-warm-accent: #d97706;   /* Warm Amber core swatch (3.04:1 graphical SC 1.4.11) */
+  --vritta-warm-text: #b45309;     /* Accessible Amber text variant (4.80:1 on canvas, 5.02:1 on surface) */
+  --vritta-warm-subtle: #fef3c7;   /* Amber 100 tint */
+
+  /* Colors — Semantic Feedback */
+  --vritta-success: #059669;
+  --vritta-success-light: #d1fae5;
+  --vritta-warning: #d97706;
+  --vritta-warning-light: #fef3c7;
+  --vritta-error: #e11d48;
+  --vritta-error-light: #ffe4e6;
+
+  /* Backwards compatibility aliases for raw CSS / test suites */
+  --color-bg-canvas: var(--vritta-canvas);
+  --color-bg-surface: var(--vritta-surface);
+  --color-bg-subtle: var(--vritta-surface-subtle);
   --color-bg-primary: var(--color-bg-canvas);
   --color-bg-secondary: var(--color-bg-surface);
   --color-bg-tertiary: var(--color-bg-subtle);
 
-  /* Borders */
-  --color-border-subtle: #e2e8f0;    /* Slate 200 border */
-  --color-border-strong: #cbd5e1;    /* Slate 300 border */
+  --color-border-subtle: var(--vritta-border-subtle);
+  --color-border-strong: var(--vritta-border-strong);
 
-  /* Text & Content (WCAG AA & AAA compliant) */
-  --color-text-primary: #0f172a;     /* Deep Charcoal Slate (17.85:1 on surface, 17.06:1 on canvas) */
-  --color-text-secondary: #475569;   /* Slate 600 (7.58:1 on surface, 7.24:1 on canvas) */
-  --color-text-muted: #64748b;       /* Slate 500 (4.76:1 on surface, 4.55:1 on canvas) */
+  --color-text-primary: var(--vritta-text-main);
+  --color-text-secondary: var(--vritta-text-sub);
+  --color-text-muted: var(--vritta-text-muted);
 
-  /* Core Brand Swatches (Approved & Locked) */
-  --color-brand-primary: #14b8a6;   /* Core Luminous Teal */
-  --color-brand-obsidian: #090d16;  /* Core Deep Obsidian */
-  --color-brand-amber: #d97706;     /* Core Warm Amber */
+  --color-brand-primary: var(--vritta-brand-primary);
+  --color-brand-obsidian: var(--vritta-brand-obsidian);
+  --color-brand-amber: var(--vritta-brand-amber);
 
-  /* Brand Accent — Accessible Deep Teal variant for light text & stroke */
-  --color-accent-primary: #0f766e;   /* Juniper/Teal-700 (5.47:1 on surface, 5.23:1 on canvas) */
-  --color-accent-hover: #115e59;     /* Deepened Juniper */
-  --color-accent-subtle: #ccfbf1;    /* Juniper 100 tint */
-
-  /* Backwards compatibility aliases */
+  --color-accent-primary: var(--vritta-accent);
+  --color-accent-hover: var(--vritta-accent-hover);
+  --color-accent-subtle: var(--vritta-accent-subtle);
   --color-accent: var(--color-accent-primary);
   --color-accent-light: var(--color-accent-subtle);
 
-  /* Warm Rhythm Accent — Core Warm Amber Swatch */
-  --color-warm-accent: #d97706;      /* Warm Amber core swatch (3.04:1 graphical SC 1.4.11) */
-  --color-warm-text: #b45309;        /* Accessible Amber text variant (4.80:1 on canvas, 5.02:1 on surface) */
-  --color-warm-subtle: #fef3c7;      /* Amber 100 tint */
+  --color-warm-accent: var(--vritta-warm-accent);
+  --color-warm-text: var(--vritta-warm-text);
+  --color-warm-subtle: var(--vritta-warm-subtle);
   --color-streak: var(--color-warm-accent);
 
-  /* Colors — Semantic Feedback */
-  --color-success: #059669;
-  --color-success-light: #d1fae5;
-  --color-warning: #d97706;
-  --color-warning-light: #fef3c7;
-  --color-error: #e11d48;
-  --color-error-light: #ffe4e6;
+  --color-success: var(--vritta-success);
+  --color-success-light: var(--vritta-success-light);
+  --color-warning: var(--vritta-warning);
+  --color-warning-light: var(--vritta-warning-light);
+  --color-error: var(--vritta-error);
+  --color-error-light: var(--vritta-error-light);
 
   /* Colors — Routine Categories (Restorative Juniper aligned) */
   --color-category-english: #0f766e;
@@ -126,42 +162,42 @@
    ======================================== */
 
 .dark {
-  /* Surfaces & Canvas */
-  --color-bg-canvas: #090d16;        /* Deep Obsidian canvas */
-  --color-bg-surface: #111827;       /* Mineral Charcoal card surface */
-  --color-bg-subtle: #1e293b;        /* Slate 800 input / badge background */
+  /* Surfaces & Canvas — Distinct runtime variables */
+  --vritta-canvas: #090d16;        /* Deep Obsidian canvas */
+  --vritta-surface: #111827;       /* Mineral Charcoal card surface */
+  --vritta-surface-subtle: #1e293b; /* Slate 800 input / badge background */
 
   /* Borders */
-  --color-border-subtle: #1e293b;    /* Slate 800 border */
-  --color-border-strong: #334155;    /* Slate 700 border */
+  --vritta-border-subtle: #1e293b;    /* Slate 800 border */
+  --vritta-border-strong: #334155;    /* Slate 700 border */
 
   /* Text & Content (Corrected dark hierarchy meeting WCAG AA >= 4.5:1) */
-  --color-text-primary: #f8fafc;     /* Crisp Slate (16.96:1 on surface, 18.57:1 on canvas) */
-  --color-text-secondary: #94a3b8;   /* Slate 400 (6.92:1 on surface, 7.58:1 on canvas) */
-  --color-text-muted: #8092a5;       /* Slate tone (5.55:1 on surface, 6.08:1 on canvas — cleanly passes AA) */
+  --vritta-text-main: #f8fafc;     /* Crisp Slate (16.96:1 on surface, 18.57:1 on canvas) */
+  --vritta-text-sub: #94a3b8;      /* Slate 400 (6.92:1 on surface, 7.58:1 on canvas) */
+  --vritta-text-muted: #8092a5;    /* Slate tone (5.55:1 on surface, 6.08:1 on canvas — cleanly passes AA) */
 
   /* Core Brand Swatches (Approved & Locked) */
-  --color-brand-primary: #14b8a6;   /* Core Luminous Teal */
-  --color-brand-obsidian: #090d16;  /* Core Deep Obsidian */
-  --color-brand-amber: #d97706;     /* Core Warm Amber */
+  --vritta-brand-primary: #14b8a6;   /* Core Luminous Teal */
+  --vritta-brand-obsidian: #090d16;  /* Core Deep Obsidian */
+  --vritta-brand-amber: #d97706;     /* Core Warm Amber */
 
   /* Brand Accent — Luminous Teal */
-  --color-accent-primary: #14b8a6;   /* Luminous Teal (7.13:1 on surface, 7.81:1 on canvas) */
-  --color-accent-hover: #2dd4bf;     /* Lightened Teal */
-  --color-accent-subtle: #134e4a;    /* Teal 900 tint */
+  --vritta-accent: #14b8a6;        /* Luminous Teal (7.13:1 on surface, 7.81:1 on canvas) */
+  --vritta-accent-hover: #2dd4bf;  /* Lightened Teal */
+  --vritta-accent-subtle: #134e4a; /* Teal 900 tint */
 
   /* Warm Rhythm Accent — Core Warm Amber Swatch */
-  --color-warm-accent: #d97706;      /* Warm Amber (5.57:1 on surface, 6.10:1 on canvas — passes AA) */
-  --color-warm-text: #d97706;        /* Warm Amber (6.10:1 on canvas) */
-  --color-warm-subtle: #78350f;      /* Amber 900 tint */
+  --vritta-warm-accent: #d97706;   /* Warm Amber (5.57:1 on surface, 6.10:1 on canvas — passes AA) */
+  --vritta-warm-text: #d97706;     /* Warm Amber (6.10:1 on canvas) */
+  --vritta-warm-subtle: #78350f;   /* Amber 900 tint */
 
   /* Colors — Semantic Feedback */
-  --color-success: #10b981;
-  --color-success-light: #064e3b;
-  --color-warning: #d97706;
-  --color-warning-light: #78350f;
-  --color-error: #fb7185;
-  --color-error-light: #881337;
+  --vritta-success: #10b981;
+  --vritta-success-light: #064e3b;
+  --vritta-warning: #d97706;
+  --vritta-warning-light: #78350f;
+  --vritta-error: #fb7185;
+  --vritta-error-light: #881337;
 
   /* Shadows in Dark Mode (ambient depth) */
   --shadow-2xs: 0 1px 2px 0 rgba(0, 0, 0, 0.4);

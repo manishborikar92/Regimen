@@ -11,20 +11,18 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+/**
+ * Next.js 16 file-based metadata automatically detects and renders non-conflicting tags for:
+ * - favicon.ico (32x32 / 16x16 standard favicon)
+ * - icon0.svg (vector application icon)
+ * - icon1.png (48x48 fallback PNG icon)
+ * - apple-icon.png (180x180 PNG touch icon for iOS)
+ * - manifest.json (web application manifest)
+ */
 export const metadata = {
   title: `${BRAND.name} — ${BRAND.tagline}`,
   description: BRAND.shortDescription,
   applicationName: BRAND.name,
-  manifest: "/manifest.json",
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "32x32" },
-      { url: "/icon0.svg", type: "image/svg+xml" },
-    ],
-    apple: [
-      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
-    ],
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -35,7 +33,6 @@ export const metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
   themeColor: BRAND.themeColor,
 };
 
@@ -49,7 +46,7 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body className={`${inter.variable} font-sans antialiased text-[var(--color-text-primary)] bg-[var(--color-bg-canvas)]`}>
+      <body className={`${inter.variable} font-sans antialiased text-main bg-canvas`}>
         <ThemeProvider>
           <AuthProvider>
             <DataProvider>

@@ -109,15 +109,15 @@ export default function TopNav({ title, subtitle }) {
 
   return (
     <>
-      <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 sticky top-0 z-40 transition-colors">
+      <header className="bg-surface/90 backdrop-blur-md border-b border-subtle sticky top-0 z-40 transition-colors">
         <div className="max-w-2xl mx-auto px-4 py-3 sm:py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-white dark:bg-gray-800 border border-gray-200/90 dark:border-gray-700 shadow-2xs flex items-center justify-center p-1 hover:shadow-xs transition-shadow">
+            <div className="w-8 h-8 rounded-xl bg-surface border border-subtle shadow-2xs flex items-center justify-center p-1 hover:shadow-xs transition-shadow">
               <Logo className="w-full h-full" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-none">
+                <h1 className="text-lg sm:text-xl font-bold text-main tracking-tight leading-none">
                   {displayTitle}
                 </h1>
                 {title && title !== BRAND.name && (
@@ -127,7 +127,7 @@ export default function TopNav({ title, subtitle }) {
                 )}
               </div>
               {subtitle && (
-                <p className="text-2xs sm:text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wide mt-0.5">
+                <p className="text-2xs sm:text-xs text-sub font-medium tracking-wide mt-0.5">
                   {subtitle}
                 </p>
               )}
@@ -150,7 +150,7 @@ export default function TopNav({ title, subtitle }) {
                       if (showProfileMenu) setShowProfileMenu(false);
                     }}
                     onKeyDown={handleTriggerKeyDown}
-                    className="w-10 h-10 min-w-[40px] min-h-[40px] sm:w-9 sm:h-9 sm:min-w-[36px] sm:min-h-[36px] p-2 rounded-xl flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
+                    className="w-10 h-10 min-w-[40px] min-h-[40px] sm:w-9 sm:h-9 sm:min-w-[36px] sm:min-h-[36px] p-2 rounded-xl flex items-center justify-center text-sub hover:text-main hover:bg-surface-subtle transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 border border-transparent hover:border-subtle"
                     aria-label={`Theme: ${theme === 'system' ? `System (${resolvedTheme})` : theme}. Select to change theme.`}
                     aria-haspopup="menu"
                     aria-expanded={showThemeMenu}
@@ -176,7 +176,7 @@ export default function TopNav({ title, subtitle }) {
                       />
                       <div
                         id="theme-menu-dropdown"
-                        className="absolute right-0 mt-2 w-36 bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 py-1.5 z-40 animate-in fade-in zoom-in-95 duration-150"
+                        className="absolute right-0 mt-2 w-36 bg-surface rounded-xl shadow-lg border border-subtle py-1.5 z-40 animate-in fade-in zoom-in-95 duration-150"
                         role="menu"
                         aria-labelledby="theme-menu-button"
                       >
@@ -194,7 +194,7 @@ export default function TopNav({ title, subtitle }) {
                               className={`w-full text-left px-3.5 py-2.5 min-h-[40px] text-xs font-medium flex items-center justify-between transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-teal-600 ${
                                 isSelected
                                   ? 'text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 font-semibold'
-                                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:bg-gray-50 dark:focus:bg-gray-800'
+                                  : 'text-sub hover:text-main hover:bg-surface-subtle focus:bg-surface-subtle'
                               }`}
                               role="menuitemradio"
                               aria-checked={isSelected}
@@ -221,11 +221,11 @@ export default function TopNav({ title, subtitle }) {
               <div className="relative">
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl p-1.5 transition-colors border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
+                  className="flex items-center gap-2 hover:bg-surface-subtle rounded-xl p-1.5 transition-colors border border-transparent hover:border-subtle"
                   aria-expanded={showProfileMenu}
                   aria-label="Profile menu"
                 >
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-teal-100 dark:bg-teal-900 border border-teal-200 dark:border-teal-800 flex items-center justify-center text-xs font-bold text-teal-800 dark:text-teal-200">
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-accent-subtle/40 border border-subtle flex items-center justify-center text-xs font-bold text-accent">
                     {user.photoURL ? (
                       <Image
                         src={user.photoURL}
@@ -241,13 +241,13 @@ export default function TopNav({ title, subtitle }) {
                     )}
                   </div>
                   <div className="hidden sm:block text-left">
-                    <p className="text-xs font-semibold text-gray-900 dark:text-gray-100 leading-tight">
+                    <p className="text-xs font-semibold text-main leading-tight">
                       {user.displayName || 'User'}
                     </p>
-                    <p className="text-2xs text-gray-400 dark:text-gray-400 truncate max-w-[120px]">{user.email}</p>
+                    <p className="text-2xs text-muted truncate max-w-[120px]">{user.email}</p>
                   </div>
                   <ChevronDown
-                    className={`w-3.5 h-3.5 text-gray-400 dark:text-gray-400 transition-transform ${showProfileMenu ? 'rotate-180' : ''}`}
+                    className={`w-3.5 h-3.5 text-muted transition-transform ${showProfileMenu ? 'rotate-180' : ''}`}
                   />
                 </button>
 
@@ -259,12 +259,12 @@ export default function TopNav({ title, subtitle }) {
                       aria-hidden="true"
                     />
                     <div
-                      className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 py-1.5 z-40"
+                      className="absolute right-0 mt-2 w-56 bg-surface rounded-xl shadow-lg border border-subtle py-1.5 z-40"
                       role="menu"
                     >
-                      <div className="px-3.5 py-2.5 border-b border-gray-100 dark:border-gray-800">
-                        <p className="text-xs font-bold text-gray-900 dark:text-gray-100">{user.displayName || 'User'}</p>
-                        <p className="text-2xs text-gray-400 dark:text-gray-400 truncate">{user.email}</p>
+                      <div className="px-3.5 py-2.5 border-b border-subtle">
+                        <p className="text-xs font-bold text-main">{user.displayName || 'User'}</p>
+                        <p className="text-2xs text-muted truncate">{user.email}</p>
                       </div>
                       <button
                         onClick={() => {
@@ -285,8 +285,7 @@ export default function TopNav({ title, subtitle }) {
               <button
                 onClick={handleSignIn}
                 disabled={signingIn}
-                className="flex items-center gap-2 px-3.5 py-1.5 bg-teal-700 dark:bg-teal-600 text-white rounded-xl hover:bg-teal-800 dark:hover:bg-teal-500 
-                transition-colors disabled:opacity-50 text-xs font-semibold shadow-2xs"
+                className="flex items-center gap-2 px-3.5 py-1.5 bg-accent hover:bg-accent-hover text-white rounded-xl transition-colors disabled:opacity-50 text-xs font-semibold shadow-2xs"
               >
                 {signingIn ? (
                   <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white/40 border-t-white" />

@@ -62,7 +62,7 @@ function WorkbookCard({ habit, isCompleted, progress = {}, onUpdateProgress }) {
 
   return (
     <div
-      className={`relative rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#111827] shadow-sm transition-all duration-200 hover:shadow-md ${
+      className={`relative rounded-xl border border-subtle bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
         isFullyComplete ? 'bg-teal-50/20 dark:bg-teal-950/20 border-teal-200 dark:border-teal-800/80' : ''
       }`}
     >
@@ -79,7 +79,7 @@ function WorkbookCard({ habit, isCompleted, progress = {}, onUpdateProgress }) {
               <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium border ${config.badgeClasses}`}>
                 {habit.category}
               </span>
-              <span className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
+              <span className="flex items-center gap-1 text-xs text-sub bg-surface-subtle px-2 py-0.5 rounded-md border border-subtle">
                 <Clock className="w-3 h-3 text-slate-400" />
                 Anytime
               </span>
@@ -88,12 +88,12 @@ function WorkbookCard({ habit, isCompleted, progress = {}, onUpdateProgress }) {
               </span>
             </div>
 
-            <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <h3 className="text-base sm:text-lg font-bold text-main flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-teal-700 dark:text-teal-400 flex-shrink-0" />
               {habit.title}
             </h3>
 
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-sub mt-1">
               Complete 2 daily workbook sessions. Review previous notes before starting.
             </p>
           </div>
@@ -128,7 +128,7 @@ function WorkbookCard({ habit, isCompleted, progress = {}, onUpdateProgress }) {
             </div>
 
             {/* Stepper Buttons */}
-            <div className="flex items-center gap-1.5 bg-white dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs">
+            <div className="flex items-center gap-1.5 bg-surface p-1 rounded-lg border border-subtle shadow-2xs">
               <button
                 type="button"
                 onClick={() => handleSessionChange(sessions - 1)}

@@ -201,32 +201,32 @@ export default function AnalyticsPage() {
           <div className="space-y-4">
             {/* High-level Rhythm Cards */}
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              <div className="bg-white dark:bg-[#111827] rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-1">
+              <div className="bg-surface rounded-2xl p-4 border border-subtle shadow-2xs space-y-1">
                 <span className="text-2xs font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider block">
                   30-Day Consistency
                 </span>
-                <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100">
+                <div className="text-2xl sm:text-3xl font-extrabold text-main">
                   {stats.avgRate}%
                 </div>
-                <p className="text-2xs text-slate-400 dark:text-slate-500">
+                <p className="text-2xs text-muted">
                   {stats.completedDays} of {stats.totalActiveDays} scheduled days fulfilled
                 </p>
               </div>
 
-              <div className="bg-white dark:bg-[#111827] rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-1">
+              <div className="bg-surface rounded-2xl p-4 border border-subtle shadow-2xs space-y-1">
                 <span className="text-2xs font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider block">
                   Total Activities Done
                 </span>
                 <div className="text-2xl sm:text-3xl font-extrabold text-teal-600 dark:text-teal-400">
                   {stats.totalCompletions}
                 </div>
-                <p className="text-2xs text-slate-400 dark:text-slate-500">Activities completed in 30 days</p>
+                <p className="text-2xs text-muted">Activities completed in 30 days</p>
               </div>
             </div>
 
             {/* Core Routine Deep Dives */}
-            <div className="bg-white dark:bg-[#111827] rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-4">
-              <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+            <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-subtle shadow-2xs space-y-4">
+              <h3 className="text-xs sm:text-sm font-bold text-main flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                 Domain Consistency Highlights
               </h3>
@@ -320,17 +320,17 @@ export default function AnalyticsPage() {
         {/* VIEW 2: Calendar 30-Day Map */}
         {viewMode === 'calendar' && (
           <div className="space-y-4">
-            <div className="bg-white dark:bg-[#111827] rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs">
+            <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-subtle shadow-2xs">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                <h3 className="text-xs sm:text-sm font-bold text-main flex items-center gap-1.5">
                   <Calendar className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                   Last 30 Days Activity Map
                 </h3>
-                <span className="text-2xs text-slate-400 dark:text-slate-500">Tap a date to inspect activities</span>
+                <span className="text-2xs text-muted">Tap a date to inspect activities</span>
               </div>
 
               {/* Day Headers (Mon-Sun) */}
-              <div className="grid grid-cols-7 gap-1.5 text-center text-2xs font-bold text-slate-400 dark:text-slate-500 py-1 border-b border-slate-200 dark:border-slate-800 mb-2">
+              <div className="grid grid-cols-7 gap-1.5 text-center text-2xs font-bold text-muted py-1 border-b border-subtle mb-2">
                 {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, idx) => (
                   <div key={idx}>{d}</div>
                 ))}
@@ -369,7 +369,7 @@ export default function AnalyticsPage() {
                       type="button"
                       onClick={() => setSelectedDate(isSelected ? null : dateStr)}
                       className={`aspect-square rounded-xl flex flex-col items-center justify-center text-xs font-bold transition-all ${cellStyle} ${
-                        isSelected ? 'ring-2 ring-teal-600 dark:ring-teal-400 ring-offset-2 ring-offset-white dark:ring-offset-[#111827] scale-105' : 'hover:opacity-85'
+                        isSelected ? 'ring-2 ring-teal-600 dark:ring-teal-400 ring-offset-2 ring-offset-surface scale-105' : 'hover:opacity-85'
                       }`}
                       aria-label={`${dateStr}: ${metrics.rate}% completed`}
                     >
@@ -383,7 +383,7 @@ export default function AnalyticsPage() {
               </div>
 
               {/* Legend */}
-              <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 text-2xs text-slate-500 dark:text-slate-400">
+              <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-4 pt-3 border-t border-subtle text-2xs text-sub">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded bg-emerald-500" />
                   <span>100% Complete</span>
@@ -405,15 +405,15 @@ export default function AnalyticsPage() {
 
             {/* Selected Date Inspector */}
             {selectedDate && (
-              <div className="bg-white dark:bg-[#111827] rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-3 animate-in fade-in duration-200">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
-                  <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">
+              <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-subtle shadow-2xs space-y-3 animate-in fade-in duration-200">
+                <div className="flex items-center justify-between pb-2 border-b border-subtle">
+                  <h4 className="text-xs sm:text-sm font-bold text-main">
                     {formatDate(selectedDate)}
                   </h4>
                   <button
                     type="button"
                     onClick={() => setSelectedDate(null)}
-                    className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                    className="text-xs text-muted hover:text-main"
                   >
                     Close
                   </button>

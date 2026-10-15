@@ -79,26 +79,26 @@ export default function HabitsPage() {
 
       <main className="max-w-2xl mx-auto px-4 py-5 sm:py-6 space-y-5">
         {/* Helper Banner */}
-        <div className="bg-gradient-to-r from-teal-50/70 via-white to-emerald-50/40 dark:from-teal-950/30 dark:via-[#111827] dark:to-emerald-950/20 p-4 rounded-2xl border border-teal-100 dark:border-teal-900/40 shadow-2xs transition-colors">
+        <div className="bg-gradient-to-r from-teal-50/70 via-surface to-emerald-50/40 dark:from-teal-950/30 dark:to-emerald-950/20 p-4 rounded-2xl border border-teal-100 dark:border-teal-900/40 shadow-2xs transition-colors">
           <div className="space-y-1">
-            <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+            <h3 className="text-xs sm:text-sm font-bold text-main flex items-center gap-1.5">
               <Compass className="w-4 h-4 text-teal-700 dark:text-teal-400" />
               Scheduling Philosophy
             </h3>
-            <p className="text-2xs sm:text-xs text-slate-600 dark:text-slate-400 leading-relaxed max-w-lg">
+            <p className="text-2xs sm:text-xs text-sub leading-relaxed max-w-lg">
               Preferred times are soft guidance, never hard deadlines. Categorize by life purpose and priority rather than rigid hours.
             </p>
           </div>
         </div>
 
         {habits.length === 0 ? (
-          <div className="text-center py-12 px-4 bg-white dark:bg-[#111827] rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-4">
+          <div className="text-center py-12 px-4 bg-surface rounded-2xl border border-subtle shadow-2xs space-y-4">
             <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 rounded-2xl flex items-center justify-center mx-auto text-teal-700 dark:text-teal-400 text-2xl">
               📝
             </div>
             <div className="max-w-sm mx-auto space-y-1.5">
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">No routines found</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <h3 className="text-base font-bold text-main">No routines found</h3>
+              <p className="text-xs text-sub">
                 Load recommended foundation routines or create your own custom habit.
               </p>
             </div>
@@ -131,7 +131,7 @@ export default function HabitsPage() {
               return (
                 <div
                   key={habit.id}
-                  className="bg-white dark:bg-[#111827] rounded-2xl p-4 sm:p-5 shadow-2xs border border-slate-200/80 dark:border-slate-800/80 hover:shadow-sm transition-shadow"
+                  className="bg-surface rounded-2xl p-4 sm:p-5 shadow-2xs border border-subtle hover:shadow-sm transition-shadow"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
@@ -140,7 +140,7 @@ export default function HabitsPage() {
                           {habit.category}
                         </span>
 
-                        <span className="flex items-center gap-1 text-2xs text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded-md font-medium">
+                        <span className="flex items-center gap-1 text-2xs text-sub bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded-md font-medium">
                           <Clock className="w-3 h-3 text-slate-400" />
                           {timingText}
                         </span>
@@ -152,20 +152,20 @@ export default function HabitsPage() {
                         )}
 
                         {isFoundation && (
-                          <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                          <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-sub border border-slate-200 dark:border-slate-700">
                             Foundation
                           </span>
                         )}
 
-                        <span className="text-2xs text-slate-400 dark:text-slate-500">#{habit.order}</span>
+                        <span className="text-2xs text-muted">#{habit.order}</span>
                       </div>
 
-                      <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100">
+                      <h3 className="text-sm sm:text-base font-bold text-main">
                         {habit.title}
                       </h3>
 
                       {habit.instructions && (
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-sub mt-1 line-clamp-2 leading-relaxed">
                           {habit.instructions}
                         </p>
                       )}

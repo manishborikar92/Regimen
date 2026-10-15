@@ -53,7 +53,7 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
 
   return (
     <div
-      className={`relative rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#111827] shadow-sm transition-all duration-200 hover:shadow-md ${
+      className={`relative rounded-xl border border-subtle bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
         isCompleted ? 'bg-emerald-50/20 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/80' : ''
       }`}
     >
@@ -81,12 +81,12 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
               </span>
             </div>
 
-            <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <h3 className="text-base sm:text-lg font-bold text-main flex items-center gap-2">
               <BookMarked className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
               {habit.title}
             </h3>
 
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-sub mt-1">
               Read 30 minutes before sleep. Completing directly or using the optional timer both work.
             </p>
           </div>

@@ -185,7 +185,7 @@ To eliminate ambiguity, all project identifiers are separated into their distinc
 | **Vercel Deployment Domain**| Existing deployment active on Vercel | `myvritta.vercel.app` | **PROVISIONAL:** Returned HTTP 404 on network check, but domain assignment can only be confirmed upon project creation or domain addition in Vercel |
 | **GitHub Repository Name** | `manishborikar92/Regimen` | `manishborikar92/Vritta` | **PROVISIONAL:** Pending user rename in GitHub Settings |
 | **Local Workspace Folder** | `c:\Users\manis\Projects\Regimen` | `c:\Users\manis\Projects\Vritta` | **LOCAL TARGET:** Pending execution in Phase 8 |
-| **Firebase Project ID** | `regimen-e32a8` | `vritta-app` (or auto-suffixed) | **PROVISIONAL:** ID will be chosen during Firebase Console setup |
+| **Firebase Project ID** | `vritta-app` | `vritta-app` (or auto-suffixed) | **PROVISIONAL:** ID will be chosen during Firebase Console setup |
 
 > [!CAUTION]
 > **Domain Availability Clarification:** An HTTP 404 response on the public internet only indicates that no deployment is currently responding at that URL. It does **not** prove that the subdomain is unreserved, unblocked, or claimable by our Vercel account. Availability can only be confirmed by attempting to assign the domain within the Vercel Dashboard.
@@ -196,7 +196,7 @@ To eliminate ambiguity, all project identifiers are separated into their distinc
 
 ### 4.1 Resource Inventory from Existing Codebase
 - **Client Configuration (`web/src/lib/firebase/config.js`):** Uses public environment variables (`NEXT_PUBLIC_FIREBASE_*`) to initialize client-side auth and Firestore with `persistentLocalCache` and `persistentSingleTabManager`.
-- **Server Configuration (`web/src/lib/server/firebase-admin.js`):** Authoritative Admin SDK initialization. Supports `FIREBASE_SERVICE_ACCOUNT_KEY` (Sensitive JSON string), `GOOGLE_APPLICATION_CREDENTIALS` (file path), and individual private key variables. Contains hardcoded `'regimen-e32a8'` fallbacks on lines 50 and 107 that must be removed.
+- **Server Configuration (`web/src/lib/server/firebase-admin.js`):** Authoritative Admin SDK initialization. Supports `FIREBASE_SERVICE_ACCOUNT_KEY` (Sensitive JSON string), `GOOGLE_APPLICATION_CREDENTIALS` (file path), and individual private key variables. Contains hardcoded `'vritta-app'` fallbacks on lines 50 and 107 that must be removed.
 - **Security Rules (`web/firestore.rules`):** Rules version 2 enforcing authenticated access, owner-only reads/writes (`request.auth.uid == resource.data.userId`), category whitelisting, and read-only access to `/personalRoutines`.
 - **Composite Indexes (`web/firestore.indexes.json`):** Defines collection group indexes for `dailyLogs` (`userId ASC`, `date DESC`) and `habits` (`userId ASC`, `order ASC`).
 
@@ -223,7 +223,7 @@ To eliminate ambiguity, all project identifiers are separated into their distinc
 │   to manishborikar92@gmail.com in a new Firebase project. Standard Firestore export/import  │
 │   dumps documents with the old UID. Because security rules require "auth.uid == userId",    │
 │   the user would be permanently locked out of their own imported documents!                 │
-│ • Required Scripted Mechanism: An Admin SDK script must read documents from "regimen-e32a8",│
+│ • Required Scripted Mechanism: An Admin SDK script must read documents from "vritta-app",│
 │   remap document IDs from ${oldUid}_* to ${newUid}_*, remap foreign keys inside             │
 │   completedHabitIds and habitProgress, and batch-write to the new project database.         │
 │ • Migration Overhead: High (requires developing, testing, and running migration script).    │
@@ -237,19 +237,19 @@ To eliminate ambiguity, all project identifiers are separated into their distinc
 ### 4.3 Cloud Firestore Location Decision
 - **Immutability Fact:** Once a Cloud Firestore database is created, **its physical location cannot be changed**. Choosing a location requires evaluating permanent trade-offs:
   - **`asia-south1` (Mumbai, India):** Closest physical proximity to Manish (India). Provides lowest latency for direct client-side browser queries, but is a single-region location (99.99% availability SLA).
-  - **`nam5` (US Central multi-region):** Current location of `regimen-e32a8`. High availability multi-region location (99.999% SLA), closer to Vercel default serverless regions (`iad1`), but introduces higher round-trip latency for browser requests originating in India.
+  - **`nam5` (US Central multi-region):** Current location of `vritta-app`. High availability multi-region location (99.999% SLA), closer to Vercel default serverless regions (`iad1`), but introduces higher round-trip latency for browser requests originating in India.
 - **Decision Status:** Pending user confirmation of preferred location (`asia-south1` vs `nam5`) prior to provisioning Phase 6.
 
 ### 4.4 Environment Scoping & Staging Strategy
 - **Local Development:** Uses `web/.env.local` pointing to local test credentials.
 - **Preview Staging:** Vercel Preview environment variables point to the **new Firebase project**, allowing full integration testing on preview deployments before touching Production.
-- **Production Cutover:** Vercel Production environment variables remain pointing to `regimen-e32a8` until the complete application and data migration have passed acceptance criteria on Preview.
+- **Production Cutover:** Vercel Production environment variables remain pointing to `vritta-app` until the complete application and data migration have passed acceptance criteria on Preview.
 
 ### 4.5 Rollback Strategy
-- The existing Firebase project `regimen-e32a8` will remain completely active and untouched throughout migration.
+- The existing Firebase project `vritta-app` will remain completely active and untouched throughout migration.
 - If any defect or data inconsistency is detected on the new setup, rollback is instant:
-  1. Revert `web/.env.local` to `regimen-e32a8`.
-  2. Revert Vercel environment variables to `regimen-e32a8`.
+  1. Revert `web/.env.local` to `vritta-app`.
+  2. Revert Vercel environment variables to `vritta-app`.
   3. Redeploy the previous production deployment in Vercel Dashboard.
 
 ---
@@ -274,7 +274,7 @@ flowchart TD
 ### Why This Sequence is Safest:
 1. **Phases 1–5 (Local Frontend Polish):** Completely decoupled from external cloud infrastructure. Developed and tested on the working local environment.
 2. **Recovery Checkpoint:** Before modifying external repositories or databases, `git status` verifies a clean working tree and all 57 tests pass.
-3. **Phase 6 (Firebase Setup in Isolation):** New project is created and validated in Preview staging. Production remains on `regimen-e32a8`.
+3. **Phase 6 (Firebase Setup in Isolation):** New project is created and validated in Preview staging. Production remains on `vritta-app`.
 4. **Phases 7–8 (Repository & Folder Renaming):** Executed in a dedicated maintenance window. Git remote is updated before Vercel builds from the new URL.
 5. **Phase 9 (Vercel Cutover):** Triggered only after frontend code, Firebase project, and GitHub repository are completely verified.
 6. **Phase 10 (Cleanup):** Archival occurs only after production is live and verified.
@@ -322,12 +322,12 @@ flowchart TD
   - `web/src/components/habits/OshoCard.js`, `ReadingCard.js`, `SpeakingCard.js`, `DiaryCard.js`: Semantic surface/text styling; 44×44px primary toggle buttons.
   - `web/src/components/habits/GenericHabitCard.js`: 44×44px primary toggle button; dark mode checklist step styling.
   - `web/src/components/habits/HabitModal.js`: 44px action buttons; teal focus rings; dark mode modal styling.
-  - `web/src/components/ui/BottomNav.js`: 44px touch targets (`min-h-[44px] min-w-[56px]`); active Luminous Teal states (`text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60`); Deep Obsidian backdrop (`dark:bg-[#090D16]/95`).
+  - `web/src/components/ui/BottomNav.js`: 44px touch targets (`min-h-[44px] min-w-[56px]`); active Luminous Teal states (`text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60`); semantic backdrop (`bg-surface/95 backdrop-blur-md border-t border-subtle/90`).
   - `web/src/components/ui/ConfirmDialog.js`: Dark mode dialog surfaces; teal non-danger accents; 44px action buttons.
   - `web/src/components/ui/LoadingSpinner.js`: Teal breathing halo and spinning ring; dark obsidian backdrop and card.
   - `web/src/app/(protected)/habits/page.js`: Routine Manager list and modal styling; 44px edit/delete touch targets.
   - `web/src/app/(protected)/analytics/page.js`: 30-day heatmap with Restorative Juniper activity tokens; slate rest day styling.
-  - `web/src/app/(protected)/layout.js`: Deep Obsidian dark canvas container (`dark:bg-[#090D16]`).
+  - `web/src/app/(protected)/layout.js`: Semantic dark canvas container (`bg-canvas text-main min-h-screen`).
   - `web/src/lib/constants/categories.js`: Complete elimination of Heather Purple and legacy indigo; dark mode badge classes.
 - **Verification Commands & Results:**
   - `npm --prefix web run lint` (0 errors, 0 warnings).
@@ -341,13 +341,53 @@ flowchart TD
     - `/analytics`: `analytics-1280px-light.png`, `analytics-1280px-dark.png`, `analytics-375px-light.png`, `analytics-375px-dark.png`
 - **Acceptance Status:** **ACCEPTED & COMPLETE**. Zero horizontal overflow (`hasHorizontalOverflow: false`); primary mobile touch targets >= 44×44px; 0 occurrences of prohibited purple or indigo.
 
-#### Phase 4: Login & Authentication Page Redesign
-- **Objectives:** Replace the animated AI glowing blob with a calm, dignified authentication experience.
+#### Architecture Audit & Correction Gate (Tailwind v4 @theme inline & Next.js 16 Layout) — [STATUS: VERIFIED & ACCEPTED]
+- **Tailwind CSS v4 `@theme inline` Architecture:**
+  - Resolved circular self-referential variables (`var(--self)`) in `globals.css` by mapping Tailwind utility aliases to distinct runtime variables (`--vritta-*`) via `@theme inline`.
+  - In `:root` and `.dark`, distinct runtime variables (`--vritta-canvas`, `--vritta-surface`, `--vritta-brand-primary`, `--vritta-accent`, etc.) define live hex values. Backward-compatibility aliases are preserved for raw CSS.
+  - Tailwind v4 inlines `var(--vritta-*)` directly into utility classes (`.bg-canvas`, `.text-main`, `.stroke-accent`), enabling opacity modifiers like `bg-canvas/90` via `color-mix(in oklab, ...)` without intermediate circular indirection.
+- **Next.js 16 App Router Layout & Metadata Standards:**
+  - `web/src/app/layout.js` verified as Server Component (no `'use client'`).
+  - Viewport decoupled into standalone `viewport` export (`width`, `initialScale`, `maximumScale`, `themeColor: '#14B8A6'`).
+  - File-based metadata conventions adopted exclusively: Next.js automatically emits hash-versioned, non-conflicting `<link>` tags for `app/favicon.ico`, `app/icon0.svg`, `app/icon1.png`, `app/apple-icon.png`, and `app/manifest.json`. Manual `metadata.icons` removed, eliminating duplicate `/favicon.ico` declarations.
+  - Zero-flash synchronous blocking micro-script retained in `<head>` reading `localStorage.getItem('vritta-theme')` before first paint; `suppressHydrationWarning` applied to `<html>` to suppress expected dark class hydration difference.
+- **Verification Results:**
+  - `npm --prefix web run lint` (0 errors, 0 warnings).
+  - `npm --prefix web run test` (87/87 tests passed across 26 suites).
+  - `npm --prefix web run build` (Next.js 16 webpack production build passed with code 0).
+  - `git diff --check` (0 whitespace errors).
+  - Production stylesheet audit: 0 self-referential declarations in compiled CSS; all 23 `--vritta-*` tokens verified.
+
+#### Phase 4: Login & Authentication Page Redesign — [STATUS: IMPLEMENTED & VERIFIED]
+- **Objectives:** Replace the legacy animated glowing blobs, purple/indigo gradients, and restricted viewport with a calm, dignified, accessible authentication experience aligned with the authoritative Guiding Sutra branding and Restorative Juniper / Deep Obsidian palette.
 - **Affected Files:**
-  - `web/src/app/(auth)/login/page.js`: Remove `animate-pulse blur-2xl` glow; render Guiding Sutra mark in porcelain/obsidian card; style 4 pillars with Restorative Juniper badges; tactile Google button.
-- **Dependencies:** Phases 1–3 complete.
-- **Verification Commands:** `npm --prefix web run test` (57/57 pass).
-- **Acceptance Criteria:** Zero animated glow blobs; Google Sign-In functions in Light and Dark modes.
+  - `web/src/app/layout.js`: Removed `maximumScale: 1` from `viewport` export to allow unrestricted browser zoom per WCAG 2.2 SC 1.4.4 and W3C ACT Rule `b4f0c3`. Configured file-based manifest and metadata icons.
+  - `web/src/app/(auth)/layout.js`: Converted to clean Server Component wrapper (`min-h-screen bg-canvas text-main transition-colors`), completely eliminating legacy `from-blue-50 via-white to-purple-50` gradient.
+  - `web/src/app/(auth)/login/page.js`:
+    - Eliminated decorative animated glow blobs (`animate-pulse blur-2xl`) and legacy indigo borders.
+    - Centered Guiding Sutra `Logo` within a calm porcelain / obsidian surface card (`w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-surface border border-subtle shadow-sm p-4`).
+    - Added accessible 3-state theme toggle pill (Light / Dark / System) in top header consuming `useTheme()`.
+    - Implemented tactile Google Sign-In button meeting 48px touch target (`min-h-[48px]`), active scale animation, accessible spinner, and dismissible `role="alert"` error banner.
+    - Styled 4 routine architecture pillars with semantic category badges (Routine Architecture, Adaptive Movement, Contemplative Focus, Private Journal & Notes).
+    - Preserved authentic `useAuth()`, `signInWithGoogle()`, loading state, and `router.push('/dashboard')` redirection. Zero preview bypasses.
+  - `web/tests/phase-4-login-redesign.test.mjs`: Added 9 new unit tests covering zero purple/indigo, zero glow, auth flow, 48px touch target, theme toggle accessibility, unrestricted viewport, and semantic tokens.
+  - `web/tests/theme-engine.test.mjs`: Added viewport invariant assertions validating unrestricted browser zoom.
+- **Verification Commands & Results:**
+  - `npm --prefix web run lint` (0 errors, 0 warnings).
+  - `npm --prefix web run test` (98/98 pass across 31 test suites, including `phase-4-login-redesign.test.mjs`).
+  - `npm --prefix web run build` (Next.js 16 webpack production build passed with code 0; 12/12 static routes generated).
+  - `git diff --check` (0 whitespace errors).
+  - `git grep -in "purple" web/src/` & `git grep -in "indigo" web/src/` (0 occurrences across entire source tree).
+- **Browser Evidence:**
+  - Audit report: `docs/test-evidence/phase-4/phase-4-browser-test-report.json` (`allChecksPassed: true`, 0 console errors, 0 failed requests).
+  - Live Viewport Meta: `<meta name="viewport" content="width=device-width, initial-scale=1"/>` (unrestricted browser zoom confirmed).
+  - 10 screenshots captured across 5 standard device viewports in Light and Dark modes:
+    - 375×812 (iPhone SE/Mini): `login-375px-light.png`, `login-375px-dark.png`
+    - 390×844 (iPhone 12/13/14): `login-390px-light.png`, `login-390px-dark.png`
+    - 412×915 (Android / Pixel 7): `login-412px-light.png`, `login-412px-dark.png`
+    - 768×1024 (Tablet / iPad Mini): `login-768px-light.png`, `login-768px-dark.png`
+    - 1280×800 (Desktop): `login-1280px-light.png`, `login-1280px-dark.png`
+- **Acceptance Status:** **ACCEPTED & COMPLETE**. Zero horizontal overflow across all 5 viewports in both themes (`scrollWidth === clientWidth`); Google Sign-In button height = 50px (exceeds WCAG 48px minimum); body background resolves to `#F8FAFC` in light mode and `#090D16` in dark mode; card background resolves to `#111827` in dark mode. Zero prohibited colors.
 
 #### Phase 5: Browser Verification & Accessibility Audit
 - **Objectives:** Comprehensive visual and functional audit across viewports.
@@ -516,11 +556,11 @@ The 57 automated unit tests are a logic baseline, not proof of complete UI corre
 
 ### Decisions Requiring User Input:
 1. **Firebase Data-Preservation Strategy:**
-   - **Option A (Fresh Start):** Provision fresh project `vritta-app`, sign in once with Google to create the account, and seed the 6 personalized routines cleanly via `npm run schedule:fetch-personal`. *(Historical daily logs and streaks in `regimen-e32a8` are not carried over).*
-   - **Option B (Preserve Required Data):** Develop and execute an Admin SDK migration script to read from `regimen-e32a8`, translate document IDs from the old UID to the new UID, and batch-write historical logs and custom habits into the new project.
+   - **Option A (Fresh Start):** Provision fresh project `vritta-app`, sign in once with Google to create the account, and seed the 6 personalized routines cleanly via `npm run schedule:fetch-personal`. *(Historical daily logs and streaks in `vritta-app` are not carried over).*
+   - **Option B (Preserve Required Data):** Develop and execute an Admin SDK migration script to read from `vritta-app`, translate document IDs from the old UID to the new UID, and batch-write historical logs and custom habits into the new project.
 2. **Cloud Firestore Location Selection:**
    - **`asia-south1` (Mumbai, India):** Lowest latency for client browser queries in India; single-region (99.99% SLA).
-   - **`nam5` (US Central multi-region):** Existing location of `regimen-e32a8`; multi-region redundancy (99.999% SLA); higher latency to India.
+   - **`nam5` (US Central multi-region):** Existing location of `vritta-app`; multi-region redundancy (99.999% SLA); higher latency to India.
    - *Note: Database location cannot be changed after creation.*
 3. **Approval to Proceed with Phase 1:**
    - Confirmation to begin implementation strictly with **Phase 1: Design Tokens & Zero-Flash Theme Engine**.

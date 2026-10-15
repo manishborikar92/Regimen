@@ -133,14 +133,14 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 dark:bg-black/80 flex items-center justify-center p-3 sm:p-4 z-[100]">
-      <div className="bg-white dark:bg-[#111827] rounded-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200 dark:border-slate-800">
+      <div className="bg-surface rounded-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto shadow-2xl border border-subtle">
         {/* Header */}
-        <div className="sticky top-0 bg-white dark:bg-[#111827] border-b border-slate-200 dark:border-slate-800 px-5 py-4 flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-surface border-b border-subtle px-5 py-4 flex items-center justify-between z-10">
           <div>
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+            <h2 className="text-base sm:text-lg font-bold text-main">
               {habit ? 'Edit Routine' : 'Create New Routine'}
             </h2>
-            <p className="text-2xs sm:text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-2xs sm:text-xs text-sub">
               Design for consistency, life purpose, and flexible completion.
             </p>
           </div>

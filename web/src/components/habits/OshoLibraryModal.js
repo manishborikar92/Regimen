@@ -28,18 +28,18 @@ export default function OshoLibraryModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 dark:bg-black/80 z-50 flex items-center justify-center p-3 sm:p-4">
-      <div className="bg-white dark:bg-[#111827] rounded-2xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+      <div className="bg-surface rounded-2xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-subtle">
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-amber-50/40 dark:bg-amber-950/30">
+        <div className="p-4 sm:p-5 border-b border-subtle flex items-center justify-between bg-amber-50/40 dark:bg-amber-950/30">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950/60 flex items-center justify-center text-amber-700 dark:text-amber-400">
               <Headphones className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+              <h3 className="text-base sm:text-lg font-bold text-main">
                 Osho Listening Library
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-sub">
                 30 Discourse Series • 6 Thematic Groups • Non-Mandatory Path
               </p>
             </div>
@@ -54,7 +54,7 @@ export default function OshoLibraryModal({
         </div>
 
         {/* Filter and Search Bar */}
-        <div className="p-3 sm:p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60 space-y-2.5">
+        <div className="p-3 sm:p-4 border-b border-subtle bg-surface-subtle space-y-2.5">
           {/* Search input */}
           <div className="relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
