@@ -10,7 +10,7 @@ const TIMING_TYPES = [
   { id: 'anytime', label: 'Anytime (Flexible)' },
   { id: 'preferred_period', label: 'Preferred Period (Morning/Afternoon/Evening)' },
   { id: 'relative', label: 'Relative (e.g., Before bed)' },
-  { id: 'exact', label: 'Optional Exact Time' },
+  { id: 'exact', label: 'Exact Time' },
 ];
 
 const COMPLETION_METHODS = [

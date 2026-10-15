@@ -47,7 +47,7 @@ Use these timing types where the current architecture can support them cleanly:
 - **Anytime:** The activity can be completed at any point during the day.
 - **Preferred period:** Morning, afternoon, or evening. This is a soft target, not a deadline.
 - **Relative timing:** For example, “before bed.” It should not require an exact clock time.
-- **Optional exact time or reminder:** Available only when useful and supported by the existing application. It is not mandatory for every routine.
+- **Exact Time or reminder:** Available only when useful and supported by the existing application. It is not mandatory for every routine.
 - **Repeated interval:** For example, a desk movement break every 30 minutes, if recurring reminders are supported.
 
 The default plan should not invent exact times for activities. Exercise should have a consistent preferred period of **afternoon**, because that preference is part of the plan. Keep the repeatable period visible, but allow completion at another time. Reading should be **before bed**. The other daily activities should remain flexible unless Manish later chooses a preference.
@@ -287,7 +287,7 @@ Redesign the habit editor around meaning and behavior rather than an exact clock
 - Title and short description/purpose.
 - Life-area category.
 - Completion method: simple completion, checklist, session/count target, duration target, or structured exercise routine, limited to types the existing architecture can support reliably.
-- Timing: Anytime, Morning, Afternoon, Evening, Before bed, or optional exact time/window.
+- Timing: Anytime, Morning, Afternoon, Evening, Before bed, or Exact Time/window.
 - Recurrence: selected weekdays or a custom repeat pattern supported by the app.
 - Required and optional steps/checklist items.
 - Estimated duration only when known.
