@@ -49,9 +49,6 @@ export default function OshoLibraryModal({
               <h3 className="text-base sm:text-lg font-bold text-main">
                 Osho Listening Library
               </h3>
-              <p className="text-xs text-sub">
-                30 Discourse Series • 6 Thematic Groups • Non-Mandatory Path
-              </p>
             </div>
           </div>
           <button
@@ -192,7 +189,7 @@ export default function OshoLibraryModal({
                           : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600'
                       }`}
                     >
-                      {isCurrent ? 'Current Series' : 'Select as Active'}
+                      {isCurrent ? 'Current Series' : 'Set as Active'}
                     </button>
 
                     {/* Talk progress counter if active */}
@@ -226,18 +223,6 @@ export default function OshoLibraryModal({
               </div>
             );
           })}
-        </div>
-
-        {/* Footer */}
-        <div className="p-3.5 sm:p-4 border-t border-subtle bg-surface-subtle flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-2xs sm:text-xs text-sub text-center sm:text-left flex-shrink-0 z-10">
-          <span>Daily session completion is tracked separately from discourse series progress.</span>
-          <button
-            type="button"
-            onClick={onClose}
-            className="min-h-[44px] sm:min-h-[38px] px-5 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-xl sm:rounded-lg text-xs font-semibold hover:bg-slate-800 dark:hover:bg-white transition-colors flex items-center justify-center"
-          >
-            Done
-          </button>
         </div>
       </div>
     </div>

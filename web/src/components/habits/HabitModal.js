@@ -150,9 +150,6 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
             <h2 className="text-base sm:text-lg font-bold text-main">
               {habit ? 'Edit Routine' : 'Create New Routine'}
             </h2>
-            <p className="text-2xs sm:text-xs text-sub">
-              Design for consistency, life purpose, and flexible completion.
-            </p>
           </div>
           <button
             onClick={onClose}
