@@ -17,10 +17,14 @@
 
 ## 1. Finalized Branding & Design System Specifications
 
-### 1.1 Brand Identity Lock
+### 1.1 Brand Identity & Authoritative Color Lock
 - **Project Name:** **VRITTA** (वृत्त — classical Sanskrit: "conduct, regular cadence, rhythmic observance, and the cyclical nature of daily life").
-- **Theme Name:** **Restorative Juniper** (organic, calming health companion; deep verdigris teal and warm amber on misty slate/obsidian).
-- **Authoritative Selected Logo:** `docs/branding-exploration/03-logo-concepts/logo-concept-3-guiding-sutra.svg`.
+- **Authoritative Approved Brand Colors:**
+  - **Deep Obsidian:** `#090D16` (Foundation Dark / Canvas & maximum-contrast brand text)
+  - **Luminous Teal:** `#14B8A6` (Signature Brand Identity & Dark-Mode Ribbon Stroke / Buttons)
+  - **Warm Amber:** `#D97706` (Rhythm, Streak Milestones, and Guiding Sutra Center Balance Point)
+- **Theme Identity:** **Restorative Juniper** (organic, calming health companion; deep verdigris teal and warm amber on misty slate/deep obsidian).
+- **Authoritative Selected Logo:** `docs/branding-exploration/03-logo-concepts/logo-concept-3-guiding-sutra.svg`. The Guiding Sutra geometry remains strictly preserved.
 
 ### 1.2 Logo Asset Audit & Derived Asset Plan
 An audit of `docs/branding-exploration/03-logo-concepts/` confirms the following files exist:
@@ -42,11 +46,15 @@ In earlier exploratory drafts, a Heather Purple (`#6D28D9` / `#A78BFA`) was prop
   - **Light Mode:** Canvas Surface `#F1F5F9` (Slate 100), Border `#CBD5E1` (Slate 300), Text `#475569` (Slate 600), Rest Badge `#0F766E14` (Juniper 8% tint).
   - **Dark Mode:** Canvas Surface `#1E293B` (Slate 800), Border `#334155` (Slate 700), Text `#94A3B8` (Slate 400), Rest Badge `#14B8A61F` (Teal 12% tint).
 
-### 1.4 Approved Semantic Design Tokens (Restorative Juniper)
+### 1.4 Approved Semantic Design Tokens (Aligned with Approved Swatches)
 
 ```css
 /* ========================================
    VRITTA Design Tokens — Restorative Juniper
+   Authoritative Brand Swatches:
+   - Deep Obsidian: #090D16
+   - Luminous Teal: #14B8A6
+   - Warm Amber: #D97706
    ======================================== */
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -64,42 +72,54 @@ In earlier exploratory drafts, a Heather Purple (`#6D28D9` / `#A78BFA`) was prop
   --color-text-secondary: #475569;  /* Slate 600 (7.58:1 on surface) */
   --color-text-muted: #64748b;      /* Slate 500 (4.76:1 on surface) */
 
-  /* Brand & Rhythm Accents */
-  --color-accent-primary: #0f766e;  /* Verdigris Juniper (5.47:1 on surface) */
+  /* Core Brand Swatches */
+  --color-brand-primary: #14b8a6;   /* Luminous Teal core brand swatch */
+  --color-brand-obsidian: #090d16;  /* Deep Obsidian core brand swatch */
+  --color-brand-amber: #d97706;     /* Warm Amber core brand swatch */
+
+  /* Brand & Rhythm Functional Accents */
+  --color-accent-primary: #0f766e;  /* Accessible Deep Teal variant (5.23:1 on canvas, 5.47:1 on card) */
   --color-accent-hover: #115e59;    /* Deepened Juniper */
   --color-accent-subtle: #ccfbf1;   /* Juniper 100 tint */
-  --color-warm-accent: #b45309;     /* Warm Amber Ochre (5.02:1 on surface) */
+  --color-warm-accent: #d97706;     /* Warm Amber core swatch (3.04:1 graphical SC 1.4.11) */
+  --color-warm-text: #b45309;       /* Accessible Amber text variant (4.80:1 on canvas, 5.02:1 on card) */
   --color-warm-subtle: #fef3c7;     /* Amber 100 tint */
 
   /* Semantic Feedback */
   --color-success: #059669;         /* Emerald */
-  --color-warning: #d97706;         /* Amber */
+  --color-warning: #d97706;         /* Warm Amber */
   --color-error: #e11d48;           /* Rose */
 }
 
 .dark {
   /* Surfaces & Canvas */
-  --color-bg-canvas: #090d16;       /* Deep Obsidian canvas */
+  --color-bg-canvas: #090d16;       /* Deep Obsidian core brand swatch (18.57:1 AAA) */
   --color-bg-surface: #111827;      /* Mineral Charcoal card surface */
   --color-bg-subtle: #1e293b;       /* Slate 800 input/badge background */
   --color-border-subtle: #1e293b;   /* Slate 800 border */
   --color-border-strong: #334155;   /* Slate 700 border */
 
   /* Text & Content */
-  --color-text-primary: #f8fafc;    /* Crisp Slate (16.96:1 on surface) */
-  --color-text-secondary: #94a3b8;  /* Slate 400 (6.92:1 on surface) */
-  --color-text-muted: #64748b;      /* Slate 500 (4.50:1 on canvas) */
+  --color-text-primary: #f8fafc;    /* Crisp Slate (16.96:1 on surface, 18.57:1 on canvas) */
+  --color-text-secondary: #94a3b8;  /* Slate 400 (6.92:1 on surface, 7.58:1 on canvas) */
+  --color-text-muted: #8092a5;      /* Slate 450 (5.55:1 on surface, 6.08:1 on canvas — passes AA) */
 
-  /* Brand & Rhythm Accents */
-  --color-accent-primary: #14b8a6;  /* Luminous Teal (7.13:1 on surface) */
+  /* Core Brand Swatches */
+  --color-brand-primary: #14b8a6;   /* Luminous Teal core brand swatch */
+  --color-brand-obsidian: #090d16;  /* Deep Obsidian core brand swatch */
+  --color-brand-amber: #d97706;     /* Warm Amber core brand swatch */
+
+  /* Brand & Rhythm Functional Accents */
+  --color-accent-primary: #14b8a6;  /* Luminous Teal (7.81:1 on canvas, 7.13:1 on surface — AAA) */
   --color-accent-hover: #2dd4bf;    /* Lightened Teal */
   --color-accent-subtle: #134e4a;   /* Teal 900 dark tint */
-  --color-warm-accent: #f59e0b;     /* Luminous Amber Gold (8.26:1 on surface) */
+  --color-warm-accent: #d97706;     /* Warm Amber core swatch (6.10:1 on canvas, 5.57:1 on surface — AA) */
+  --color-warm-text: #d97706;       /* Warm Amber (6.10:1 on canvas — AA) */
   --color-warm-subtle: #78350f;     /* Amber 900 dark tint */
 
   /* Semantic Feedback */
   --color-success: #10b981;         /* Mint Emerald */
-  --color-warning: #f59e0b;         /* Amber Gold */
+  --color-warning: #d97706;         /* Warm Amber */
   --color-error: #fb7185;           /* Light Rose */
 }
 ```
@@ -120,27 +140,31 @@ Contrast ratios were mathematically calculated using the official W3C relative l
 
 | Evaluated Foreground / Background Pair | Contrast Ratio | WCAG 2.2 AA Result | WCAG 2.2 AAA Result |
 | :--- | :--- | :--- | :--- |
-| **Light:** Primary Text `#0F172A` on Canvas `#F8FAFC` | **17.06 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
-| **Light:** Secondary Text `#475569` on Canvas `#F8FAFC` | **7.24 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
-| **Light:** Muted Text `#64748B` on Canvas `#F8FAFC` | **4.55 : 1** | PASS (>= 4.5:1) | Not AAA |
-| **Light:** Primary Brand `#0F766E` on Canvas `#F8FAFC` | **5.23 : 1** | PASS (>= 4.5:1) | Not AAA |
-| **Light:** Warm Amber `#B45309` on Canvas `#F8FAFC` | **4.80 : 1** | PASS (>= 4.5:1) | Not AAA |
-| **Light:** Primary Text `#0F172A` on Card Surface `#FFFFFF` | **17.85 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
-| **Light:** Secondary Text `#475569` on Card Surface `#FFFFFF` | **7.58 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
-| **Light:** Muted Text `#64748B` on Card Surface `#FFFFFF` | **4.76 : 1** | PASS (>= 4.5:1) | Not AAA |
-| **Light:** Primary Brand `#0F766E` on Card Surface `#FFFFFF` | **5.47 : 1** | PASS (>= 4.5:1) | Not AAA |
-| **Light:** Warm Amber `#B45309` on Card Surface `#FFFFFF` | **5.02 : 1** | PASS (>= 4.5:1) | Not AAA |
-| **Light:** White Text `#FFFFFF` on Brand Button `#0F766E` | **5.47 : 1** | PASS (>= 4.5:1) | Not AAA |
-| **Light:** White Text `#FFFFFF` on Amber Button `#B45309` | **5.02 : 1** | PASS (>= 4.5:1) | Not AAA |
-| **Dark:** Primary Text `#F8FAFC` on Dark Canvas `#090D16` | **18.57 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
-| **Dark:** Secondary Text `#94A3B8` on Dark Canvas `#090D16` | **7.58 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
-| **Dark:** Brand Teal `#14B8A6` on Dark Canvas `#090D16` | **7.81 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
-| **Dark:** Amber Gold `#F59E0B` on Dark Canvas `#090D16` | **9.05 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
-| **Dark:** Primary Text `#F8FAFC` on Dark Surface `#111827` | **16.96 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
-| **Dark:** Secondary Text `#94A3B8` on Dark Surface `#111827` | **6.92 : 1** | PASS (>= 4.5:1) | Large/UI AAA only |
-| **Dark:** Brand Teal `#14B8A6` on Dark Surface `#111827` | **7.13 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
-| **Dark:** Amber Gold `#F59E0B` on Dark Surface `#111827` | **8.26 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
-| **Dark:** Obsidian Text `#090D16` on Brand Button `#14B8A6`| **7.81 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Brand Swatch:** Deep Obsidian `#090D16` on Canvas `#F8FAFC` | **18.57 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Brand Swatch:** Deep Obsidian `#090D16` on Card Surface `#FFFFFF` | **19.43 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Brand Swatch:** Luminous Teal `#14B8A6` on Dark Canvas `#090D16` | **7.81 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Brand Swatch:** Luminous Teal `#14B8A6` on Dark Surface `#111827` | **7.13 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Brand Button:** Obsidian Text `#090D16` on Luminous Teal `#14B8A6` | **7.81 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Brand Swatch:** Warm Amber `#D97706` on Dark Canvas `#090D16` | **6.10 : 1** | PASS (>= 4.5:1) | AA Normal Text / UI |
+| **Brand Swatch:** Warm Amber `#D97706` on Dark Surface `#111827` | **5.57 : 1** | PASS (>= 4.5:1) | AA Normal Text / UI |
+| **Brand Graphic:** Warm Amber `#D97706` on Light Canvas `#F8FAFC` | **3.04 : 1** | PASS Graphics SC 1.4.11 (>= 3.0:1) | Non-text UI/Logo Dot |
+| **Brand Graphic:** Warm Amber `#D97706` on Card Surface `#FFFFFF` | **3.19 : 1** | PASS Graphics SC 1.4.11 (>= 3.0:1) | Non-text UI/Logo Dot |
+| **Text Variant:** Amber Text `#B45309` on Light Canvas `#F8FAFC` | **4.80 : 1** | PASS (>= 4.5:1) | AA Text (Documented Variant) |
+| **Text Variant:** Amber Text `#B45309` on Card Surface `#FFFFFF` | **5.02 : 1** | PASS (>= 4.5:1) | AA Text (Documented Variant) |
+| **Brand Accent Variant:** Deep Teal `#0F766E` on Canvas `#F8FAFC` | **5.23 : 1** | PASS (>= 4.5:1) | AA Text / Stroke Variant |
+| **Brand Accent Variant:** Deep Teal `#0F766E` on Card `#FFFFFF` | **5.47 : 1** | PASS (>= 4.5:1) | AA Text / Stroke Variant |
+| **Light Canvas:** Primary Text `#0F172A` on Canvas `#F8FAFC` | **17.06 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Light Canvas:** Secondary Text `#475569` on Canvas `#F8FAFC` | **7.24 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Light Canvas:** Muted Text `#64748B` on Canvas `#F8FAFC` | **4.55 : 1** | PASS (>= 4.5:1) | Not AAA |
+| **Light Card:** Primary Text `#0F172A` on Card Surface `#FFFFFF` | **17.85 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Light Card:** Secondary Text `#475569` on Card Surface `#FFFFFF` | **7.58 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Light Card:** Muted Text `#64748B` on Card Surface `#FFFFFF` | **4.76 : 1** | PASS (>= 4.5:1) | Not AAA |
+| **Dark Canvas:** Primary Text `#F8FAFC` on Dark Canvas `#090D16` | **18.57 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Dark Canvas:** Secondary Text `#94A3B8` on Dark Canvas `#090D16` | **7.58 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Dark Canvas:** Muted Text `#8092A5` on Dark Canvas `#090D16` | **6.08 : 1** | PASS (>= 4.5:1) | AA Normal Text |
+| **Dark Surface:** Primary Text `#F8FAFC` on Dark Surface `#111827` | **16.96 : 1** | PASS (>= 4.5:1) | PASS (>= 7.0:1) |
+| **Dark Surface:** Secondary Text `#94A3B8` on Dark Surface `#111827` | **6.92 : 1** | PASS (>= 4.5:1) | Large/UI AAA only |
+| **Dark Surface:** Muted Text `#8092A5` on Dark Surface `#111827` | **5.55 : 1** | PASS (>= 4.5:1) | AA Normal Text |
 
 ### 2.3 Corrected WCAG 2.2 Target Size & Accessibility Standards
 - **WCAG 2.2 SC 2.5.8 (Target Size - Minimum) — Level AA:** Requires an interactive target size of at least **24 × 24 CSS pixels**, or sufficient spacing such that a 24px diameter circle centered on the target does not intersect adjacent targets. All application buttons meet this criterion.

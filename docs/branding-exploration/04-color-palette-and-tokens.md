@@ -1,60 +1,69 @@
-# Comprehensive Color Palette Exploration: 9 Distinct Visual Directions
+# VRITTA — Color Palette & Design System Tokens
 
-**Date:** 14 October 2026 (Revision 2)  
-**Subject:** 9 Researched, Production-Grade Design Systems for the Routine Companion  
-**Audience:** Manish Borikar  
-**Status:** Phase 5 Exploration Deliverable (Approval-First Gate)
+**Date:** 15 October 2026 (Revision 3 — Finalized Brand Colors)
+**Subject:** Authoritative Brand Palette & Semantic Design System for VRITTA
+**Audience:** Manish Borikar
+**Status:** **AUTHORITATIVE BRAND LOCK — APPROVED & FINALIZED**
+
+---
+
+## 0. Authoritative Finalized Brand Colors
+
+The core brand palette is strictly locked to the three approved swatches below. These supersede conflicting earlier exploratory proposals:
+
+| Brand Swatch | Hex Code | Visual Role | Semantic Application |
+| :--- | :--- | :--- | :--- |
+| **Deep Obsidian** | `#090D16` | Foundation Dark / Deep Anchor | Dark canvas background (`--color-bg-canvas`), dark mode shell, and maximum-contrast light-mode brand text/accents. |
+| **Luminous Teal** | `#14B8A6` | Signature Brand Identity | Primary brand accent (`--color-brand-primary`, `--color-accent-primary` in dark), Guiding Sutra thread stroke in dark mode, brand buttons. |
+| **Warm Amber** | `#D97706` | Rhythm & Mindfulness Balance | Guiding Sutra center balance point (`cx=100 cy=100 r=8`), habit streak counter, milestone focus indicator, warning feedback. |
+
+> [!IMPORTANT]
+> **Distinction Between Brand Colors and Supporting Tokens:**
+> The 3 swatches above are the authoritative identity colors. They are supported by clean functional tokens for surfaces (Misty Slate `#F8FAFC`, Porcelain `#FFFFFF`, Mineral Charcoal `#111827`), text tiers (Charcoal Slate `#0F172A`, Crisp Slate `#F8FAFC`, Slate 400 `#94A3B8`, Muted Slate `#8092A5`), borders (`#E2E8F0`, `#1E293B`), and semantic indicators (Emerald `#059669`, Rose `#E11D48`). Where Luminous Teal or Warm Amber are placed as small body text on light backgrounds, clearly documented contrast-tested variants (`#0F766E` for teal text/stroke, `#B45309` for amber text) are utilized to preserve WCAG 2.2 AA accessibility without forcing unsuitable colors onto low-contrast surfaces.
 
 ---
 
 ## 1. Design Direction & Anti-Cliché Foundation
 
-Following your directive, the color exploration has been completely expanded from a single candidate into **nine genuinely distinct, fully architected visual directions**.
-
-Each palette is constructed on strict professional design standards:
+The color system is constructed on strict professional design standards:
 - **No AI-Trope Gradients:** Zero arbitrary purple-to-blue neon washes, zero fluorescent glows.
-- **Rooted in Product Meaning:** Each palette is designed around Manish's actual practices: physical recovery (body restoration protocol), mindful awareness (Osho discourses), language mastery (Norman Lewis), nightly reading, and private journaling.
-- **Full Semantic Token Rigor:** Every option specifies exact hex values for Light & Dark canvases, card surfaces, borders, text tiers, interactive hover/active states, and semantic feedback indicators.
-- **WCAG 2.2 AA / AAA Verification:** Every palette is audited for text contrast, focus visibility (`:focus-visible`), and low eye-fatigue evening reading.
+- **Rooted in Product Meaning:** Designed around Manish's actual practices: physical recovery (body restoration protocol), mindful awareness (Osho discourses), language mastery (Norman Lewis), nightly reading, and private journaling.
+- **Full Semantic Token Rigor:** Exact hex values for Light & Dark canvases, card surfaces, borders, text tiers, interactive hover/active states, and semantic feedback indicators.
+- **WCAG 2.2 AA / AAA Verification:** Audited for text contrast, graphical object contrast (WCAG 2.2 SC 1.4.11), focus visibility (`:focus-visible`), and low eye-fatigue evening reading.
 
 ---
 
-## 2. The 9 Distinct Color Directions
+## 2. Authoritative Primary System: Restorative Juniper & Warm Amber
 
 ```
 ┌──────────────────────────────────────┬────────────────────────────┬──────────────────────────────────────┐
 │ Palette Name                         │ Dominant Vibe / Aesthetic  │ Best Suited For                      │
 ├──────────────────────────────────────┼────────────────────────────┼──────────────────────────────────────┤
 │ 1. Restorative Juniper & Warm Amber  │ Organic restorative health │ Physical vitality & calm habits      │
-│ 2. Nordic Spruce & Birch Sandstone   │ Boreal forest & deep stone │ Maximum calm & lowest eye strain     │
-│ 3. Kyoto Sumi & Temple Vermilion     │ Zen ink & calligraphy      │ Mindful awareness & Osho study       │
-│ 4. Terracotta & Mediterranean Olive  │ Warm tactile earth         │ Grounded bodily health & journaling  │
-│ 5. Prussian Navy & Desert Ochre      │ Scholarly nocturnal book   │ Night reading & language mastery     │
-│ 6. Titanium Monolith & Lapis Lazuli  │ Architectural precision    │ Structured progress & clean order    │
-│ 7. Dusk Fig & Restorative Sage       │ Twilight contemplative     │ Evening wind-down & nervous system   │
-│ 8. Modernist Zinc & Signal Amber     │ Pure minimalist monochrome │ Zero distraction, high focus         │
-│ 9. Botanical Moss & Burnished Copper │ Living garden & rich earth │ Sustainable habit growth & tracking  │
+│    (APPROVED & FINALIZED)            │ Deep obsidian & teal loop  │ Authoritative VRITTA Brand System    │
 └──────────────────────────────────────┴────────────────────────────┴──────────────────────────────────────┘
 ```
 
----
-
-### Palette 1: Restorative Juniper & Warm Amber
+### Approved Brand Palette: Restorative Juniper, Deep Obsidian & Warm Amber
 > **Vibe:** Organic, healing, vital, grounded.  
-> **Rationale:** Juniper verdigris evokes botanical medicine, natural breath, and steady physical restoration. Warm amber anchors milestones and streaks without gamified hyperactivity.
+> **Rationale:** Deep Obsidian anchors the nocturnal study and Osho listening spaces. Luminous Teal symbolizes the continuous unbroken thread of daily practice. Warm Amber marks the calm center of personal equilibrium and steady habit rhythms.
 
 | Semantic Token | Light Mode (Day) | Dark Mode (Night) | Notes & Contrast Audit |
 | :--- | :--- | :--- | :--- |
-| **Canvas Background** | `#F8FAFC` (Misty Slate) | `#090D16` (Deep Obsidian) | Low eye-fatigue slate base. |
-| **Card Surface** | `#FFFFFF` (Porcelain) | `#111827` (Mineral Slate) | 1px subtle border wrapper. |
+| **Canvas Background** | `#F8FAFC` (Misty Slate) | `#090D16` (Deep Obsidian) | **Authoritative Swatch** `#090D16` used as dark base. |
+| **Card Surface** | `#FFFFFF` (Porcelain) | `#111827` (Mineral Charcoal) | 1px subtle border wrapper. |
 | **Borders (Subtle / Strong)** | `#E2E8F0` / `#CBD5E1` | `#1E293B` / `#334155` | Defined structure without harshness. |
-| **Text (Primary / Secondary)** | `#0F172A` / `#475569` | `#F8FAFC` / `#94A3B8` | **15.8:1** (Light) / **17.2:1** (Dark) — AAA |
-| **Primary Brand Accent** | `#0F766E` (Juniper) | `#14B8A6` (Luminous Teal) | Buttons, active navigation, key icons. |
+| **Text Primary** | `#0F172A` (Deep Slate) | `#F8FAFC` (Crisp Slate) | **17.85:1** (Light) / **18.57:1** (Dark) — Exceeds AAA |
+| **Text Secondary** | `#475569` (Slate 600) | `#94A3B8` (Slate 400) | **7.58:1** (Light) / **7.58:1** (Dark) — Exceeds AAA |
+| **Text Muted** | `#64748B` (Slate 500) | `#8092A5` (Slate 450) | **4.76:1** (Light) / **6.08:1** (Dark) — Passes AA $\ge 4.5:1$ |
+| **Primary Brand Swatch** | `#14B8A6` (Luminous Teal) | `#14B8A6` (Luminous Teal) | **Authoritative Swatch**; 7.81:1 AAA on `#090D16`. |
+| **Brand Accent (Interactive)** | `#0F766E` (Deep Teal variant) | `#14B8A6` (Luminous Teal) | `#0F766E` gives **5.23:1 AA** on light canvas. |
 | **Interactive Hover / Active**| `#115E59` / `#0D9488` | `#2DD4BF` / `#0F766E` | Tactile depression states. |
-| **Warm Accent (Streak/Focus)**| `#B45309` (Amber) | `#F59E0B` (Gold) | Streak counter and anchor dot in logo. |
-| **Semantic Success** | `#059669` (Emerald) | `#10B981` (Mint) | Completed tasks, session 2 check. |
-| **Semantic Warning / Error** | `#D97706` / `#E11D48` | `#F59E0B` / `#FB7185` | Rest notes / confirmation modal. |
-| **Recovery / Rest Token** | `#6D28D9` (Heather) | `#A78BFA` (Lilac) | Sunday planned rest day badge. |
+| **Warm Rhythm Swatch** | `#D97706` (Warm Amber) | `#D97706` (Warm Amber) | **Authoritative Swatch**; Logo dot & streaks. |
+| **Warm Text Variant (Light)** | `#B45309` (Amber-700) | `#D97706` (Warm Amber) | `#B45309` gives **4.80:1 AA** text on light canvas. |
+| **Semantic Success** | `#059669` (Emerald) | `#10B981` (Mint Emerald) | Completed tasks, session 2 check. |
+| **Semantic Warning / Error** | `#D97706` / `#E11D48` | `#D97706` / `#FB7185` | Rest notes / confirmation modal. |
+| **Recovery / Rest Token** | Slate & Teal tint | Slate & Teal tint | Harmonious rest badge (Heather purple removed). |
 - **Strengths:** Fresh, restorative, feels like a dedicated health and mindfulness companion.
 - **Weaknesses:** Teals are popular in modern productivity apps, though Juniper's deep green undertone distinguishes it from generic cyan.
 

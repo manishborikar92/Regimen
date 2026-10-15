@@ -41,10 +41,10 @@ describe('Phase 2: Authoritative Logo & Favicon Asset Pipeline', () => {
         assert.ok(content.includes('viewBox="0 0 200 200"'), `${svgPath} must use 200x200 viewBox`);
         assert.ok(content.includes(AUTHORITATIVE_PATH), `${svgPath} must match exact Guiding Sutra coordinates`);
         assert.ok(content.includes('cx="100"') && content.includes('cy="100"') && content.includes('r="8"'), `${svgPath} must include center balance dot at (100, 100, r=8)`);
-        assert.ok(content.includes('#0F766E'), `${svgPath} must reference Restorative Juniper #0F766E`);
-        assert.ok(content.includes('#14B8A6'), `${svgPath} must include dark mode Luminous Teal #14B8A6`);
-        assert.ok(content.includes('#D97706'), `${svgPath} must include Warm Amber #D97706`);
-        assert.ok(content.includes('#F59E0B'), `${svgPath} must include dark mode Warm Gold #F59E0B`);
+        assert.ok(content.includes('#0F766E'), `${svgPath} must reference accessible light stroke #0F766E`);
+        assert.ok(content.includes('#14B8A6'), `${svgPath} must include core Luminous Teal #14B8A6`);
+        assert.ok(content.includes('#090D16'), `${svgPath} must include core Deep Obsidian #090D16`);
+        assert.ok(content.includes('#D97706'), `${svgPath} must include core Warm Amber #D97706`);
       }
     });
   });
@@ -104,7 +104,7 @@ describe('Phase 2: Authoritative Logo & Favicon Asset Pipeline', () => {
 
       assert.ok(manifest.name.startsWith('VRITTA'), 'Manifest name must start with VRITTA');
       assert.equal(manifest.short_name, 'VRITTA');
-      assert.equal(manifest.theme_color, '#0F766E');
+      assert.equal(manifest.theme_color, '#14B8A6');
       assert.equal(manifest.background_color, '#F8FAFC');
 
       // Verify every declared icon exists

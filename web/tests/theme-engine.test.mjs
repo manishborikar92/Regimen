@@ -41,11 +41,16 @@ describe('Phase 1: VRITTA Design Tokens & Theme Engine', () => {
   describe('Brand Configuration & Semantic Tokens', () => {
     it('should declare authoritative VRITTA brand name and Restorative Juniper primary tokens', () => {
       assert.equal(BRAND.name.toUpperCase(), 'VRITTA');
-      assert.equal(BRAND.themeColor, '#0F766E'); // Verdigris 700
+      assert.equal(BRAND.themeColor, '#14B8A6'); // Luminous Teal primary brand swatch
+      assert.equal(BRAND.brandColors.deepObsidian, '#090D16');
+      assert.equal(BRAND.brandColors.luminousTeal, '#14B8A6');
+      assert.equal(BRAND.brandColors.warmAmber, '#D97706');
+      assert.equal(BRAND.colors.primary[500], '#14b8a6');
       assert.equal(BRAND.colors.primary[600], '#0f766e');
-      assert.equal(BRAND.colors.primary[700], '#115e59');
-      assert.equal(BRAND.colors.primary[50], '#f0fdfa');
-      assert.equal(BRAND.colors.accent.juniper, '#0f766e');
+      assert.equal(BRAND.colors.accent.teal, '#14b8a6');
+      assert.equal(BRAND.colors.accent.amber, '#d97706');
+      assert.equal(BRAND.colors.accent.amberText, '#b45309');
+      assert.equal(BRAND.colors.accent.juniperText, '#0f766e');
       assert.equal(BRAND.colors.surface.canvas, '#f8fafc'); // Authoritative Misty Slate
       assert.equal(BRAND.colors.surface.card, '#ffffff');
       assert.equal(BRAND.colors.surface.canvasDark, '#090d16');
@@ -70,9 +75,33 @@ describe('Phase 1: VRITTA Design Tokens & Theme Engine', () => {
       const lightSecondary = getContrastRatio('#475569', '#F8FAFC');
       assert.ok(lightSecondary >= 7.0, `Light secondary text contrast ${lightSecondary.toFixed(2)}:1 must meet AAA (>= 7.0:1)`);
 
-      // Light mode brand Verdigris 700 (#0F766E) on White Card
-      const brandOnWhite = getContrastRatio('#0F766E', '#FFFFFF');
-      assert.ok(brandOnWhite >= 4.5, `Brand on white contrast ${brandOnWhite.toFixed(2)}:1 must meet AA (>= 4.5:1)`);
+      // Core Brand Swatch: Deep Obsidian (#090D16) on Light Canvas (#F8FAFC)
+      const obsidianOnCanvas = getContrastRatio('#090D16', '#F8FAFC');
+      assert.ok(obsidianOnCanvas >= 18.0, `Deep Obsidian on canvas ${obsidianOnCanvas.toFixed(2)}:1 must exceed AAA (>= 7.0:1)`);
+
+      // Core Brand Swatch: Luminous Teal (#14B8A6) on Deep Obsidian (#090D16)
+      const tealOnObsidian = getContrastRatio('#14B8A6', '#090D16');
+      assert.ok(tealOnObsidian >= 7.0, `Luminous Teal on Obsidian ${tealOnObsidian.toFixed(2)}:1 must meet AAA (>= 7.0:1)`);
+
+      // Core Brand Swatch: Deep Obsidian text (#090D16) on Luminous Teal Button (#14B8A6)
+      const textOnTealButton = getContrastRatio('#090D16', '#14B8A6');
+      assert.ok(textOnTealButton >= 7.0, `Obsidian text on Teal button ${textOnTealButton.toFixed(2)}:1 must meet AAA (>= 7.0:1)`);
+
+      // Core Brand Swatch: Warm Amber (#D97706) on Deep Obsidian (#090D16)
+      const amberOnObsidian = getContrastRatio('#D97706', '#090D16');
+      assert.ok(amberOnObsidian >= 4.5, `Warm Amber on Obsidian ${amberOnObsidian.toFixed(2)}:1 must meet AA (>= 4.5:1)`);
+
+      // Core Brand Swatch: Warm Amber (#D97706) on Light Canvas (#F8FAFC) - Graphical Object (WCAG 2.2 SC 1.4.11)
+      const amberOnLightCanvas = getContrastRatio('#D97706', '#F8FAFC');
+      assert.ok(amberOnLightCanvas >= 3.0, `Warm Amber on light canvas ${amberOnLightCanvas.toFixed(2)}:1 must meet Non-text SC 1.4.11 (>= 3.0:1)`);
+
+      // Documented Variant: Amber Text (#B45309) on Light Canvas (#F8FAFC)
+      const amberTextOnLight = getContrastRatio('#B45309', '#F8FAFC');
+      assert.ok(amberTextOnLight >= 4.5, `Amber text on light canvas ${amberTextOnLight.toFixed(2)}:1 must meet AA (>= 4.5:1)`);
+
+      // Documented Variant: Deep Teal (#0F766E) on Light Canvas (#F8FAFC)
+      const deepTealOnLight = getContrastRatio('#0F766E', '#F8FAFC');
+      assert.ok(deepTealOnLight >= 4.5, `Deep Teal on light canvas ${deepTealOnLight.toFixed(2)}:1 must meet AA (>= 4.5:1)`);
 
       // Dark mode primary text (#F8FAFC) on Dark Canvas (#090D16)
       const darkCanvasText = getContrastRatio('#F8FAFC', '#090D16');
@@ -301,11 +330,17 @@ describe('Phase 1: VRITTA Design Tokens & Theme Engine', () => {
       // Runtime tokens in :root
       assert.ok(cssContent.includes('--color-bg-canvas: #f8fafc;'), 'Must define light canvas #f8fafc in :root');
       assert.ok(cssContent.includes('--color-bg-surface: #ffffff;'), 'Must define light card in :root');
-      assert.ok(cssContent.includes('--color-accent-primary: #0f766e;'), 'Must define brand primary in :root');
+      assert.ok(cssContent.includes('--color-brand-primary: #14b8a6;'), 'Must define core brand primary in :root');
+      assert.ok(cssContent.includes('--color-brand-obsidian: #090d16;'), 'Must define core brand obsidian in :root');
+      assert.ok(cssContent.includes('--color-brand-amber: #d97706;'), 'Must define core brand amber in :root');
+      assert.ok(cssContent.includes('--color-accent-primary: #0f766e;'), 'Must define accessible teal variant in :root');
+      assert.ok(cssContent.includes('--color-warm-accent: #d97706;'), 'Must define core warm accent in :root');
 
       // Runtime tokens in .dark
       assert.ok(cssContent.includes('--color-bg-canvas: #090d16;'), 'Must define dark canvas in .dark');
       assert.ok(cssContent.includes('--color-bg-surface: #111827;'), 'Must define dark card in .dark');
+      assert.ok(cssContent.includes('--color-accent-primary: #14b8a6;'), 'Must define dark brand accent in .dark');
+      assert.ok(cssContent.includes('--color-warm-accent: #d97706;'), 'Must define dark warm accent in .dark');
       assert.ok(cssContent.includes('--color-text-muted: #8092a5;'), 'Must define accessible dark muted text in .dark');
 
       // Reduced motion media query

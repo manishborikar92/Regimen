@@ -6,7 +6,7 @@
     @media (prefers-color-scheme: dark) {
       .vritta-bg { fill: #090D16; }
       .vritta-thread { stroke: #14B8A6; }
-      .vritta-dot { fill: #F59E0B; }
+      .vritta-dot { fill: #D97706; }
     }
   </style>
 

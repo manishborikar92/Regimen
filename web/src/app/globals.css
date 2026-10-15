@@ -23,8 +23,13 @@
   --color-brand-hover: var(--color-accent-hover);
   --color-brand-subtle: var(--color-accent-subtle);
 
+  --color-brand-primary: var(--color-brand-primary);
+  --color-brand-obsidian: var(--color-brand-obsidian);
+  --color-brand-amber: var(--color-brand-amber);
+
   --color-rhythm: var(--color-warm-accent);
   --color-rhythm-subtle: var(--color-warm-subtle);
+  --color-warm-text: var(--color-warm-text);
 }
 
 /* ========================================
@@ -51,8 +56,13 @@
   --color-text-secondary: #475569;   /* Slate 600 (7.58:1 on surface, 7.24:1 on canvas) */
   --color-text-muted: #64748b;       /* Slate 500 (4.76:1 on surface, 4.55:1 on canvas) */
 
-  /* Brand Accent — Verdigris Juniper */
-  --color-accent-primary: #0f766e;   /* Juniper (5.47:1 on surface) */
+  /* Core Brand Swatches (Approved & Locked) */
+  --color-brand-primary: #14b8a6;   /* Core Luminous Teal */
+  --color-brand-obsidian: #090d16;  /* Core Deep Obsidian */
+  --color-brand-amber: #d97706;     /* Core Warm Amber */
+
+  /* Brand Accent — Accessible Deep Teal variant for light text & stroke */
+  --color-accent-primary: #0f766e;   /* Juniper/Teal-700 (5.47:1 on surface, 5.23:1 on canvas) */
   --color-accent-hover: #115e59;     /* Deepened Juniper */
   --color-accent-subtle: #ccfbf1;    /* Juniper 100 tint */
 
@@ -60,8 +70,9 @@
   --color-accent: var(--color-accent-primary);
   --color-accent-light: var(--color-accent-subtle);
 
-  /* Warm Rhythm Accent — Amber Ochre */
-  --color-warm-accent: #b45309;      /* Warm Amber (5.02:1 on surface) */
+  /* Warm Rhythm Accent — Core Warm Amber Swatch */
+  --color-warm-accent: #d97706;      /* Warm Amber core swatch (3.04:1 graphical SC 1.4.11) */
+  --color-warm-text: #b45309;        /* Accessible Amber text variant (4.80:1 on canvas, 5.02:1 on surface) */
   --color-warm-subtle: #fef3c7;      /* Amber 100 tint */
   --color-streak: var(--color-warm-accent);
 
@@ -129,19 +140,25 @@
   --color-text-secondary: #94a3b8;   /* Slate 400 (6.92:1 on surface, 7.58:1 on canvas) */
   --color-text-muted: #8092a5;       /* Slate tone (5.55:1 on surface, 6.08:1 on canvas — cleanly passes AA) */
 
+  /* Core Brand Swatches (Approved & Locked) */
+  --color-brand-primary: #14b8a6;   /* Core Luminous Teal */
+  --color-brand-obsidian: #090d16;  /* Core Deep Obsidian */
+  --color-brand-amber: #d97706;     /* Core Warm Amber */
+
   /* Brand Accent — Luminous Teal */
   --color-accent-primary: #14b8a6;   /* Luminous Teal (7.13:1 on surface, 7.81:1 on canvas) */
   --color-accent-hover: #2dd4bf;     /* Lightened Teal */
   --color-accent-subtle: #134e4a;    /* Teal 900 tint */
 
-  /* Warm Rhythm Accent — Luminous Amber Gold */
-  --color-warm-accent: #f59e0b;      /* Amber Gold (8.26:1 on surface, 9.05:1 on canvas) */
+  /* Warm Rhythm Accent — Core Warm Amber Swatch */
+  --color-warm-accent: #d97706;      /* Warm Amber (5.57:1 on surface, 6.10:1 on canvas — passes AA) */
+  --color-warm-text: #d97706;        /* Warm Amber (6.10:1 on canvas) */
   --color-warm-subtle: #78350f;      /* Amber 900 tint */
 
   /* Colors — Semantic Feedback */
   --color-success: #10b981;
   --color-success-light: #064e3b;
-  --color-warning: #f59e0b;
+  --color-warning: #d97706;
   --color-warning-light: #78350f;
   --color-error: #fb7185;
   --color-error-light: #881337;

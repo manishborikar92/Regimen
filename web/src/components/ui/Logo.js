@@ -6,7 +6,11 @@
  * centered around a calm anchor point of balance.
  *
  * Source of truth: docs/branding-exploration/03-logo-concepts/logo-concept-3-guiding-sutra.svg
- * Colors: Restorative Juniper (#0F766E / dark: #14B8A6) and Warm Rhythm Amber (#D97706 / dark: #F59E0B).
+ * Authoritative Brand Swatches:
+ * - Deep Obsidian: #090D16
+ * - Luminous Teal: #14B8A6 (Dark-mode ribbon loop)
+ * - Warm Amber: #D97706 (Center balance dot)
+ * - Accessible Deep Teal: #0F766E (Light-mode ribbon loop variant for WCAG AA >= 5.2:1)
  */
 export default function Logo({ className = "w-8 h-8", title = "VRITTA Logo: The Guiding Sutra" }) {
   return (
@@ -21,7 +25,7 @@ export default function Logo({ className = "w-8 h-8", title = "VRITTA Logo: The 
       {/* Continuous Harmonious Thread Loop (Bezier Precision) */}
       <path
         d="M 68 132 C 44 132 40 100 68 84 C 92 70 108 130 132 116 C 160 100 156 68 132 68 C 108 68 92 128 68 132 Z"
-        className="stroke-[var(--color-brand-primary,#0F766E)] dark:stroke-[var(--color-accent-primary,#14B8A6)] transition-colors"
+        className="stroke-[var(--color-accent-primary,#0F766E)] dark:stroke-[var(--color-brand-primary,#14B8A6)] transition-colors"
         strokeWidth="13"
         strokeLinecap="round"
         strokeLinejoin="round"
