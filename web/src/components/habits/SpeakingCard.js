@@ -1,22 +1,108 @@
 'use client';
 
-import { useState, memo } from 'react';
-import { MessageSquare, Check, Clock, Bot, ChevronDown, PenLine } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
+import { MessageSquare, Check, Clock, Bot, PenLine } from 'lucide-react';
 import { getCategoryConfig } from '@/lib/constants/categories';
 
 function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProgress }) {
-  const [showNotes, setShowNotes] = useState(false);
+  const [showNotes, setShowNotes] = useState(Boolean(progress.notes));
   const [notes, setNotes] = useState(progress.notes || '');
+  const [isEditing, setIsEditing] = useState(false);
+  const [prevProgressNotes, setPrevProgressNotes] = useState(progress.notes);
 
   const config = getCategoryConfig(habit.category);
 
+  // Synchronization and debouncing refs
+  const latestNotesRef = useRef(notes);
+  const lastSavedNotesRef = useRef(progress.notes || '');
+  const latestProgressRef = useRef(progress);
+  const isCompletedRef = useRef(isCompleted);
+  const timerRef = useRef(null);
+
+  // Synchronize incoming external notes during render when not actively editing
+  if (!isEditing && progress.notes !== prevProgressNotes) {
+    setPrevProgressNotes(progress.notes);
+    setNotes(progress.notes || '');
+  }
+
+  // Keep refs synchronized in effects
+  useEffect(() => {
+    latestNotesRef.current = notes;
+    latestProgressRef.current = progress;
+    isCompletedRef.current = isCompleted;
+  }, [notes, progress, isCompleted]);
+
+  // Flush pending changes immediately
+  const flushSave = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
+    setIsEditing(false);
+
+    if (latestNotesRef.current !== lastSavedNotesRef.current) {
+      const textToSave = latestNotesRef.current;
+      lastSavedNotesRef.current = textToSave;
+
+      try {
+        onUpdateProgress(habit.id, {
+          ...latestProgressRef.current,
+          notes: textToSave,
+        }, isCompletedRef.current);
+      } catch (err) {
+        console.error('Error saving speaking notes:', err);
+      }
+    }
+  }, [habit.id, onUpdateProgress]);
+
+  // Debounced input change (~400ms)
   const handleNotesChange = (text) => {
     setNotes(text);
-    onUpdateProgress(habit.id, {
-      ...progress,
-      notes: text,
-    }, isCompleted);
+    latestNotesRef.current = text;
+    setIsEditing(true);
+
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+
+    timerRef.current = setTimeout(() => {
+      flushSave();
+    }, 400);
   };
+
+  // Immediate save on blur
+  const handleBlur = () => {
+    flushSave();
+  };
+
+  // Flush pending save if completion toggle is clicked
+  const handleToggle = () => {
+    flushSave();
+    onToggle(habit.id);
+  };
+
+  // Immediate flush on unmount (e.g. client-side page navigation or activity unmount)
+  useEffect(() => {
+    return () => {
+      flushSave();
+    };
+  }, [flushSave]);
+
+  // Immediate flush on tab switch or page unload
+  useEffect(() => {
+    const handleVisibilityOrUnload = () => {
+      flushSave();
+    };
+
+    window.addEventListener('visibilitychange', handleVisibilityOrUnload);
+    window.addEventListener('beforeunload', handleVisibilityOrUnload);
+
+    return () => {
+      window.removeEventListener('visibilitychange', handleVisibilityOrUnload);
+      window.removeEventListener('beforeunload', handleVisibilityOrUnload);
+    };
+  }, [flushSave]);
 
   return (
     <div
@@ -57,7 +143,7 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
           {/* Quick Completion Button */}
           <button
             type="button"
-            onClick={() => onToggle(habit.id)}
+            onClick={handleToggle}
             className={`w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border-2 flex items-center justify-center transition-all ${
               isCompleted
                 ? 'bg-sky-600 border-sky-600 text-white shadow-xs'
@@ -74,7 +160,7 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
           <button
             type="button"
             onClick={() => setShowNotes(!showNotes)}
-            className="flex items-center gap-1 text-xs font-medium text-sky-700 dark:text-sky-400 hover:text-sky-900 dark:hover:text-sky-300"
+            className="flex items-center gap-1.5 text-xs font-semibold text-sky-700 dark:text-sky-400 hover:text-sky-900 dark:hover:text-sky-300 min-h-[36px] py-1.5 transition-colors"
           >
             <PenLine className="w-3.5 h-3.5" />
             {showNotes ? 'Hide conversation notes' : 'Add conversation topics / notes (optional)'}
@@ -85,9 +171,10 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
               <textarea
                 value={notes}
                 onChange={(e) => handleNotesChange(e.target.value)}
+                onBlur={handleBlur}
                 placeholder="What topics did you talk about today? Any new phrases or pronunciation points learned?"
                 rows={2}
-                className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-sky-500 focus:border-transparent placeholder-slate-400"
+                className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-base sm:text-xs text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-sky-500 focus:border-transparent placeholder-slate-400 transition-colors"
               />
             </div>
           )}

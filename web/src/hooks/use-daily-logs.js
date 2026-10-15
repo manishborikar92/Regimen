@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { onSnapshot } from 'firebase/firestore';
 import {
     getDailyLogRef,
@@ -135,7 +135,7 @@ export function useDailyLogs(user, todaysHabits = []) {
 
     // Today's completion stats:
     // Important: Sunday exercise is a planned rest day, so it is excluded from the denominator!
-    const todayStats = (() => {
+    const todayStats = useMemo(() => {
         // Exclude planned rest days from the completion denominator
         const activeRequiredHabits = todaysHabits.filter(h => {
             const isSundayRest = currentDow === 'Sun' && (h.completionMethod === 'exercise_plan' || h.category === 'Movement & Strength');
@@ -152,7 +152,7 @@ export function useDailyLogs(user, todaysHabits = []) {
             percentage,
             isSunday: currentDow === 'Sun',
         };
-    })();
+    }, [todaysHabits, currentDow, todayLog]);
 
     return {
         dailyLogs,

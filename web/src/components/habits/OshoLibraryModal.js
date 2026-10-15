@@ -34,11 +34,6 @@ export default function OshoLibraryModal({
       }}
     >
       <div className="bg-surface rounded-t-3xl sm:rounded-2xl max-w-2xl w-full max-h-[90vh] sm:max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border-t sm:border border-subtle">
-        {/* Mobile Pull Bar Indicator */}
-        <div className="sm:hidden pt-2.5 pb-1 flex justify-center bg-amber-50/40 dark:bg-amber-950/30 flex-shrink-0">
-          <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
-        </div>
-
         {/* Header */}
         <div className="p-4 sm:p-5 border-b border-subtle flex items-center justify-between bg-amber-50/40 dark:bg-amber-950/30 flex-shrink-0 z-10">
           <div className="flex items-center gap-2.5">

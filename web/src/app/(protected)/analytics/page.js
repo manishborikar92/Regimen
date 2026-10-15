@@ -76,6 +76,14 @@ export default function AnalyticsPage() {
     };
   }, [habits, dailyLogs]);
 
+  // Memoize 30-day activity map with metrics precalculated once
+  const last30DaysWithMetrics = useMemo(() => {
+    return last30Days.map(item => ({
+      ...item,
+      metrics: getDayMetrics(item.dateStr, item.dayOfWeek),
+    }));
+  }, [last30Days, getDayMetrics]);
+
   // Calculate overall statistics
   const stats = useMemo(() => {
     if (!habits || habits.length === 0) return null;
@@ -89,12 +97,7 @@ export default function AnalyticsPage() {
     let oshoListeningDays = 0;
     let readingDays = 0;
 
-    for (let i = 0; i < 30; i++) {
-      const date = getDaysAgo(i);
-      const dateStr = getDateString(date);
-      const dow = getDayOfWeek(date);
-
-      const metrics = getDayMetrics(dateStr, dow);
+    for (const { dateStr, dayOfWeek: dow, metrics } of last30DaysWithMetrics) {
       if (metrics.scheduledCount > 0) {
         totalActiveDays++;
         if (metrics.rate >= 50) completedDays++;
@@ -141,7 +144,7 @@ export default function AnalyticsPage() {
       readingDays,
       avgRate,
     };
-  }, [habits, dailyLogs, getDayMetrics]);
+  }, [habits, dailyLogs, last30DaysWithMetrics]);
 
   // Selected date details
   const selectedDateHabits = useMemo(() => {
@@ -343,8 +346,7 @@ export default function AnalyticsPage() {
                   <div key={`spacer-${i}`} />
                 ))}
 
-                {last30Days.map(({ dateStr, dayOfWeek, dayNum }) => {
-                  const metrics = getDayMetrics(dateStr, dayOfWeek);
+                {last30DaysWithMetrics.map(({ dateStr, dayOfWeek, dayNum, metrics }) => {
                   const isSelected = selectedDate === dateStr;
 
                   // Calm, supportive color mapping (NO aggressive red, slate/teal on Sunday rest)
