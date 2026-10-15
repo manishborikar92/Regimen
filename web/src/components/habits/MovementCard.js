@@ -219,9 +219,9 @@ function MovementCard({
                 />
               </div>
 
-              {/* Expandable Exercise Checklist: Polished Mobile-First Layout */}
+              {/* Expandable Exercise Checklist: Redesigned Structured Cards */}
               {isExpanded && (
-                <div className="space-y-2.5">
+                <div className="space-y-3 pt-1">
                   {currentItems.map((item, idx) => {
                     const isChecked = completedItemIds.includes(item.id);
                     const isItemDetailsOpen = expandedExerciseId === item.id;
@@ -229,67 +229,97 @@ function MovementCard({
                     return (
                       <div
                         key={item.id}
-                        className={`p-3 rounded-xl border transition-all ${
+                        className={`p-3.5 sm:p-4 rounded-2xl border transition-all ${
                           isChecked
-                            ? 'bg-teal-50/40 dark:bg-teal-950/30 border-teal-200 dark:border-teal-800/60'
-                            : 'bg-white dark:bg-stone-800/90 border-stone-200 dark:border-stone-700/80 shadow-2xs'
+                            ? 'bg-teal-50/40 dark:bg-teal-950/20 border-teal-200/90 dark:border-teal-800/60 shadow-2xs'
+                            : 'bg-white dark:bg-stone-800/90 border-stone-200 dark:border-stone-700/80 shadow-2xs hover:border-stone-300 dark:hover:border-stone-600'
                         }`}
                       >
+                        {/* Step Header: Checkbox alongside Title & Duration Badge */}
                         <div className="flex items-start gap-3">
-                          <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={() => handleToggleItem(item.id)}
-                            className="mt-0.5 w-5 h-5 rounded text-teal-600 focus:ring-teal-500 border-stone-300 dark:border-stone-600 dark:bg-stone-900 flex-shrink-0 cursor-pointer"
-                            id={`ex_${item.id}`}
-                          />
+                          <div className="pt-0.5 flex-shrink-0">
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => handleToggleItem(item.id)}
+                              className="w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-md text-teal-600 focus:ring-teal-500 border-stone-300 dark:border-stone-600 dark:bg-stone-900 cursor-pointer transition-colors"
+                              id={`ex_${item.id}`}
+                              aria-label={`Mark step ${idx + 1} (${item.name}) complete`}
+                            />
+                          </div>
+
                           <div className="flex-1 min-w-0">
                             {/* Responsive Title & Target: flex-col on mobile, flex-row on larger viewports */}
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
                               <label
                                 htmlFor={`ex_${item.id}`}
-                                className={`text-xs sm:text-sm font-semibold cursor-pointer leading-snug ${
-                                  isChecked ? 'line-through text-stone-400 dark:text-stone-500' : 'text-stone-900 dark:text-stone-100'
+                                className={`text-sm sm:text-base font-bold cursor-pointer leading-snug ${
+                                  isChecked
+                                    ? 'line-through text-stone-400 dark:text-stone-500'
+                                    : 'text-stone-900 dark:text-stone-100'
                                 }`}
                               >
                                 {idx + 1}. {item.name}
                               </label>
-                              <span className="self-start sm:self-auto text-2xs text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 px-2 py-0.5 rounded font-medium border border-teal-200 dark:border-teal-800/60">
-                                {item.target || item.reps}
-                              </span>
+
+                              {/* Duration / Target Badge: Under title on narrow screens, horizontal on wider screens */}
+                              {(item.target || item.reps) && (
+                                <span className="inline-flex items-center gap-1.5 text-2xs sm:text-xs text-teal-700 dark:text-teal-300 bg-teal-50/80 dark:bg-teal-950/60 px-2.5 py-0.5 rounded-full font-medium border border-teal-200 dark:border-teal-800/60 self-start sm:self-auto flex-shrink-0">
+                                  <Clock className="w-3 h-3 text-teal-600 dark:text-teal-400" />
+                                  <span>{item.target || item.reps}</span>
+                                </span>
+                              )}
                             </div>
 
                             {item.rest && item.rest !== 'None' && (
-                              <p className="text-2xs text-stone-400 dark:text-stone-500 mt-1">Rest: {item.rest}</p>
-                            )}
-
-                            {/* Details toggle with accessible touch target */}
-                            <button
-                              type="button"
-                              onClick={() => setExpandedExerciseId(isItemDetailsOpen ? null : item.id)}
-                              className="text-2xs text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 flex items-center gap-1 font-medium min-h-[36px] py-1 transition-colors"
-                            >
-                              <span>{isItemDetailsOpen ? 'Hide form tips' : 'Form instructions & variations'}</span>
-                              <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isItemDetailsOpen ? 'rotate-180' : ''}`} />
-                            </button>
-
-                            {isItemDetailsOpen && (
-                              <div className="mt-2 text-xs text-stone-600 dark:text-stone-300 bg-stone-50 dark:bg-stone-900/60 p-3 rounded-lg space-y-1.5 border border-stone-200/80 dark:border-stone-700/80 leading-relaxed">
-                                <p><strong className="text-stone-900 dark:text-stone-100">Form:</strong> {item.instructions}</p>
-                                {item.easierVariation && (
-                                  <p className="text-amber-800 dark:text-amber-400">
-                                    <strong className="text-amber-900 dark:text-amber-300">Easier:</strong> {item.easierVariation}
-                                  </p>
-                                )}
-                                {item.harderVariation && (
-                                  <p className="text-teal-800 dark:text-teal-300">
-                                    <strong className="text-teal-900 dark:text-teal-200">Progression:</strong> {item.harderVariation}
-                                  </p>
-                                )}
-                              </div>
+                              <p className="text-2xs text-stone-400 dark:text-stone-500 mt-1">
+                                Rest: {item.rest}
+                              </p>
                             )}
                           </div>
                         </div>
+
+                        {/* Subtle Divider separating exercise content from disclosure */}
+                        <div className="border-t border-stone-200/70 dark:border-stone-700/60 my-2.5 sm:my-3" />
+
+                        {/* Disclosure Trigger: Comfortably tappable row with aligned chevron */}
+                        <button
+                          type="button"
+                          onClick={() => setExpandedExerciseId(isItemDetailsOpen ? null : item.id)}
+                          className="w-full flex items-center justify-between text-left min-h-[38px] py-1 text-xs sm:text-sm font-semibold text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-lg group"
+                          aria-expanded={isItemDetailsOpen}
+                        >
+                          <span>Form instructions & variations</span>
+                          <ChevronDown
+                            className={`w-4 h-4 text-teal-600 dark:text-teal-400 transition-transform duration-200 flex-shrink-0 ${
+                              isItemDetailsOpen ? 'rotate-180' : ''
+                            }`}
+                          />
+                        </button>
+
+                        {/* Expanded Form Instructions, Variations & Cues */}
+                        {isItemDetailsOpen && (
+                          <div className="mt-2 text-xs text-stone-600 dark:text-stone-300 bg-stone-100/70 dark:bg-stone-900/60 p-3 sm:p-3.5 rounded-xl space-y-2 border border-stone-200/80 dark:border-stone-700/80 leading-relaxed">
+                            {item.instructions && (
+                              <div>
+                                <span className="font-bold text-stone-900 dark:text-stone-100 block mb-0.5">Form:</span>
+                                <p className="text-stone-600 dark:text-stone-300 whitespace-pre-line">{item.instructions}</p>
+                              </div>
+                            )}
+                            {item.easierVariation && (
+                              <div className="pt-1.5 border-t border-stone-200/50 dark:border-stone-800/60">
+                                <span className="font-bold text-amber-900 dark:text-amber-300 block mb-0.5">Easier Variation:</span>
+                                <p className="text-amber-800 dark:text-amber-400">{item.easierVariation}</p>
+                              </div>
+                            )}
+                            {item.harderVariation && (
+                              <div className="pt-1.5 border-t border-stone-200/50 dark:border-stone-800/60">
+                                <span className="font-bold text-teal-900 dark:text-teal-200 block mb-0.5">Progression:</span>
+                                <p className="text-teal-800 dark:text-teal-300">{item.harderVariation}</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
