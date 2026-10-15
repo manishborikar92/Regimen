@@ -119,11 +119,11 @@ describe('Phase 3: UI/UX Component Polish (Mobile-First)', () => {
   });
 
   describe('3. Brand Color Application & Dark Mode Integration', () => {
-    it('should verify StreakCounter integrates Warm Amber #D97706 and teal completed badge', () => {
-      const content = readWebFile('src/components/habits/StreakCounter.js');
-      assert.ok(content.includes('text-amber-600') && content.includes('dark:text-amber-400'), 'StreakCounter must use Warm Amber text');
-      assert.ok(content.includes('text-teal-700') && content.includes('dark:text-teal-300'), 'StreakCounter must use teal completed badge');
-      assert.ok(content.includes('dark:via-[#111827]') || content.includes('dark:bg-slate-800'), 'StreakCounter must support dark background');
+    it('should verify TodayRhythmBanner integrates Warm Amber #D97706 and teal completed badge', () => {
+      const content = readWebFile('src/components/habits/TodayRhythmBanner.js');
+      assert.ok(content.includes('text-amber-600') && content.includes('dark:text-amber-400'), 'TodayRhythmBanner must use Warm Amber text');
+      assert.ok(content.includes('text-teal-700') && content.includes('dark:text-teal-300'), 'TodayRhythmBanner must use teal completed badge');
+      assert.ok(content.includes('dark:via-surface') || content.includes('dark:bg-slate-800'), 'TodayRhythmBanner must support dark background');
     });
 
     it('should verify BottomNav applies Luminous Teal active state and Deep Obsidian backdrop', () => {

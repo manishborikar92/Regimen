@@ -11,12 +11,12 @@ import {
   SpeakingCard,
   DiaryCard,
   GenericHabitCard,
-  StreakCounter,
+  TodayRhythmBanner,
 } from '@/components/habits';
 import { TopNav, LoadingSpinner } from '@/components/ui';
 import { formatDate } from '@/utils/date-helpers';
 import { BRAND } from '@/lib/constants/brand';
-import { Compass, CheckCircle2 } from 'lucide-react';
+import { Compass } from 'lucide-react';
 
 const EMPTY_PROGRESS = Object.freeze({});
 
@@ -168,8 +168,6 @@ export default function DashboardPage() {
     );
   }, [todayLog, todayProgress, userProfile, updateProgress, toggleHabit, updateProfile]);
 
-  const allCompletedToday = todayStats.total > 0 && todayStats.completed >= todayStats.total;
-
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -179,39 +177,8 @@ export default function DashboardPage() {
       <TopNav title={BRAND.name} subtitle={formatDate()} />
 
       <main className="max-w-2xl mx-auto px-4 py-5 sm:py-6 space-y-5">
-        {/* Supportive Rhythm Counter */}
-        <StreakCounter />
-
-        {/* Today's Progress Banner */}
-        <div className="bg-surface rounded-2xl p-4 sm:p-5 shadow-2xs border border-subtle transition-colors">
-          <div className="flex items-center justify-between mb-2.5">
-            <div>
-              <span className="text-xs font-semibold text-sub uppercase tracking-wider">
-                Today&apos;s Rhythm
-              </span>
-              <p className="text-sm font-semibold text-main mt-0.5">
-                {todayStats.completed} of {todayStats.total} planned activities completed
-              </p>
-            </div>
-            <span className="text-sm font-extrabold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 px-2.5 py-1 rounded-full border border-teal-200 dark:border-teal-800/60">
-              {todayStats.percentage}%
-            </span>
-          </div>
-
-          <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
-            <div
-              className="bg-gradient-to-r from-teal-600 to-teal-400 dark:from-teal-500 dark:to-teal-300 h-2.5 rounded-full transition-all duration-300"
-              style={{ width: `${todayStats.percentage}%` }}
-            />
-          </div>
-
-          {allCompletedToday && (
-            <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-              <span>All planned activities completed for today! Relax and enjoy your evening.</span>
-            </div>
-          )}
-        </div>
+        {/* Unified Today's Rhythm Banner */}
+        <TodayRhythmBanner />
 
         {error && (
           <div className="p-3.5 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900/60 rounded-xl text-rose-800 dark:text-rose-200 text-xs">
