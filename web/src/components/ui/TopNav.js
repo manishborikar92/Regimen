@@ -47,31 +47,31 @@ export default function TopNav({ title, subtitle }) {
   return (
     <>
       <header className="bg-surface/90 backdrop-blur-md border-b border-subtle sticky top-0 z-40 transition-colors">
-        <div className="max-w-2xl mx-auto px-4 py-3 sm:py-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-surface border border-subtle shadow-2xs flex items-center justify-center p-1 hover:shadow-xs transition-shadow">
+        <div className="max-w-2xl mx-auto px-4 py-2.5 sm:py-3.5 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-surface border border-subtle shadow-2xs flex items-center justify-center p-1 sm:p-1.5 flex-shrink-0 hover:shadow-xs transition-shadow">
               <Logo className="w-full h-full" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg sm:text-xl font-bold text-main tracking-tight leading-none">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 min-w-0">
+                <h1 className="text-base sm:text-lg lg:text-xl font-bold text-main tracking-tight leading-tight sm:leading-none truncate sm:overflow-visible">
                   {displayTitle}
                 </h1>
                 {title && title !== BRAND.name && (
-                  <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200 dark:bg-teal-950 dark:text-teal-300 dark:border-teal-900 hidden sm:inline-block">
+                  <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200 dark:bg-teal-950 dark:text-teal-300 dark:border-teal-900 hidden sm:inline-block flex-shrink-0">
                     {BRAND.name}
                   </span>
                 )}
               </div>
               {subtitle && (
-                <p className="text-2xs sm:text-xs text-sub font-medium tracking-wide mt-0.5">
+                <p className="text-2xs sm:text-xs text-sub font-medium tracking-normal sm:tracking-wide mt-0.5 truncate leading-tight">
                   {subtitle}
                 </p>
               )}
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
             {/* Accessible Icon-Only Light/Dark Toggle */}
             <ThemeToggle />
 
@@ -79,7 +79,7 @@ export default function TopNav({ title, subtitle }) {
               <div className="relative">
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center gap-2 hover:bg-surface-subtle rounded-xl p-1.5 min-h-[44px] min-w-[44px] justify-center sm:justify-start transition-colors border border-transparent hover:border-subtle focus-visible:outline-2 focus-visible:outline-offset-2"
+                  className="flex items-center gap-2 hover:bg-surface-subtle rounded-full sm:rounded-xl p-1 sm:p-1.5 min-h-[44px] min-w-[44px] justify-center sm:justify-start transition-colors border border-transparent hover:border-subtle focus-visible:outline-2 focus-visible:outline-offset-2"
                   aria-expanded={showProfileMenu}
                   aria-label="Profile menu"
                 >
@@ -105,7 +105,7 @@ export default function TopNav({ title, subtitle }) {
                     <p className="text-2xs text-muted truncate max-w-[120px]">{user.email}</p>
                   </div>
                   <ChevronDown
-                    className={`w-3.5 h-3.5 text-muted transition-transform ${showProfileMenu ? 'rotate-180' : ''}`}
+                    className={`w-3.5 h-3.5 text-muted transition-transform hidden sm:block ${showProfileMenu ? 'rotate-180' : ''}`}
                   />
                 </button>
 
