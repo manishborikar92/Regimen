@@ -1,5 +1,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { DataProvider } from "@/contexts/DataContext";
 import { ToastProvider } from "@/contexts/ToastContext";
@@ -10,16 +11,18 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+/**
+ * Next.js 16 file-based metadata automatically detects and renders non-conflicting tags for:
+ * - favicon.ico (32x32 / 16x16 standard favicon)
+ * - icon0.svg (vector application icon)
+ * - icon1.png (48x48 fallback PNG icon)
+ * - apple-icon.png (180x180 PNG touch icon for iOS)
+ * - manifest.json (web application manifest)
+ */
 export const metadata = {
   title: `${BRAND.name} — ${BRAND.tagline}`,
   description: BRAND.shortDescription,
   applicationName: BRAND.name,
-  manifest: "/manifest.json",
-  icons: {
-    icon: "/logo.svg",
-    shortcut: "/logo.svg",
-    apple: "/logo.svg",
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -30,22 +33,31 @@ export const metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
   themeColor: BRAND.themeColor,
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased text-gray-900 bg-slate-50`}>
-        <AuthProvider>
-          <DataProvider>
-            <ToastProvider>
-              {children}
-            </ToastProvider>
-          </DataProvider>
-        </AuthProvider>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var s=localStorage.getItem('vritta-theme');var p=window.matchMedia('(prefers-color-scheme: dark)').matches;if(s==='dark'||(!s&&p)||(s==='system'&&p)){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){}})()`,
+          }}
+        />
+      </head>
+      <body className={`${inter.variable} font-sans antialiased text-main bg-canvas`}>
+        <ThemeProvider>
+          <AuthProvider>
+            <DataProvider>
+              <ToastProvider>
+                {children}
+              </ToastProvider>
+            </DataProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
 }
+

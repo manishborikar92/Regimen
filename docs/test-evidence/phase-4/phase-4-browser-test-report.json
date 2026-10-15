@@ -1,0 +1,137 @@
+{
+  "timestamp": "2026-10-15T06:01:27.234Z",
+  "viewportsAudited": [
+    "375x812 (Mobile-First (iPhone SE/Mini))",
+    "390x844 (Mobile (iPhone 12/13/14))",
+    "412x915 (Mobile (Pixel 7 / Android))",
+    "768x1024 (Tablet (iPad Mini / Portrait))",
+    "1280x800 (Desktop (1280x800))"
+  ],
+  "themesAudited": [
+    "light",
+    "dark"
+  ],
+  "capturedScreenshots": [
+    "login-375px-light.png",
+    "login-375px-dark.png",
+    "login-390px-light.png",
+    "login-390px-dark.png",
+    "login-412px-light.png",
+    "login-412px-dark.png",
+    "login-768px-light.png",
+    "login-768px-dark.png",
+    "login-1280px-light.png",
+    "login-1280px-dark.png"
+  ],
+  "viewportMeta": "width=device-width, initial-scale=1",
+  "metricsByViewport": {
+    "375px": {
+      "light": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(248, 250, 252)",
+        "headingTextColor": "rgb(15, 23, 42)",
+        "buttonDimensions": {
+          "width": 320,
+          "height": 50
+        }
+      },
+      "dark": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(9, 13, 22)",
+        "headingTextColor": "rgb(248, 250, 252)",
+        "cardBg": "rgb(17, 24, 39)"
+      }
+    },
+    "390px": {
+      "light": {
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(248, 250, 252)",
+        "headingTextColor": "rgb(15, 23, 42)",
+        "buttonDimensions": {
+          "width": 320,
+          "height": 50
+        }
+      },
+      "dark": {
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(9, 13, 22)",
+        "headingTextColor": "rgb(248, 250, 252)",
+        "cardBg": "rgb(17, 24, 39)"
+      }
+    },
+    "412px": {
+      "light": {
+        "scrollWidth": 412,
+        "clientWidth": 412,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(248, 250, 252)",
+        "headingTextColor": "rgb(15, 23, 42)",
+        "buttonDimensions": {
+          "width": 320,
+          "height": 50
+        }
+      },
+      "dark": {
+        "scrollWidth": 412,
+        "clientWidth": 412,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(9, 13, 22)",
+        "headingTextColor": "rgb(248, 250, 252)",
+        "cardBg": "rgb(17, 24, 39)"
+      }
+    },
+    "768px": {
+      "light": {
+        "scrollWidth": 768,
+        "clientWidth": 768,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(248, 250, 252)",
+        "headingTextColor": "rgb(15, 23, 42)",
+        "buttonDimensions": {
+          "width": 320,
+          "height": 50
+        }
+      },
+      "dark": {
+        "scrollWidth": 768,
+        "clientWidth": 768,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(9, 13, 22)",
+        "headingTextColor": "rgb(248, 250, 252)",
+        "cardBg": "rgb(17, 24, 39)"
+      }
+    },
+    "1280px": {
+      "light": {
+        "scrollWidth": 1280,
+        "clientWidth": 1280,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(248, 250, 252)",
+        "headingTextColor": "rgb(15, 23, 42)",
+        "buttonDimensions": {
+          "width": 320,
+          "height": 50
+        }
+      },
+      "dark": {
+        "scrollWidth": 1280,
+        "clientWidth": 1280,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(9, 13, 22)",
+        "headingTextColor": "rgb(248, 250, 252)",
+        "cardBg": "rgb(17, 24, 39)"
+      }
+    }
+  },
+  "consoleErrors": [],
+  "failedRequests": [],
+  "allChecksPassed": true
+}

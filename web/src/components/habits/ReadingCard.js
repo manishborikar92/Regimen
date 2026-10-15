@@ -53,13 +53,13 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
 
   return (
     <div
-      className={`relative rounded-xl border border-gray-100 bg-white shadow-sm transition-all duration-200 hover:shadow-md ${
-        isCompleted ? 'bg-emerald-50/20 border-emerald-200' : ''
+      className={`relative rounded-xl border border-subtle bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
+        isCompleted ? 'bg-emerald-50/20 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/80' : ''
       }`}
     >
       {/* Top accent bar */}
       <div
-        className={`h-1.5 w-full rounded-t-xl bg-gradient-to-r from-emerald-500 to-teal-500 ${
+        className={`h-1.5 w-full rounded-t-xl bg-gradient-to-r from-emerald-500 to-teal-500 dark:from-emerald-400 dark:to-teal-400 ${
           isCompleted ? 'opacity-80' : 'opacity-40'
         }`}
       />
@@ -72,21 +72,21 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
               <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium border ${config.badgeClasses}`}>
                 {habit.category}
               </span>
-              <span className="flex items-center gap-1 text-xs text-indigo-800 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md font-medium">
-                <Moon className="w-3 h-3 text-indigo-600" />
+              <span className="flex items-center gap-1 text-xs text-teal-800 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/60 px-2 py-0.5 rounded-md font-medium">
+                <Moon className="w-3 h-3 text-teal-600 dark:text-teal-400" />
                 Before bed (Relative timing)
               </span>
-              <span className="text-xs text-emerald-800 font-semibold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+              <span className="text-xs text-emerald-800 dark:text-emerald-300 font-semibold bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800/60">
                 30 Minutes Target
               </span>
             </div>
 
-            <h3 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
-              <BookMarked className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+            <h3 className="text-base sm:text-lg font-bold text-main flex items-center gap-2">
+              <BookMarked className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
               {habit.title}
             </h3>
 
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">
+            <p className="text-xs sm:text-sm text-sub mt-1">
               Read 30 minutes before sleep. Completing directly or using the optional timer both work.
             </p>
           </div>
@@ -95,10 +95,10 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
           <button
             type="button"
             onClick={() => onToggle(habit.id)}
-            className={`w-9 h-9 rounded-full border-2 flex items-center justify-center transition-all ${
+            className={`w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border-2 flex items-center justify-center transition-all ${
               isCompleted
                 ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
-                : 'border-gray-300 hover:border-emerald-500 text-transparent'
+                : 'border-slate-300 dark:border-slate-600 hover:border-emerald-500 text-transparent'
             }`}
             aria-label={isCompleted ? 'Mark reading incomplete' : 'Mark reading complete'}
           >
@@ -107,12 +107,12 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
         </div>
 
         {/* Optional 30-Minute Timer Box */}
-        <div className="mt-4 p-3 bg-gray-50/80 rounded-xl border border-gray-100 flex items-center justify-between gap-3">
+        <div className="mt-4 p-3 bg-slate-50/80 dark:bg-slate-800/50 rounded-xl border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-emerald-600" />
+            <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <div>
-              <span className="text-xs text-gray-500 block">Optional 30-Min Reading Timer</span>
-              <span className="text-sm font-mono font-bold text-gray-900">{timeFormatted}</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 block">30-Min Reading Timer</span>
+              <span className="text-sm font-mono font-bold text-slate-900 dark:text-slate-100">{timeFormatted}</span>
             </div>
           </div>
 
@@ -120,9 +120,9 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
             <button
               type="button"
               onClick={handleStartTimer}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors ${
+              className={`min-h-[40px] px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
                 timerActive
-                  ? 'bg-amber-100 text-amber-800 hover:bg-amber-200'
+                  ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 hover:bg-amber-200'
                   : 'bg-emerald-600 text-white hover:bg-emerald-700'
               }`}
             >
@@ -139,7 +139,7 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
             <button
               type="button"
               onClick={handleResetTimer}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-200"
+              className="min-w-[40px] min-h-[40px] p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center transition-colors"
               title="Reset Timer"
               aria-label="Reset Timer"
             >

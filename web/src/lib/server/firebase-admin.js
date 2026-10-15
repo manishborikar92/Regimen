@@ -47,7 +47,7 @@ function resolveCredential() {
   if (process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
     try {
       return cert({
-        projectId: projectId || 'regimen-e32a8',
+        projectId: projectId || 'vritta-app',
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
         privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
       });
@@ -104,7 +104,7 @@ function initializeFirebaseAdmin() {
   }
 
   const credential = resolveCredential();
-  const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'regimen-e32a8';
+  const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'vritta-app';
 
   if (!credential) {
     // Return uninitialized stub that fails securely with an actionable error message

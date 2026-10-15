@@ -1,0 +1,309 @@
+{
+  "timestamp": "2026-10-15T06:28:38.995Z",
+  "viewportsAudited": [
+    "375x812",
+    "390x844",
+    "412x915",
+    "768x1024",
+    "1280x800"
+  ],
+  "routesAudited": [
+    "/",
+    "/login",
+    "/dashboard",
+    "/habits",
+    "/analytics"
+  ],
+  "themesAudited": [
+    "light",
+    "dark",
+    "system"
+  ],
+  "capturedScreenshots": [
+    "login-375px-light.png",
+    "login-375px-dark.png",
+    "login-1280px-light.png",
+    "login-1280px-dark.png",
+    "dashboard-375px-light.png",
+    "dashboard-375px-dark.png",
+    "dashboard-390px-light.png",
+    "dashboard-390px-dark.png",
+    "dashboard-412px-light.png",
+    "dashboard-412px-dark.png",
+    "dashboard-768px-light.png",
+    "dashboard-768px-dark.png",
+    "dashboard-1280px-light.png",
+    "dashboard-1280px-dark.png",
+    "habits-375px-light.png",
+    "habits-375px-dark.png",
+    "habits-1280px-light.png",
+    "habits-1280px-dark.png",
+    "analytics-375px-light.png",
+    "analytics-375px-dark.png",
+    "analytics-1280px-light.png",
+    "analytics-1280px-dark.png",
+    "modal-osho-library-375px-dark.png",
+    "modal-osho-library-1280px-dark.png",
+    "modal-habit-edit-375px-dark.png",
+    "modal-habit-edit-1280px-dark.png",
+    "modal-confirm-dialog-375px-dark.png",
+    "interaction-workbook-stepper-375px-dark.png",
+    "interaction-habit-toggled-375px-dark.png",
+    "interaction-reading-timer-375px-dark.png"
+  ],
+  "viewportMeta": "width=device-width, initial-scale=1",
+  "metrics": {
+    "login": {
+      "375px_light": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "overflow": false,
+        "bodyBg": "rgb(248, 250, 252)",
+        "h1Color": "rgb(15, 23, 42)"
+      },
+      "375px_dark": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "overflow": false,
+        "bodyBg": "rgb(9, 13, 22)",
+        "cardBg": "rgb(17, 24, 39)"
+      },
+      "1280px_light": {
+        "scrollWidth": 1280,
+        "clientWidth": 1280,
+        "overflow": false,
+        "bodyBg": "rgb(248, 250, 252)",
+        "h1Color": "rgb(15, 23, 42)"
+      },
+      "1280px_dark": {
+        "scrollWidth": 1280,
+        "clientWidth": 1280,
+        "overflow": false,
+        "bodyBg": "rgb(9, 13, 22)",
+        "cardBg": "rgb(17, 24, 39)"
+      }
+    },
+    "dashboard": {
+      "375px_light": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(248, 250, 252)",
+        "headingText": "VRITTA",
+        "habitCount": 18,
+        "smallButtonCount": 5
+      },
+      "375px_dark": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(9, 13, 22)",
+        "cardBg": "rgb(17, 24, 39)"
+      },
+      "390px_light": {
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(248, 250, 252)",
+        "headingText": "VRITTA",
+        "habitCount": 18,
+        "smallButtonCount": 6
+      },
+      "390px_dark": {
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(9, 13, 22)",
+        "cardBg": "rgb(17, 24, 39)"
+      },
+      "412px_light": {
+        "scrollWidth": 412,
+        "clientWidth": 412,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(248, 250, 252)",
+        "headingText": "VRITTA",
+        "habitCount": 18,
+        "smallButtonCount": 6
+      },
+      "412px_dark": {
+        "scrollWidth": 412,
+        "clientWidth": 412,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(9, 13, 22)",
+        "cardBg": "rgb(17, 24, 39)"
+      },
+      "768px_light": {
+        "scrollWidth": 768,
+        "clientWidth": 768,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(248, 250, 252)",
+        "headingText": "VRITTA",
+        "habitCount": 18,
+        "smallButtonCount": 6
+      },
+      "768px_dark": {
+        "scrollWidth": 768,
+        "clientWidth": 768,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(9, 13, 22)",
+        "cardBg": "rgb(17, 24, 39)"
+      },
+      "1280px_light": {
+        "scrollWidth": 1280,
+        "clientWidth": 1280,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(248, 250, 252)",
+        "headingText": "VRITTA",
+        "habitCount": 18,
+        "smallButtonCount": 6
+      },
+      "1280px_dark": {
+        "scrollWidth": 1280,
+        "clientWidth": 1280,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(9, 13, 22)",
+        "cardBg": "rgb(17, 24, 39)"
+      }
+    },
+    "habits": {
+      "375px_light": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(248, 250, 252)",
+        "routineListItems": 7
+      },
+      "375px_dark": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(9, 13, 22)",
+        "cardBg": "rgb(17, 24, 39)"
+      },
+      "1280px_light": {
+        "scrollWidth": 1280,
+        "clientWidth": 1280,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(248, 250, 252)",
+        "routineListItems": 7
+      },
+      "1280px_dark": {
+        "scrollWidth": 1280,
+        "clientWidth": 1280,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(9, 13, 22)",
+        "cardBg": "rgb(17, 24, 39)"
+      }
+    },
+    "analytics": {
+      "375px_light": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(248, 250, 252)"
+      },
+      "375px_dark": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(9, 13, 22)",
+        "cardBg": "rgb(17, 24, 39)"
+      },
+      "1280px_light": {
+        "scrollWidth": 1280,
+        "clientWidth": 1280,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(248, 250, 252)"
+      },
+      "1280px_dark": {
+        "scrollWidth": 1280,
+        "clientWidth": 1280,
+        "hasHorizontalOverflow": false,
+        "bodyBg": "rgb(9, 13, 22)",
+        "cardBg": "rgb(17, 24, 39)"
+      }
+    }
+  },
+  "interactions": {
+    "rootRedirect": {
+      "target": "/dashboard",
+      "expected": "/dashboard",
+      "passed": true
+    },
+    "oshoLibraryModal": {
+      "opened": true,
+      "dialogDetected": true
+    },
+    "habitModal": {
+      "opened": true,
+      "dialogDetected": true
+    },
+    "confirmDialog": {
+      "opened": true,
+      "dialogDetected": true
+    },
+    "workbookStepper": {
+      "clicked": true
+    },
+    "habitToggle": {
+      "clicked": true
+    },
+    "readingTimer": {
+      "started": true
+    }
+  },
+  "contrastAudits": [
+    {
+      "pair": "Light Canvas : Main Text",
+      "ratio": 17.06,
+      "required": 4.5,
+      "level": "AAA",
+      "passed": true
+    },
+    {
+      "pair": "Light Canvas : Sub Text",
+      "ratio": 7.24,
+      "required": 4.5,
+      "level": "AAA",
+      "passed": true
+    },
+    {
+      "pair": "Dark Canvas : Main Text",
+      "ratio": 18.57,
+      "required": 4.5,
+      "level": "AAA",
+      "passed": true
+    },
+    {
+      "pair": "Dark Canvas : Sub Text",
+      "ratio": 13.09,
+      "required": 4.5,
+      "level": "AAA",
+      "passed": true
+    },
+    {
+      "pair": "Dark Surface : Main Text",
+      "ratio": 16.96,
+      "required": 4.5,
+      "level": "AAA",
+      "passed": true
+    },
+    {
+      "pair": "Dark Canvas : Luminous Teal Accent",
+      "ratio": 7.81,
+      "required": 3,
+      "level": "AAA",
+      "passed": true
+    },
+    {
+      "pair": "Dark Canvas : Warm Amber Accent",
+      "ratio": 6.1,
+      "required": 3,
+      "level": "AA",
+      "passed": true
+    }
+  ],
+  "consoleErrors": [],
+  "failedRequests": [],
+  "allChecksPassed": true
+}

@@ -32,20 +32,20 @@ export default function ConfirmDialog({
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={!isLoading ? onClose : undefined} />
 
             <div
-                className="relative bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200"
+                className="relative bg-surface border border-subtle rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200"
                 role="dialog"
                 aria-labelledby="dialog-title"
                 aria-describedby="dialog-description"
                 aria-modal="true"
             >
                 <div className="text-center mb-6">
-                    <div className={`mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-4 ${isDanger ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
+                    <div className={`mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-4 ${isDanger ? 'bg-red-100 text-red-600 dark:bg-red-950/50 dark:text-red-400' : 'bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-300'}`}>
                         {isDanger ? <AlertTriangle className="w-6 h-6" /> : <Info className="w-6 h-6" />}
                     </div>
-                    <h3 id="dialog-title" className="text-lg font-bold text-gray-900 mb-2">
+                    <h3 id="dialog-title" className="text-lg font-bold text-main mb-2">
                         {title}
                     </h3>
-                    <p id="dialog-description" className="text-sm text-gray-600">
+                    <p id="dialog-description" className="text-sm text-sub">
                         {message}
                     </p>
                 </div>
@@ -54,14 +54,14 @@ export default function ConfirmDialog({
                     <button
                         onClick={onClose}
                         disabled={isLoading}
-                        className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors disabled:opacity-50"
+                        className="flex-1 px-4 py-2.5 min-h-[44px] bg-surface-subtle text-sub rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
                     >
                         {cancelText}
                     </button>
                     <button
                         onClick={onConfirm}
                         disabled={isLoading}
-                        className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-white ${isDanger ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'
+                        className={`flex-1 px-4 py-2.5 min-h-[44px] rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-white ${isDanger ? 'bg-red-600 hover:bg-red-700' : 'bg-teal-600 hover:bg-teal-700'
                             }`}
                     >
                         {isLoading && (

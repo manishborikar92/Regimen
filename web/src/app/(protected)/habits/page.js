@@ -79,26 +79,26 @@ export default function HabitsPage() {
 
       <main className="max-w-2xl mx-auto px-4 py-5 sm:py-6 space-y-5">
         {/* Helper Banner */}
-        <div className="bg-gradient-to-r from-indigo-50/70 via-white to-teal-50/50 p-4 rounded-2xl border border-indigo-100 shadow-2xs">
+        <div className="bg-gradient-to-r from-teal-50/70 via-surface to-emerald-50/40 dark:from-teal-950/30 dark:to-emerald-950/20 p-4 rounded-2xl border border-teal-100 dark:border-teal-900/40 shadow-2xs transition-colors">
           <div className="space-y-1">
-            <h3 className="text-xs sm:text-sm font-bold text-gray-900 flex items-center gap-1.5">
-              <Compass className="w-4 h-4 text-indigo-600" />
+            <h3 className="text-xs sm:text-sm font-bold text-main flex items-center gap-1.5">
+              <Compass className="w-4 h-4 text-teal-700 dark:text-teal-400" />
               Scheduling Philosophy
             </h3>
-            <p className="text-2xs sm:text-xs text-gray-600 leading-relaxed max-w-lg">
+            <p className="text-2xs sm:text-xs text-sub leading-relaxed max-w-lg">
               Preferred times are soft guidance, never hard deadlines. Categorize by life purpose and priority rather than rigid hours.
             </p>
           </div>
         </div>
 
         {habits.length === 0 ? (
-          <div className="text-center py-12 px-4 bg-white rounded-2xl border border-gray-100 shadow-2xs space-y-4">
-            <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto text-indigo-600 text-2xl">
+          <div className="text-center py-12 px-4 bg-surface rounded-2xl border border-subtle shadow-2xs space-y-4">
+            <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 rounded-2xl flex items-center justify-center mx-auto text-teal-700 dark:text-teal-400 text-2xl">
               📝
             </div>
             <div className="max-w-sm mx-auto space-y-1.5">
-              <h3 className="text-base font-bold text-gray-900">No routines found</h3>
-              <p className="text-xs text-gray-500">
+              <h3 className="text-base font-bold text-main">No routines found</h3>
+              <p className="text-xs text-sub">
                 Load recommended foundation routines or create your own custom habit.
               </p>
             </div>
@@ -107,14 +107,14 @@ export default function HabitsPage() {
                 type="button"
                 onClick={handleSeedHabits}
                 disabled={seeding}
-                className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-xs sm:text-sm font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 shadow-2xs"
+                className="px-5 py-2.5 bg-teal-700 dark:bg-teal-600 text-white rounded-xl text-xs sm:text-sm font-semibold hover:bg-teal-800 dark:hover:bg-teal-500 transition-colors disabled:opacity-50 shadow-2xs"
               >
                 {seeding ? 'Loading Routines...' : 'Load Recommended Routines'}
               </button>
               <button
                 type="button"
                 onClick={() => { setEditingHabit(null); setShowModal(true); }}
-                className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl text-xs sm:text-sm font-semibold hover:bg-gray-50 transition-colors"
+                className="px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs sm:text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
               >
                 Create Custom Routine
               </button>
@@ -131,7 +131,7 @@ export default function HabitsPage() {
               return (
                 <div
                   key={habit.id}
-                  className="bg-white rounded-2xl p-4 sm:p-5 shadow-2xs border border-gray-100 hover:shadow-sm transition-shadow"
+                  className="bg-surface rounded-2xl p-4 sm:p-5 shadow-2xs border border-subtle hover:shadow-sm transition-shadow"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
@@ -140,32 +140,32 @@ export default function HabitsPage() {
                           {habit.category}
                         </span>
 
-                        <span className="flex items-center gap-1 text-2xs text-gray-600 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md font-medium">
-                          <Clock className="w-3 h-3 text-gray-400" />
+                        <span className="flex items-center gap-1 text-2xs text-sub bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded-md font-medium">
+                          <Clock className="w-3 h-3 text-slate-400" />
                           {timingText}
                         </span>
 
                         {isPersonal && (
-                          <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-100">
+                          <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800/60">
                             Personal
                           </span>
                         )}
 
                         {isFoundation && (
-                          <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
+                          <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-sub border border-slate-200 dark:border-slate-700">
                             Foundation
                           </span>
                         )}
 
-                        <span className="text-2xs text-gray-400">#{habit.order}</span>
+                        <span className="text-2xs text-muted">#{habit.order}</span>
                       </div>
 
-                      <h3 className="text-sm sm:text-base font-bold text-gray-900">
+                      <h3 className="text-sm sm:text-base font-bold text-main">
                         {habit.title}
                       </h3>
 
                       {habit.instructions && (
-                        <p className="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-sub mt-1 line-clamp-2 leading-relaxed">
                           {habit.instructions}
                         </p>
                       )}
@@ -175,7 +175,7 @@ export default function HabitsPage() {
                         {habit.frequency?.map(day => (
                           <span
                             key={day}
-                            className="text-2xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded font-medium"
+                            className="text-2xs px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded font-medium"
                           >
                             {day}
                           </span>
@@ -183,17 +183,17 @@ export default function HabitsPage() {
                       </div>
 
                       {habit.checklistItems?.length > 0 && (
-                        <p className="text-2xs text-indigo-600 font-medium mt-2">
+                        <p className="text-2xs text-teal-700 dark:text-teal-400 font-medium mt-2">
                           {habit.checklistItems.length} checklist steps configured
                         </p>
                       )}
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-1.5 ml-2 flex-shrink-0">
+                    <div className="flex gap-1 ml-2 flex-shrink-0">
                       <button
                         onClick={() => { setEditingHabit(habit); setShowModal(true); }}
-                        className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors"
+                        className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-teal-700 dark:hover:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/50 rounded-xl transition-colors"
                         title="Edit Routine"
                         aria-label={`Edit ${habit.title}`}
                       >
@@ -201,7 +201,7 @@ export default function HabitsPage() {
                       </button>
                       <button
                         onClick={() => setDeleteConfirm(habit.id)}
-                        className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+                        className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl transition-colors"
                         title="Delete Routine"
                         aria-label={`Delete ${habit.title}`}
                       >
@@ -241,7 +241,7 @@ export default function HabitsPage() {
         <div className="max-w-2xl mx-auto px-4 flex justify-end">
           <button
             onClick={() => { setEditingHabit(null); setShowModal(true); }}
-            className="w-13 h-13 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 transition-all hover:scale-105 flex items-center justify-center pointer-events-auto shadow-indigo-200"
+            className="w-13 h-13 min-w-[52px] min-h-[52px] bg-teal-700 dark:bg-teal-600 text-white rounded-full shadow-lg hover:bg-teal-800 dark:hover:bg-teal-500 transition-all hover:scale-105 flex items-center justify-center pointer-events-auto shadow-teal-700/30"
             aria-label="Add Routine"
           >
             <Plus className="w-6 h-6" />

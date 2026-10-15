@@ -26,7 +26,7 @@ export default function ProtectedLayout({ children }) {
     if (!user) return null;
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-20">
+        <div className="min-h-screen bg-canvas text-main transition-colors duration-200 pb-20">
             {children}
             <BottomNav />
         </div>

@@ -31,7 +31,7 @@ flowchart TD
     subgraph Local Development & CLI Environment
         LocalDev["Next.js Dev Server (localhost:3000)<br/>Reads web/.env.local"]
         LocalCLI["CLI: npm run schedule:fetch-personal<br/>Explicitly loads web/.env.local"]
-        ExtCred["External Credential Store<br/>%USERPROFILE%/.credentials/regimen-e32a8-firebase-adminsdk.json"]
+        ExtCred["External Credential Store<br/>%USERPROFILE%/.credentials/vritta-app-firebase-adminsdk.json"]
     end
 
     subgraph Google Cloud & Firebase Backend
@@ -79,7 +79,7 @@ Store the Firebase service-account JSON file in your personal Windows user profi
    ```
 3. Move or place your Firebase Admin SDK service account key file there:
    ```
-   C:\Users\<YourUsername>\.credentials\regimen-e32a8-firebase-adminsdk.json
+   C:\Users\<YourUsername>\.credentials\vritta-app-firebase-adminsdk.json
    ```
 4. Verify file permissions: Ensure only your Windows user account has read access to this directory.
 
@@ -95,16 +95,16 @@ Next.js automatically loads `web/.env.local` for the local development server (`
 2. Ensure public Firebase Web configuration variables are present:
    ```env
    NEXT_PUBLIC_FIREBASE_API_KEY="AIzaSyB-Jl7nSWKkLq9TG1BrD_S8qLW8gcM4ARo"
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="regimen-e32a8.firebaseapp.com"
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID="regimen-e32a8"
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="regimen-e32a8.firebasestorage.app"
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="vritta-app.firebaseapp.com"
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID="vritta-app"
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="vritta-app.firebasestorage.app"
    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="19741273143"
    NEXT_PUBLIC_FIREBASE_APP_ID="1:19741273143:web:f239f511f41849f62123b2"
    NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID="G-YVD3B80SB6"
    ```
 3. Add the pointer to your external service-account file using **forward slashes**:
    ```env
-   GOOGLE_APPLICATION_CREDENTIALS="C:/Users/<YourUsername>/.credentials/regimen-e32a8-firebase-adminsdk.json"
+   GOOGLE_APPLICATION_CREDENTIALS="C:/Users/<YourUsername>/.credentials/vritta-app-firebase-adminsdk.json"
    ```
    *(Replace `<YourUsername>` with your Windows user name, e.g., `manis`)*.
 
@@ -181,7 +181,7 @@ Open `http://localhost:3000` and test Google Sign-In.
 | Symptom / Error | Root Cause | Solution |
 | :--- | :--- | :--- |
 | `[Error] Firebase Admin credentials are not configured.` | Missing or mistyped `GOOGLE_APPLICATION_CREDENTIALS` in `web/.env.local`. | Verify path in `web/.env.local`. Ensure it points to the external JSON file with forward slashes. |
-| `ENOENT: no such file or directory` | The credential file path does not exist on disk. | Verify that `C:/Users/<username>/.credentials/regimen-e32a8-firebase-adminsdk.json` exists and is readable. |
+| `ENOENT: no such file or directory` | The credential file path does not exist on disk. | Verify that `C:/Users/<username>/.credentials/vritta-app-firebase-adminsdk.json` exists and is readable. |
 | `[Error] No user record found in Firebase Auth for manishborikar92@gmail.com` | User has not logged into the project yet. | Sign in to the local or hosted application once with Google using `manishborikar92@gmail.com` to provision the auth record. |
 | `auth/invalid-credential` or `Unexpected token in JSON` | The service-account JSON file is corrupted or incomplete. | Re-download the service account key from Google Cloud Console / Firebase Console. |
 
@@ -205,7 +205,7 @@ Vercel serverless functions run in ephemeral container environments where local 
 ### Step 4.2: Step-by-Step Vercel Configuration
 
 1. **Copy the Entire JSON Content**:
-   - Open your external service-account key (`C:\Users\<username>\.credentials\regimen-e32a8-firebase-adminsdk.json`) in a secure text editor.
+   - Open your external service-account key (`C:\Users\<username>\.credentials\vritta-app-firebase-adminsdk.json`) in a secure text editor.
    - Copy the entire JSON object string, including curly braces `{ ... }`.
 
 2. **Navigate to Project Settings on Vercel**:
@@ -223,7 +223,7 @@ Vercel serverless functions run in ephemeral container environments where local 
    Ensure the following public variables are configured for Production and Preview:
    - `NEXT_PUBLIC_FIREBASE_API_KEY`
    - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
-   - `NEXT_PUBLIC_FIREBASE_PROJECT_ID` (`regimen-e32a8`)
+   - `NEXT_PUBLIC_FIREBASE_PROJECT_ID` (`vritta-app`)
    - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
    - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
    - `NEXT_PUBLIC_FIREBASE_APP_ID`
@@ -309,7 +309,7 @@ When adding collections, updating field validations, or adjusting authorization 
    ```
 3. **Deploy security rules to Firebase**:
    ```powershell
-   firebase deploy --only firestore:rules --project regimen-e32a8
+   firebase deploy --only firestore:rules --project vritta-app
    ```
 4. **Impact**: Security rule deployments take effect **immediately** across all clients without requiring an application rebuild or Vercel redeployment.
 
@@ -321,7 +321,7 @@ If a query requires a composite index:
 1. **Update `web/firestore.indexes.json`**.
 2. **Deploy indexes via Firebase CLI**:
    ```powershell
-   firebase deploy --only firestore:indexes --project regimen-e32a8
+   firebase deploy --only firestore:indexes --project vritta-app
    ```
 3. **Impact**: Firebase builds the index in the background (typically 2–5 minutes). Queries using the index will succeed once index status changes from `BUILDING` to `ENABLED`.
 
@@ -335,7 +335,7 @@ Service account keys should be rotated periodically (e.g., every 90 or 180 days)
    - Go to [Firebase Console](https://console.firebase.google.com/) > Project Settings > **Service accounts**.
    - Click **Generate new private key** > Download new JSON file.
 2. **Update External Local File**:
-   - Place the new file in `C:\Users\<username>\.credentials\regimen-e32a8-firebase-adminsdk.json`.
+   - Place the new file in `C:\Users\<username>\.credentials\vritta-app-firebase-adminsdk.json`.
 3. **Update Vercel Sensitive Environment Variable**:
    - Open Vercel Project Settings > Environment Variables > Edit `FIREBASE_SERVICE_ACCOUNT_KEY`.
    - Paste the new JSON content > Click **Save**.
@@ -370,9 +370,9 @@ If separating preview and production into distinct Firebase projects (e.g., `reg
 
 | Environment | Firebase Project ID | Client Config (`NEXT_PUBLIC_FIREBASE_*`) | Vercel Environment Scope |
 | :--- | :--- | :--- | :--- |
-| **Local Dev** | `regimen-e32a8` (or staging) | Defined in `web/.env.local` | Local only |
+| **Local Dev** | `vritta-app` (or staging) | Defined in `web/.env.local` | Local only |
 | **Preview Branches** | `regimen-staging` | Configured in Vercel Project Settings | Scoped to **Preview** |
-| **Production** | `regimen-e32a8` (prod) | Configured in Vercel Project Settings | Scoped to **Production** |
+| **Production** | `vritta-app` (prod) | Configured in Vercel Project Settings | Scoped to **Production** |
 
 To switch environments in the Firebase CLI:
 ```powershell
