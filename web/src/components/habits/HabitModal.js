@@ -31,7 +31,7 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
     timingType: 'anytime',
     preferredPeriod: 'Anytime',
     relativeTiming: 'Before bed',
-    time: 'Flexible',
+    time: '',
     instructions: '',
     frequency: [...DAYS],
     checklistItems: [],
