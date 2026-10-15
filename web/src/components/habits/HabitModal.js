@@ -132,10 +132,20 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 dark:bg-black/80 flex items-center justify-center p-3 sm:p-4 z-[100]">
-      <div className="bg-surface rounded-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto shadow-2xl border border-subtle">
+    <div
+      className="fixed inset-0 bg-black/60 dark:bg-black/80 flex items-end sm:items-center justify-center p-0 sm:p-4 z-[100]"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="bg-surface rounded-t-3xl sm:rounded-2xl w-full max-w-lg max-h-[90vh] sm:max-h-[92vh] flex flex-col shadow-2xl border-t sm:border border-subtle overflow-hidden">
+        {/* Mobile Pull Bar Indicator */}
+        <div className="sm:hidden pt-2.5 pb-1 flex justify-center bg-surface flex-shrink-0">
+          <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+        </div>
+
         {/* Header */}
-        <div className="sticky top-0 bg-surface border-b border-subtle px-5 py-4 flex items-center justify-between z-10">
+        <div className="bg-surface border-b border-subtle px-5 py-3.5 sm:py-4 flex items-center justify-between flex-shrink-0 z-10">
           <div>
             <h2 className="text-base sm:text-lg font-bold text-main">
               {habit ? 'Edit Routine' : 'Create New Routine'}
@@ -146,245 +156,249 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+            type="button"
+            className="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4">
-          {/* Title */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Routine Title *
-            </label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              className="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent placeholder-slate-400"
-              placeholder="e.g., Practice English Workbook"
-              maxLength={120}
-            />
-            {errors.title && <p className="text-rose-500 text-xs mt-1">{errors.title}</p>}
-          </div>
-
-          {/* Life-Area Category */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Life-Area Category
-            </label>
-            <select
-              value={formData.category}
-              onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-              className="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-            >
-              {CATEGORIES.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Completion Method */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Tracking / Completion Method
-            </label>
-            <select
-              value={formData.completionMethod}
-              onChange={(e) => setFormData(prev => ({ ...prev, completionMethod: e.target.value }))}
-              className="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-            >
-              {COMPLETION_METHODS.map(m => (
-                <option key={m.id} value={m.id}>{m.label}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Timing Preference Model */}
-          <div className="p-3.5 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+          {/* Scrollable Form Content */}
+          <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4">
+            {/* Title */}
             <div>
-              <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">
-                Timing Preference (Soft Target, Not a Deadline)
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Routine Title *
               </label>
-              <div className="grid grid-cols-2 gap-2">
-                {TIMING_TYPES.map(t => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, timingType: t.id }))}
-                    className={`min-h-[40px] px-3 py-2 text-2xs sm:text-xs rounded-lg font-medium text-left border transition-all ${
-                      formData.timingType === t.id
-                        ? 'bg-teal-700 dark:bg-teal-600 text-white border-teal-700 dark:border-teal-600 shadow-2xs'
-                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
-                    }`}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                className="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl text-base sm:text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent placeholder-slate-400"
+                placeholder="e.g., Practice English Workbook"
+                maxLength={120}
+              />
+              {errors.title && <p className="text-rose-500 text-xs mt-1">{errors.title}</p>}
             </div>
 
-            {formData.timingType === 'preferred_period' && (
+            {/* Life-Area Category */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Life-Area Category
+              </label>
+              <select
+                value={formData.category}
+                onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                className="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl text-base sm:text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+              >
+                {CATEGORIES.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Completion Method */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Tracking / Completion Method
+              </label>
+              <select
+                value={formData.completionMethod}
+                onChange={(e) => setFormData(prev => ({ ...prev, completionMethod: e.target.value }))}
+                className="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl text-base sm:text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+              >
+                {COMPLETION_METHODS.map(m => (
+                  <option key={m.id} value={m.id}>{m.label}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Timing Preference Model */}
+            <div className="p-3.5 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
               <div>
-                <label className="block text-2xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                  Preferred Period of Day:
+                <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">
+                  Timing Preference (Soft Target, Not a Deadline)
                 </label>
-                <div className="flex gap-2">
-                  {['Morning', 'Afternoon', 'Evening'].map(period => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {TIMING_TYPES.map(t => (
                     <button
-                      key={period}
+                      key={t.id}
                       type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, preferredPeriod: period }))}
-                      className={`min-h-[38px] flex-1 py-1.5 text-xs rounded-lg font-medium border transition-colors ${
-                        formData.preferredPeriod === period
-                          ? 'bg-amber-600 text-white border-amber-600'
+                      onClick={() => setFormData(prev => ({ ...prev, timingType: t.id }))}
+                      className={`min-h-[40px] px-3 py-2 text-2xs sm:text-xs rounded-lg font-medium text-left border transition-all ${
+                        formData.timingType === t.id
+                          ? 'bg-teal-700 dark:bg-teal-600 text-white border-teal-700 dark:border-teal-600 shadow-2xs'
                           : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
                       }`}
                     >
-                      {period}
+                      {t.label}
                     </button>
                   ))}
                 </div>
               </div>
-            )}
 
-            {formData.timingType === 'relative' && (
-              <div>
-                <label className="block text-2xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                  Relative Anchor:
-                </label>
-                <input
-                  type="text"
-                  value={formData.relativeTiming}
-                  onChange={(e) => setFormData(prev => ({ ...prev, relativeTiming: e.target.value }))}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
-                  placeholder="e.g., Before bed, After waking"
-                />
-              </div>
-            )}
-
-            {formData.timingType === 'exact' && (
-              <div>
-                <label className="block text-2xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                  Suggested Target Time:
-                </label>
-                <input
-                  type="text"
-                  value={formData.time}
-                  onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
-                  placeholder="e.g., 04:30 PM"
-                />
-              </div>
-            )}
-
-            <div className="flex items-center gap-1.5 text-2xs text-slate-500 dark:text-slate-400">
-              <Info className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 flex-shrink-0" />
-              <span>Preferred times guide your day without penalty for completing at other times.</span>
-            </div>
-          </div>
-
-          {/* Active Days / Recurrence */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-              Active Weekdays
-            </label>
-            <div className="flex flex-wrap gap-1.5">
-              {DAYS.map(day => (
-                <button
-                  key={day}
-                  type="button"
-                  onClick={() => toggleDay(day)}
-                  className={`w-10 h-10 min-w-[40px] min-h-[40px] rounded-lg text-xs font-bold transition-all ${
-                    formData.frequency.includes(day)
-                      ? 'bg-teal-700 dark:bg-teal-600 text-white shadow-2xs'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
-                  }`}
-                >
-                  {day}
-                </button>
-              ))}
-            </div>
-            {errors.frequency && <p className="text-rose-500 text-xs mt-1">{errors.frequency}</p>}
-          </div>
-
-          {/* Instructions & Notes */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Instructions & Purpose Notes
-            </label>
-            <textarea
-              value={formData.instructions}
-              onChange={(e) => setFormData(prev => ({ ...prev, instructions: e.target.value }))}
-              rows={3}
-              placeholder="Add purpose, instructions, or helpful notes..."
-              className="w-full px-3.5 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent leading-relaxed placeholder-slate-400"
-            />
-          </div>
-
-          {/* Checklist Items (if checklist method chosen) */}
-          {formData.completionMethod === 'checklist' && (
-            <div className="space-y-2">
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
-                Checklist Steps
-              </label>
-              <div className="space-y-1.5">
-                {formData.checklistItems.map((item, index) => (
-                  <div key={index} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
-                    <span className="flex-1 text-xs text-slate-800 dark:text-slate-200">{item.label}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeChecklistItem(index)}
-                      className="text-rose-500 hover:text-rose-700 p-1 min-w-[32px] min-h-[32px] flex items-center justify-center"
-                      aria-label="Remove item"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+              {formData.timingType === 'preferred_period' && (
+                <div>
+                  <label className="block text-2xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                    Preferred Period of Day:
+                  </label>
+                  <div className="flex gap-2">
+                    {['Morning', 'Afternoon', 'Evening'].map(period => (
+                      <button
+                        key={period}
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, preferredPeriod: period }))}
+                        className={`min-h-[38px] flex-1 py-1.5 text-xs rounded-lg font-medium border transition-colors ${
+                          formData.preferredPeriod === period
+                            ? 'bg-amber-600 text-white border-amber-600'
+                            : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
+                        }`}
+                      >
+                        {period}
+                      </button>
+                    ))}
                   </div>
-                ))}
+                </div>
+              )}
 
-                <div className="flex gap-2">
+              {formData.timingType === 'relative' && (
+                <div>
+                  <label className="block text-2xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                    Relative Anchor:
+                  </label>
                   <input
                     type="text"
-                    value={newChecklistItem}
-                    onChange={(e) => setNewChecklistItem(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        addChecklistItem();
-                      }
-                    }}
-                    placeholder="Add step or exercise..."
-                    className="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400"
+                    value={formData.relativeTiming}
+                    onChange={(e) => setFormData(prev => ({ ...prev, relativeTiming: e.target.value }))}
+                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg text-base sm:text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                    placeholder="e.g., Before bed, After waking"
                   />
-                  <button
-                    type="button"
-                    onClick={addChecklistItem}
-                    className="min-h-[38px] px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold"
-                  >
-                    Add Step
-                  </button>
                 </div>
+              )}
+
+              {formData.timingType === 'exact' && (
+                <div>
+                  <label className="block text-2xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                    Suggested Target Time:
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.time}
+                    onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
+                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg text-base sm:text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                    placeholder="e.g., 04:30 PM"
+                  />
+                </div>
+              )}
+
+              <div className="flex items-center gap-1.5 text-2xs text-slate-500 dark:text-slate-400">
+                <Info className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 flex-shrink-0" />
+                <span>Preferred times guide your day without penalty for completing at other times.</span>
               </div>
             </div>
-          )}
 
-          {/* Display Order */}
-          <div className="flex items-center justify-between pt-1">
-            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Display Order</label>
-            <input
-              type="number"
-              value={formData.order}
-              onChange={(e) => setFormData(prev => ({ ...prev, order: parseInt(e.target.value) || 1 }))}
-              min={1}
-              className="w-20 px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-center font-bold bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-            />
+            {/* Active Days / Recurrence */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                Active Weekdays
+              </label>
+              <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
+                {DAYS.map(day => (
+                  <button
+                    key={day}
+                    type="button"
+                    onClick={() => toggleDay(day)}
+                    className={`w-full h-10 min-h-[40px] flex items-center justify-center rounded-lg text-xs font-bold transition-all ${
+                      formData.frequency.includes(day)
+                        ? 'bg-teal-700 dark:bg-teal-600 text-white shadow-2xs'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    {day}
+                  </button>
+                ))}
+              </div>
+              {errors.frequency && <p className="text-rose-500 text-xs mt-1">{errors.frequency}</p>}
+            </div>
+
+            {/* Instructions & Notes */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Instructions & Purpose Notes
+              </label>
+              <textarea
+                value={formData.instructions}
+                onChange={(e) => setFormData(prev => ({ ...prev, instructions: e.target.value }))}
+                rows={3}
+                placeholder="Add purpose, instructions, or helpful notes..."
+                className="w-full px-3.5 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-base sm:text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent leading-relaxed placeholder-slate-400"
+              />
+            </div>
+
+            {/* Checklist Items (if checklist method chosen) */}
+            {formData.completionMethod === 'checklist' && (
+              <div className="space-y-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Checklist Steps
+                </label>
+                <div className="space-y-1.5">
+                  {formData.checklistItems.map((item, index) => (
+                    <div key={index} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+                      <span className="flex-1 text-xs text-slate-800 dark:text-slate-200">{item.label}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeChecklistItem(index)}
+                        className="text-rose-500 hover:text-rose-700 p-1 min-w-[32px] min-h-[32px] flex items-center justify-center"
+                        aria-label="Remove item"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newChecklistItem}
+                      onChange={(e) => setNewChecklistItem(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          addChecklistItem();
+                        }
+                      }}
+                      placeholder="Add step or exercise..."
+                      className="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg text-base sm:text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400"
+                    />
+                    <button
+                      type="button"
+                      onClick={addChecklistItem}
+                      className="min-h-[38px] px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold"
+                    >
+                      Add Step
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Display Order */}
+            <div className="flex items-center justify-between pt-1">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Display Order</label>
+              <input
+                type="number"
+                value={formData.order}
+                onChange={(e) => setFormData(prev => ({ ...prev, order: parseInt(e.target.value) || 1 }))}
+                min={1}
+                className="w-20 px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-base sm:text-xs text-center font-bold bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+              />
+            </div>
           </div>
 
-          {/* Modal Actions */}
-          <div className="flex items-center gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+          {/* Sticky Modal Action Bar */}
+          <div className="bg-surface border-t border-subtle px-5 py-3.5 flex items-center gap-3 flex-shrink-0 z-10">
             {habit && onDelete && (
               <button
                 type="button"
