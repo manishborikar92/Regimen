@@ -13,7 +13,7 @@ import {
   GenericHabitCard,
   TodayRhythmBanner,
 } from '@/components/habits';
-import { TopNav, LoadingSpinner } from '@/components/ui';
+import { TopNav, DashboardSkeleton } from '@/components/ui';
 import { formatDate } from '@/utils/date-helpers';
 import { BRAND } from '@/lib/constants/brand';
 import { Compass } from 'lucide-react';
@@ -169,7 +169,7 @@ export default function DashboardPage() {
   }, [todayLog, todayProgress, userProfile, updateProgress, toggleHabit, updateProfile]);
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <DashboardSkeleton />;
   }
 
   return (

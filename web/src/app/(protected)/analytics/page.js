@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Check, Calendar, TrendingUp, Sparkles, BookOpen, Activity, Headphones, Moon, Award } from 'lucide-react';
 import { useData } from '@/contexts/DataContext';
-import { TopNav } from '@/components/ui';
+import { TopNav, AnalyticsSkeleton } from '@/components/ui';
 import { getDateString, getDaysAgo, getDayOfWeek, formatDate } from '@/utils/date-helpers';
 import { BRAND } from '@/lib/constants/brand';
 
@@ -11,7 +11,7 @@ import { BRAND } from '@/lib/constants/brand';
 const DAY_TO_COLUMN = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
 
 export default function AnalyticsPage() {
-  const { habits, dailyLogs, userProfile, fetchDailyLogs } = useData();
+  const { habits, dailyLogs, userProfile, fetchDailyLogs, loading } = useData();
   const [selectedDate, setSelectedDate] = useState(null);
   const [viewMode, setViewMode] = useState('insights'); // 'insights' | 'calendar'
 
@@ -165,6 +165,10 @@ export default function AnalyticsPage() {
         };
       });
   }, [selectedDate, habits, dailyLogs]);
+
+  if (loading) {
+    return <AnalyticsSkeleton />;
+  }
 
   return (
     <>
