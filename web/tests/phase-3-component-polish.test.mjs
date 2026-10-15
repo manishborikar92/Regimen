@@ -100,10 +100,10 @@ describe('Phase 3: UI/UX Component Polish (Mobile-First)', () => {
       }
     });
 
-    it('should verify WorkbookCard stepper buttons are at least 40x40px', () => {
+    it('should verify WorkbookCard stepper buttons meet WCAG 2.2 touch target standards (min 44x44px)', () => {
       const content = readWebFile('src/components/habits/WorkbookCard.js');
-      assert.ok(content.includes('min-w-[40px]'), 'WorkbookCard stepper must specify min-w-[40px]');
-      assert.ok(content.includes('min-h-[40px]'), 'WorkbookCard stepper must specify min-h-[40px]');
+      assert.ok(content.includes('min-w-[44px]'), 'WorkbookCard stepper must specify min-w-[44px]');
+      assert.ok(content.includes('min-h-[44px]'), 'WorkbookCard stepper must specify min-h-[44px]');
     });
 
     it('should verify BottomNav items meet touch target accessibility guidelines', () => {
