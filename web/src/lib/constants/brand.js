@@ -2,17 +2,17 @@
  * Centralized Brand Configuration for Vritta.
  * Single source of truth for the app's display identity, typography, and theme tokens.
  *
- * Provisional brand name: Vritta (वृत्त)
+ * Approved brand name: Vritta (वृत्त)
  * Meaning: In Sanskrit, Vritta signifies conduct, rhythm, regular observance,
  * and the natural cyclical pattern of daily life. It embodies unhurried, mindful
  * self-cultivation without guilt or rigid deadlines.
  */
 
 export const BRAND = {
-  name: 'VRITTA',
+  name: 'Vritta',
   tagline: 'Personal Routine Companion',
   shortDescription: 'A calm, flexible personal routine companion for mindful consistency.',
-  logoAlt: 'VRITTA Logo: The Guiding Sutra',
+  logoAlt: 'Vritta Logo: The Guiding Sutra',
   author: 'Manish Borikar',
   themeColor: '#14B8A6', // Authoritative Primary Brand Swatch: Luminous Teal
 

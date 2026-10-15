@@ -66,8 +66,11 @@ describe('Phase 4: Login & Authentication Page Redesign', () => {
 
     it('should verify interactive theme switcher is integrated with full accessibility labels', () => {
       const loginContent = readWebFile('src/app/(auth)/login/page.js');
-      assert.ok(loginContent.includes('useTheme()'), 'Login page must consume useTheme');
-      assert.ok(loginContent.includes('aria-label='), 'Theme toggle button must define aria-label');
+      const toggleContent = readWebFile('src/components/ui/ThemeToggle.js');
+      assert.ok(loginContent.includes('<ThemeToggle'), 'Login page must render shared ThemeToggle component');
+      assert.ok(toggleContent.includes('useTheme()'), 'ThemeToggle must consume useTheme');
+      assert.ok(toggleContent.includes('aria-label='), 'Theme toggle button must define aria-label');
+      assert.ok(toggleContent.includes('min-h-[44px]'), 'Theme toggle button must meet min-h-[44px] touch target');
     });
 
     it('should verify root layout viewport allows unrestricted browser zoom', () => {

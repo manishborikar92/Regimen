@@ -1,6 +1,6 @@
 /**
  * Structured 12-Week Movement and Functional Strength Plan.
- * Adheres strictly to section 4.2 of docs/regimen_project_brief.md.
+ * Adheres strictly to section 4.2 of docs/vritta_project_brief.md.
  * 
  * Rules:
  * - Dynamic resolution by weekday (Workout M/W/F, Walk+Stretches T/Th/Sa, Rest Sun).

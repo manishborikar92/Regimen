@@ -78,19 +78,6 @@ export default function HabitsPage() {
       <TopNav title="Routine Manager" subtitle="Life Areas & Scheduling" />
 
       <main className="max-w-2xl mx-auto px-4 py-5 sm:py-6 space-y-5">
-        {/* Helper Banner */}
-        <div className="bg-gradient-to-r from-teal-50/70 via-surface to-emerald-50/40 dark:from-teal-950/30 dark:to-emerald-950/20 p-4 rounded-2xl border border-teal-100 dark:border-teal-900/40 shadow-2xs transition-colors">
-          <div className="space-y-1">
-            <h3 className="text-xs sm:text-sm font-bold text-main flex items-center gap-1.5">
-              <Compass className="w-4 h-4 text-teal-700 dark:text-teal-400" />
-              Scheduling Philosophy
-            </h3>
-            <p className="text-2xs sm:text-xs text-sub leading-relaxed max-w-lg">
-              Preferred times are soft guidance, never hard deadlines. Categorize by life purpose and priority rather than rigid hours.
-            </p>
-          </div>
-        </div>
-
         {habits.length === 0 ? (
           <div className="text-center py-12 px-4 bg-surface rounded-2xl border border-subtle shadow-2xs space-y-4">
             <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 rounded-2xl flex items-center justify-center mx-auto text-teal-700 dark:text-teal-400 text-2xl">

@@ -1,87 +1,24 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
-import { ChevronDown, LogOut, Sun, Moon, Monitor, Check } from 'lucide-react';
+import { ChevronDown, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { useTheme } from '@/contexts/ThemeContext';
 import { BRAND } from '@/lib/constants/brand';
 import ConfirmDialog from './ConfirmDialog';
 import Logo from './Logo';
-
-const THEME_OPTIONS = [
-  { id: 'light', label: 'Light', Icon: Sun },
-  { id: 'dark', label: 'Dark', Icon: Moon },
-  { id: 'system', label: 'System', Icon: Monitor },
-];
+import ThemeToggle from './ThemeToggle';
 
 export default function TopNav({ title, subtitle }) {
   const { user, signInWithGoogle, logout } = useAuth();
-  const { theme, resolvedTheme, setTheme, isMounted } = useTheme();
   const router = useRouter();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [showThemeMenu, setShowThemeMenu] = useState(false);
   const [signingIn, setSigningIn] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const themeTriggerRef = useRef(null);
-  const themeItemRefs = useRef([]);
-
   const displayTitle = title || BRAND.name;
-
-  // Focus active theme option when dropdown opens
-  useEffect(() => {
-    if (showThemeMenu) {
-      const activeIdx = THEME_OPTIONS.findIndex((opt) => opt.id === theme);
-      const targetIdx = activeIdx >= 0 ? activeIdx : 0;
-      const timer = setTimeout(() => {
-        themeItemRefs.current[targetIdx]?.focus();
-      }, 20);
-      return () => clearTimeout(timer);
-    }
-  }, [showThemeMenu, theme]);
-
-  // Handle keyboard navigation within the theme menu
-  const handleMenuKeyDown = useCallback((e, index) => {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      setShowThemeMenu(false);
-      themeTriggerRef.current?.focus();
-    } else if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      const nextIdx = (index + 1) % THEME_OPTIONS.length;
-      themeItemRefs.current[nextIdx]?.focus();
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      const prevIdx = (index - 1 + THEME_OPTIONS.length) % THEME_OPTIONS.length;
-      themeItemRefs.current[prevIdx]?.focus();
-    } else if (e.key === 'Home') {
-      e.preventDefault();
-      themeItemRefs.current[0]?.focus();
-    } else if (e.key === 'End') {
-      e.preventDefault();
-      themeItemRefs.current[THEME_OPTIONS.length - 1]?.focus();
-    } else if (e.key === 'Tab') {
-      setShowThemeMenu(false);
-    }
-  }, []);
-
-  // Handle keyboard events on the trigger button
-  const handleTriggerKeyDown = useCallback((e) => {
-    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      setShowThemeMenu(true);
-      if (showProfileMenu) setShowProfileMenu(false);
-    }
-  }, [showProfileMenu]);
-
-  const handleSelectTheme = useCallback((id) => {
-    setTheme(id);
-    setShowThemeMenu(false);
-    themeTriggerRef.current?.focus();
-  }, [setTheme]);
 
   const handleSignIn = async () => {
     setSigningIn(true);
@@ -135,87 +72,8 @@ export default function TopNav({ title, subtitle }) {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Accessible 3-State Theme Switcher */}
-            <div className="relative">
-              {!isMounted ? (
-                <div className="w-10 h-10 sm:w-9 sm:h-9" aria-hidden="true" />
-              ) : (
-                <>
-                  <button
-                    ref={themeTriggerRef}
-                    id="theme-menu-button"
-                    type="button"
-                    onClick={() => {
-                      setShowThemeMenu(!showThemeMenu);
-                      if (showProfileMenu) setShowProfileMenu(false);
-                    }}
-                    onKeyDown={handleTriggerKeyDown}
-                    className="w-10 h-10 min-w-[40px] min-h-[40px] sm:w-9 sm:h-9 sm:min-w-[36px] sm:min-h-[36px] p-2 rounded-xl flex items-center justify-center text-sub hover:text-main hover:bg-surface-subtle transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 border border-transparent hover:border-subtle"
-                    aria-label={`Theme: ${theme === 'system' ? `System (${resolvedTheme})` : theme}. Select to change theme.`}
-                    aria-haspopup="menu"
-                    aria-expanded={showThemeMenu}
-                    aria-controls="theme-menu-dropdown"
-                    title={`Theme: ${theme === 'system' ? `System (${resolvedTheme})` : theme}`}
-                  >
-                    {resolvedTheme === 'dark' ? (
-                      <Moon className="w-4 h-4 text-amber-400" aria-hidden="true" />
-                    ) : (
-                      <Sun className="w-4 h-4 text-amber-600" aria-hidden="true" />
-                    )}
-                  </button>
-
-                  {showThemeMenu && (
-                    <>
-                      <div
-                        className="fixed inset-0 z-30"
-                        onClick={() => {
-                          setShowThemeMenu(false);
-                          themeTriggerRef.current?.focus();
-                        }}
-                        aria-hidden="true"
-                      />
-                      <div
-                        id="theme-menu-dropdown"
-                        className="absolute right-0 mt-2 w-36 bg-surface rounded-xl shadow-lg border border-subtle py-1.5 z-40 animate-in fade-in zoom-in-95 duration-150"
-                        role="menu"
-                        aria-labelledby="theme-menu-button"
-                      >
-                        {THEME_OPTIONS.map(({ id, label, Icon }, idx) => {
-                          const isSelected = theme === id;
-                          return (
-                            <button
-                              key={id}
-                              ref={(el) => {
-                                themeItemRefs.current[idx] = el;
-                              }}
-                              type="button"
-                              onClick={() => handleSelectTheme(id)}
-                              onKeyDown={(e) => handleMenuKeyDown(e, idx)}
-                              className={`w-full text-left px-3.5 py-2.5 min-h-[40px] text-xs font-medium flex items-center justify-between transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-teal-600 ${
-                                isSelected
-                                  ? 'text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 font-semibold'
-                                  : 'text-sub hover:text-main hover:bg-surface-subtle focus:bg-surface-subtle'
-                              }`}
-                              role="menuitemradio"
-                              aria-checked={isSelected}
-                              tabIndex={isSelected || (idx === 0 && theme === 'system') ? 0 : -1}
-                            >
-                              <span className="flex items-center gap-2">
-                                <Icon className="w-3.5 h-3.5" aria-hidden="true" />
-                                {label}
-                              </span>
-                              {isSelected && (
-                                <Check className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" aria-hidden="true" />
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </>
-                  )}
-                </>
-              )}
-            </div>
+            {/* Accessible Icon-Only Light/Dark Toggle */}
+            <ThemeToggle />
 
             {user ? (
               <div className="relative">
@@ -311,4 +169,3 @@ export default function TopNav({ title, subtitle }) {
     </>
   );
 }
-

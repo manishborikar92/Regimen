@@ -1,6 +1,6 @@
 /**
  * The 30-entry Osho Listening Library.
- * Strictly adheres to section 4.3 of docs/regimen_project_brief.md.
+ * Strictly adheres to section 4.3 of docs/vritta_project_brief.md.
  * 
  * Rules:
  * - Arranged in six distinct groups in the canonical order.

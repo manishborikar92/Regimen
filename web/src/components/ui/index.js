@@ -3,3 +3,4 @@ export { default as LoadingSpinner } from './LoadingSpinner';
 export { default as TopNav } from './TopNav';
 export { default as ConfirmDialog } from './ConfirmDialog';
 export { default as Logo } from './Logo';
+export { default as ThemeToggle } from './ThemeToggle';

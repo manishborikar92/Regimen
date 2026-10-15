@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Authoritative VRITTA Logo component — The Guiding Sutra.
+ * Authoritative Vritta Logo component — The Guiding Sutra.
  * A continuous monoline ribbon loop representing the unbroken thread connecting all daily practices,
  * centered around a calm anchor point of balance.
  *
@@ -12,7 +12,7 @@
  * - Warm Amber: #D97706 (Center balance dot)
  * - Accessible Deep Teal: #0F766E (Light-mode ribbon loop variant for WCAG AA >= 5.2:1)
  */
-export default function Logo({ className = "w-8 h-8", title = "VRITTA Logo: The Guiding Sutra" }) {
+export default function Logo({ className = "w-8 h-8", title = "Vritta Logo: The Guiding Sutra" }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
