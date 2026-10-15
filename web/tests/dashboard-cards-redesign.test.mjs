@@ -134,5 +134,42 @@ describe('Phase 2: Mobile-First Dashboard Cards Redesign', () => {
         'MovementCard must include smooth chevron transition'
       );
     });
+
+    it('should verify MovementCard expanded steps use flex-col on mobile to prevent title crushing', () => {
+      const content = readWebFile('src/components/habits/MovementCard.js');
+      assert.ok(
+        content.includes('flex flex-col sm:flex-row sm:items-center sm:justify-between'),
+        'Movement steps must use responsive column-to-row wrapping'
+      );
+      assert.ok(
+        content.includes('self-start sm:self-auto'),
+        'Movement step duration badges must align cleanly on mobile'
+      );
+    });
+
+    it('should verify Safety & Progression Modal follows standardized Vritta modal architecture', () => {
+      const content = readWebFile('src/components/habits/MovementCard.js');
+      assert.ok(
+        content.includes('rounded-t-3xl sm:rounded-2xl'),
+        'Modal container must use bottom-sheet on mobile and centered modal on desktop'
+      );
+      assert.ok(
+        content.includes('items-end sm:items-center'),
+        'Backdrop must align bottom on mobile and center on desktop'
+      );
+      assert.ok(
+        content.includes('flex-shrink-0 z-10'),
+        'Modal header must remain pinned at the top during scrolling'
+      );
+      assert.ok(
+        content.includes('<X className="w-5 h-5" />'),
+        'Modal must use standard Lucide X close control'
+      );
+      assert.ok(
+        content.includes('e.target === e.currentTarget'),
+        'Modal must allow closing by clicking on the backdrop overlay'
+      );
+    });
   });
 });
+

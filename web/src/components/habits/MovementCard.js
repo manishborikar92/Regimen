@@ -12,6 +12,7 @@ import {
   Moon,
   ShieldAlert,
   Sparkles,
+  X,
 } from 'lucide-react';
 import { getCategoryConfig } from '@/lib/constants/categories';
 import {
@@ -218,9 +219,9 @@ function MovementCard({
                 />
               </div>
 
-              {/* Expandable Exercise Checklist */}
+              {/* Expandable Exercise Checklist: Polished Mobile-First Layout */}
               {isExpanded && (
-                <div className="space-y-2">
+                <div className="space-y-2.5 pt-1 border-t border-stone-200/80 dark:border-stone-700/80">
                   {currentItems.map((item, idx) => {
                     const isChecked = completedItemIds.includes(item.id);
                     const isItemDetailsOpen = expandedExerciseId === item.id;
@@ -228,50 +229,52 @@ function MovementCard({
                     return (
                       <div
                         key={item.id}
-                        className={`p-2.5 rounded-lg border transition-all ${
+                        className={`p-3 rounded-xl border transition-all ${
                           isChecked
                             ? 'bg-teal-50/40 dark:bg-teal-950/30 border-teal-200 dark:border-teal-800/60'
-                            : 'bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700'
+                            : 'bg-white dark:bg-stone-800/90 border-stone-200 dark:border-stone-700/80 shadow-2xs'
                         }`}
                       >
-                        <div className="flex items-start gap-2.5">
+                        <div className="flex items-start gap-3">
                           <input
                             type="checkbox"
                             checked={isChecked}
                             onChange={() => handleToggleItem(item.id)}
-                            className="mt-1 w-4.5 h-4.5 rounded text-teal-600 focus:ring-teal-500 border-stone-300 dark:border-stone-600 dark:bg-stone-900"
+                            className="mt-0.5 w-5 h-5 rounded text-teal-600 focus:ring-teal-500 border-stone-300 dark:border-stone-600 dark:bg-stone-900 flex-shrink-0 cursor-pointer"
                             id={`ex_${item.id}`}
                           />
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between gap-1.5">
+                            {/* Responsive Title & Target: flex-col on mobile, flex-row on larger viewports */}
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                               <label
                                 htmlFor={`ex_${item.id}`}
-                                className={`text-xs sm:text-sm font-semibold cursor-pointer ${
+                                className={`text-xs sm:text-sm font-semibold cursor-pointer leading-snug ${
                                   isChecked ? 'line-through text-stone-400 dark:text-stone-500' : 'text-stone-900 dark:text-stone-100'
                                 }`}
                               >
                                 {idx + 1}. {item.name}
                               </label>
-                              <span className="text-2xs sm:text-xs text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 px-2 py-0.5 rounded font-medium border border-teal-200 dark:border-teal-800/60 flex-shrink-0">
+                              <span className="self-start sm:self-auto text-2xs text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 px-2 py-0.5 rounded font-medium border border-teal-200 dark:border-teal-800/60">
                                 {item.target || item.reps}
                               </span>
                             </div>
 
                             {item.rest && item.rest !== 'None' && (
-                              <p className="text-2xs text-stone-400 dark:text-stone-500 mt-0.5">Rest: {item.rest}</p>
+                              <p className="text-2xs text-stone-400 dark:text-stone-500 mt-1">Rest: {item.rest}</p>
                             )}
 
-                            {/* Details toggle */}
+                            {/* Details toggle with accessible touch target */}
                             <button
                               type="button"
                               onClick={() => setExpandedExerciseId(isItemDetailsOpen ? null : item.id)}
-                              className="text-2xs text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 mt-1 flex items-center gap-0.5 font-medium min-h-[32px] py-1"
+                              className="text-2xs text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 flex items-center gap-1 font-medium min-h-[36px] py-1 transition-colors"
                             >
-                              {isItemDetailsOpen ? 'Hide form tips' : 'Form instructions & variations'}
+                              <span>{isItemDetailsOpen ? 'Hide form tips' : 'Form instructions & variations'}</span>
+                              <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isItemDetailsOpen ? 'rotate-180' : ''}`} />
                             </button>
 
                             {isItemDetailsOpen && (
-                              <div className="mt-2 text-xs text-stone-600 dark:text-stone-300 bg-stone-50 dark:bg-stone-900/60 p-2.5 rounded-md space-y-1.5 border border-stone-200/80 dark:border-stone-700/80">
+                              <div className="mt-2 text-xs text-stone-600 dark:text-stone-300 bg-stone-50 dark:bg-stone-900/60 p-3 rounded-lg space-y-1.5 border border-stone-200/80 dark:border-stone-700/80 leading-relaxed">
                                 <p><strong className="text-stone-900 dark:text-stone-100">Form:</strong> {item.instructions}</p>
                                 {item.easierVariation && (
                                   <p className="text-amber-800 dark:text-amber-400">
@@ -323,83 +326,88 @@ function MovementCard({
         </div>
       </div>
 
-      {/* Safety & Progression Modal */}
+      {/* Safety & Progression Modal (Standardized Vritta Modal Architecture) */}
       {showSafetyModal && (
-        <div className="fixed inset-0 bg-black/60 dark:bg-black/80 z-50 flex items-center justify-center p-4 z-[100]">
-          <div className="bg-surface rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-5 border border-subtle shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-subtle">
-              <h3 className="text-lg font-bold text-main flex items-center gap-2">
-                <ShieldAlert className="w-5 h-5 text-rose-600" />
-                <span>Movement Safety & 12-Week Plan</span>
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowSafetyModal(false)}
-                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 text-lg font-bold rounded-lg"
-                aria-label="Close safety modal"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Medical Check-up Caution Banner */}
-            <div className="p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 rounded-xl space-y-1">
-              <p className="text-xs font-bold text-rose-900 dark:text-rose-200 uppercase tracking-wide">
-                Important Medical Guardrail
-              </p>
-              <p className="text-xs text-rose-800 dark:text-rose-300 leading-relaxed">
-                Prepared for low body weight restoration. A medical check-up is explicitly recommended within the first 4 weeks (ideally before Week 5). Please remain at 2 sets until that medical evaluation has taken place.
-              </p>
-            </div>
-
-            {/* Stop Signals */}
-            <div className="space-y-2">
-              <h4 className="text-sm font-bold text-stone-900 dark:text-stone-100">Stop Signals — Cease Exercise Immediately:</h4>
-              <ul className="space-y-1 text-xs text-stone-700 dark:text-stone-300 bg-stone-50 dark:bg-stone-800/60 p-3 rounded-lg border border-stone-200 dark:border-stone-700">
-                {STOP_SIGNALS.map((signal, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <span className="text-rose-600 font-bold">•</span>
-                    <span>{signal}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* 12-Week Progression Table */}
-            <div className="space-y-2">
-              <h4 className="text-sm font-bold text-stone-900 dark:text-stone-100">12-Week Progression Structure:</h4>
-              <div className="space-y-2">
-                {PROGRESSION_PHASES.map((phase, idx) => (
-                  <div key={idx} className="p-3 bg-stone-50 dark:bg-stone-800/60 rounded-lg text-xs space-y-1 border border-stone-200/80 dark:border-stone-700/80">
-                    <div className="flex items-center justify-between">
-                      <strong className="text-stone-900 dark:text-stone-100 font-bold">{phase.phase}</strong>
-                      <span className="text-teal-700 dark:text-teal-300 font-semibold">{phase.targetSets}</span>
-                    </div>
-                    <p className="text-stone-600 dark:text-stone-400">{phase.guidance}</p>
-                    <p className="text-amber-800 dark:text-amber-400 font-medium">⚠️ {phase.caution}</p>
-                  </div>
-                ))}
+        <div
+          className="fixed inset-0 bg-black/60 dark:bg-black/80 flex items-end sm:items-center justify-center p-0 sm:p-4 z-[100]"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowSafetyModal(false);
+          }}
+        >
+          <div className="bg-surface rounded-t-3xl sm:rounded-2xl max-w-lg w-full max-h-[90vh] sm:max-h-[92vh] flex flex-col shadow-2xl border-t sm:border border-subtle overflow-hidden">
+            {/* Sticky Header with Permanent Close Button */}
+            <div className="bg-surface border-b border-subtle px-5 py-3.5 sm:py-4 flex items-center justify-between flex-shrink-0 z-10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-950/60 flex items-center justify-center text-rose-700 dark:text-rose-400 flex-shrink-0">
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-bold text-main">
+                    Movement Safety & 12-Week Plan
+                  </h2>
+                </div>
               </div>
-            </div>
-
-            {/* General Health Notes */}
-            <div className="space-y-1 text-xs text-stone-600 dark:text-stone-300 bg-teal-50/50 dark:bg-teal-950/30 p-3 rounded-lg border border-teal-100 dark:border-teal-900/40">
-              <p className="font-semibold text-teal-900 dark:text-teal-200">General Recovery Guidance:</p>
-              <ul className="list-disc pl-4 space-y-1 text-teal-950 dark:text-teal-300">
-                {GENERAL_HEALTH_NOTES.map((note, idx) => (
-                  <li key={idx}>{note}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="pt-2 flex justify-end">
               <button
                 type="button"
                 onClick={() => setShowSafetyModal(false)}
-                className="min-h-[44px] px-5 py-2.5 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-lg text-sm font-medium hover:bg-stone-800 dark:hover:bg-white transition-colors"
+                className="w-8 h-8 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center justify-center text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 transition-colors"
+                aria-label="Close"
               >
-                Close
+                <X className="w-5 h-5" />
               </button>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-5 min-h-0">
+              {/* Medical Check-up Caution Banner */}
+              <div className="p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 rounded-xl space-y-1">
+                <p className="text-xs font-bold text-rose-900 dark:text-rose-200 uppercase tracking-wide">
+                  Important Medical Guardrail
+                </p>
+                <p className="text-xs text-rose-800 dark:text-rose-300 leading-relaxed">
+                  Prepared for low body weight restoration. A medical check-up is explicitly recommended within the first 4 weeks (ideally before Week 5). Please remain at 2 sets until that medical evaluation has taken place.
+                </p>
+              </div>
+
+              {/* Stop Signals */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-bold text-stone-900 dark:text-stone-100">Stop Signals — Cease Exercise Immediately:</h4>
+                <ul className="space-y-1 text-xs text-stone-700 dark:text-stone-300 bg-stone-50 dark:bg-stone-800/60 p-3 rounded-lg border border-stone-200 dark:border-stone-700">
+                  {STOP_SIGNALS.map((signal, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-rose-600 font-bold">•</span>
+                      <span>{signal}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* 12-Week Progression Table */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-bold text-stone-900 dark:text-stone-100">12-Week Progression Structure:</h4>
+                <div className="space-y-2">
+                  {PROGRESSION_PHASES.map((phase, idx) => (
+                    <div key={idx} className="p-3 bg-stone-50 dark:bg-stone-800/60 rounded-lg text-xs space-y-1 border border-stone-200/80 dark:border-stone-700/80">
+                      <div className="flex items-center justify-between">
+                        <strong className="text-stone-900 dark:text-stone-100 font-bold">{phase.phase}</strong>
+                        <span className="text-teal-700 dark:text-teal-300 font-semibold">{phase.targetSets}</span>
+                      </div>
+                      <p className="text-stone-600 dark:text-stone-400">{phase.guidance}</p>
+                      <p className="text-amber-800 dark:text-amber-400 font-medium">⚠️ {phase.caution}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* General Health Notes */}
+              <div className="space-y-1 text-xs text-stone-600 dark:text-stone-300 bg-teal-50/50 dark:bg-teal-950/30 p-3 rounded-lg border border-teal-100 dark:border-teal-900/40">
+                <p className="font-semibold text-teal-900 dark:text-teal-200">General Recovery Guidance:</p>
+                <ul className="list-disc pl-4 space-y-1 text-teal-950 dark:text-teal-300">
+                  {GENERAL_HEALTH_NOTES.map((note, idx) => (
+                    <li key={idx}>{note}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </div>
