@@ -139,11 +139,6 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
       }}
     >
       <div className="bg-surface rounded-t-3xl sm:rounded-2xl w-full max-w-lg max-h-[90vh] sm:max-h-[92vh] flex flex-col shadow-2xl border-t sm:border border-subtle overflow-hidden">
-        {/* Mobile Pull Bar Indicator */}
-        <div className="sm:hidden pt-2.5 pb-1 flex justify-center bg-surface flex-shrink-0">
-          <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
-        </div>
-
         {/* Header */}
         <div className="bg-surface border-b border-subtle px-5 py-3.5 sm:py-4 flex items-center justify-between flex-shrink-0 z-10">
           <div>
