@@ -1,10 +1,10 @@
-# VRITTA — Next-Phase Implementation Plan & Engineering Migration Roadmap
+# Vritta — Phased Implementation Plan & Engineering Migration Roadmap
 
-**Project Name:** VRITTA (वृत्त)  
-**Author:** Manish Borikar  
-**Target Repository:** `c:\Users\manis\Projects\Regimen` → `c:\Users\manis\Projects\Vritta`  
-**Date:** 14 October 2026 (Revision 3 — Corrected & Evidence-Based)  
-**Status:** **PLANNING & RESEARCH GATE (APPROVAL-FIRST — DO NOT IMPLEMENT UNTIL EXPLICITLY APPROVED)**  
+**Project Name:** Vritta (वृत्त)<br/>
+**Author:** Manish Borikar<br/>
+**Target Repository:** `c:\Users\manis\Projects\Regimen` → `c:\Users\manis\Projects\Vritta`<br/>
+**Date:** 15 October 2026 (Revision 4 — Re-Sequenced & Complete Brand Realignment)<br/>
+**Status:** **PLANNING & RESEARCH GATE (APPROVAL-FIRST — DO NOT IMPLEMENT UNTIL EXPLICITLY APPROVED)**<br/>
 **Canonical Implementation Plan:** This document is the single authoritative implementation roadmap in the repository.
 
 ---
@@ -18,7 +18,8 @@
 ## 1. Finalized Branding & Design System Specifications
 
 ### 1.1 Brand Identity & Authoritative Color Lock
-- **Project Name:** **VRITTA** (वृत्त — classical Sanskrit: "conduct, regular cadence, rhythmic observance, and the cyclical nature of daily life").
+- **Project Name:** **Vritta** (वृत्त — classical Sanskrit: "conduct, regular cadence, rhythmic observance, and the cyclical nature of daily life").
+- **Canonical Display Name:** **Vritta** (exact capitalization). Visible UI copy, headers, badges, metadata, and manifests must use this exact capitalization.
 - **Authoritative Approved Brand Colors:**
   - **Deep Obsidian:** `#090D16` (Foundation Dark / Canvas & maximum-contrast brand text)
   - **Luminous Teal:** `#14B8A6` (Signature Brand Identity & Dark-Mode Ribbon Stroke / Buttons)
@@ -176,19 +177,19 @@ Contrast ratios were mathematically calculated using the official W3C relative l
 
 ## 3. Disentangling Names, URLs & Resource Availability
 
-To eliminate ambiguity, all project identifiers are separated into their distinct functional contexts:
+All project identifiers are separated into their distinct functional contexts, reflecting the verified infrastructure reality:
 
-| Identifier Context | Current Repository / Service Reality | Proposed Target Value | Availability / Verification Status |
+| Identifier Context | Current Repository / Service Reality | Authoritative Target Value | Verification & Operational Status |
 | :--- | :--- | :--- | :--- |
-| **Brand / Display Name** | "Vritta" in `brand.js`; "Regimen" in docs | **VRITTA** | **APPROVED & FINALIZED** by user |
-| **Vercel Project Name** | Currently `Regimen` or `regimen-web` | `vritta-app` (or `vritta-web`) | **PROVISIONAL:** Must be verified in Vercel Dashboard |
-| **Vercel Deployment Domain**| Existing deployment active on Vercel | `myvritta.vercel.app` | **PROVISIONAL:** Returned HTTP 404 on network check, but domain assignment can only be confirmed upon project creation or domain addition in Vercel |
-| **GitHub Repository Name** | `manishborikar92/Regimen` | `manishborikar92/Vritta` | **PROVISIONAL:** Pending user rename in GitHub Settings |
-| **Local Workspace Folder** | `c:\Users\manis\Projects\Regimen` | `c:\Users\manis\Projects\Vritta` | **LOCAL TARGET:** Pending execution in Phase 8 |
-| **Firebase Project ID** | `vritta-app` | `vritta-app` (or auto-suffixed) | **PROVISIONAL:** ID will be chosen during Firebase Console setup |
+| **Brand / Display Name** | "Vritta" in code / visible UI; old docs have "Regimen" | **Vritta** | **APPROVED & AUTHORITATIVE:** Canonical capitalization **Vritta** (Phase 11 will complete project-wide migration). |
+| **Vercel Project Name** | Configured in Vercel | `vritta` | **USER-COMPLETED & VERIFIED:** Confirmed in user settings and live Vercel HTTP response. |
+| **Vercel Deployment Domain**| Active Vercel production edge | `myvritta.vercel.app` | **USER-COMPLETED & VERIFIED:** Serving HTTP 200 via Vercel edge `bom1`. Live deployment runs build from GitHub `origin/m/dev`. |
+| **GitHub Repository Name** | `manishborikar92/Vritta` | `manishborikar92/Vritta` | **USER-COMPLETED & VERIFIED:** `git remote -v` and `git ls-remote` confirm remote points to `Vritta.git`. |
+| **Local Workspace Folder** | `c:\Users\manis\Projects\Regimen` | `c:\Users\manis\Projects\Vritta` | **EXPLICITLY DEFERRED:** Retained as the **very last phase in execution order (Phase 8)** to prevent file-lock breakage. |
+| **Firebase Project ID** | `vritta-app` | `vritta-app` | **USER-COMPLETED & VERIFIED:** Admin SDK and client configs connected; 6 canonical routines populated under UID `2W83kgjX9db8QiIWqZd5AJrc8PQ2`. |
 
-> [!CAUTION]
-> **Domain Availability Clarification:** An HTTP 404 response on the public internet only indicates that no deployment is currently responding at that URL. It does **not** prove that the subdomain is unreserved, unblocked, or claimable by our Vercel account. Availability can only be confirmed by attempting to assign the domain within the Vercel Dashboard.
+> [!NOTE]
+> **Production Parity Distinction:** While `myvritta.vercel.app` is live and routing properly, its active deployment was generated from the remote GitHub commit on `origin/m/dev` prior to local commit `502851b`. The local working tree contains the latest code (Phases 1–5). A controlled production release in Phase 13 will bring the live site into full parity.
 
 ---
 
@@ -254,36 +255,51 @@ To eliminate ambiguity, all project identifiers are separated into their distinc
 
 ---
 
-## 5. Dependency-Aware 10-Phase Roadmap & Safe Sequencing
+## 5. Dependency-Aware 13-Phase Roadmap & Safe Sequencing
 
 ```mermaid
 flowchart TD
-    Gate["Approval Gate (User Authorizes Plan)"] --> P1["Phase 1: Design Tokens & Theme Engine [VERIFIED]"]
-    P1 --> P2["Phase 2: Master Vector Assets Migration [VERIFIED]"]
-    P2 --> P3["Phase 3: UI/UX Component Polish [VERIFIED]"]
-    P3 --> P4["Phase 4: Login Page Redesign [VERIFIED]"]
-    P4 --> P5["Phase 5: Browser Verification & Accessibility Audit [VERIFIED]"]
+    subgraph FrontendPhases["Completed & Verified Frontend Phases"]
+        P1["Phase 1: Design Tokens & Theme Engine [VERIFIED]"]
+        P2["Phase 2: Master Vector Assets Migration [VERIFIED]"]
+        P3["Phase 3: UI/UX Component Polish [VERIFIED]"]
+        P4["Phase 4: Login Page Redesign [VERIFIED]"]
+        P5["Phase 5: Browser Verification & Accessibility Audit [VERIFIED]"]
+        P1 --> P2 --> P3 --> P4 --> P5
+    end
 
-    subgraph UserCompletedInfra["User-Completed Infrastructure Operations (Verified)"]
+    subgraph UserInfra["User-Completed Infrastructure Operations (Verified)"]
         P6["Phase 6: Fresh Firebase Setup & Seed Migration [VERIFIED]"]
         P7["Phase 7: GitHub Repository Renaming & Git Remote [VERIFIED]"]
         P9["Phase 9: Vercel Project & Domain Setup [VERIFIED]"]
     end
 
-    P5 --> UserCompletedInfra
-    UserCompletedInfra --> Checkpoint["Production Deployment & Code Sync Checkpoint"]
-    Checkpoint --> P8["Phase 8: Local Folder Renaming (DEFERRED TO FINAL STEP)"]
-    P8 --> P10["Phase 10: Documentation Archival, Cleanup & Final Handover"]
+    P5 --> P11["Phase 11: Complete Brand Renaming to Vritta [READY]"]
+    UserInfra -.-> P11
+    P11 --> P12["Phase 12: Icon-Only Light/Dark Theme Switcher [PENDING P11]"]
+    P12 --> P13["Phase 13: Integration Verification & Production Parity [PENDING P12]"]
+    P13 --> P10["Phase 10: Documentation Archival & Cleanup [PENDING P13]"]
+    P10 --> P8["Phase 8: Local Workspace Folder Renaming [FINAL STEP]"]
 ```
 
-### Actual Execution Sequence & Status Highlights:
-1. **Phases 1–4 (Local Frontend Implementation):** Fully implemented, tested, and verified on local working tree (98 passing tests, zero purple/indigo, Guiding Sutra branding).
-2. **Phase 5 (Comprehensive Browser Verification & Accessibility Audit):** Executed and verified using headless Chrome CDP with live authenticated sessions across 5 viewports, 5 routes, and dark/light modes.
-3. **Phase 6 (Firebase Project `vritta-app`):** Completed by Manish; verified active project `vritta-app`, Admin SDK connection, and 6 canonical habits seeded in Cloud Firestore under UID `2W83kgjX9db8QiIWqZd5AJrc8PQ2`.
-4. **Phase 7 (GitHub Repository `Vritta`):** Completed by Manish; verified `origin` remote points to `https://github.com/manishborikar92/Vritta.git`.
-5. **Phase 9 (Vercel Project `vritta` & Domain `myvritta.vercel.app`):** Completed by Manish; verified live HTTP 200 response from Vercel edge `bom1`. Deployed commit reflects remote GitHub `origin/m/dev`, while local working tree contains the latest Phase 1–5 code.
-6. **Phase 8 (Local Workspace Folder Renaming):** **Explicitly deferred to the very end**, after all code, deployment, and documentation tasks are fully verified, preventing breaking active IDE, path, or terminal locks.
-7. **Phase 10 (Final Archival & Handover):** Final phase to archive exploration docs and verify end-to-end operational readiness.
+### Complete 13-Phase Execution Sequence & Status Summary
+
+| Phase ID | Phase Name | Execution Context | Current Status | Next Action / Blocker |
+| :--- | :--- | :--- | :--- | :--- |
+| **Phase 1** | Design Tokens & Zero-Flash Theme Engine | Local Frontend | **COMPLETED & VERIFIED** | Closed. 57/57 tests pass, zero-flash script verified. |
+| **Phase 2** | Master Vector Assets & Branding Metadata | Local Frontend | **COMPLETED & VERIFIED** | Closed. Guiding Sutra vector assets, favicons, PWA manifest installed. |
+| **Phase 3** | UI/UX Component Polish (Mobile-First) | Local Frontend | **COMPLETED & VERIFIED** | Closed. 87/87 tests pass, 44px touch targets, zero purple/indigo. |
+| **Audit Gate** | Tailwind CSS v4 `@theme inline` & Layout Audit | Architecture | **COMPLETED & VERIFIED** | Closed. Removed circular vars, decoupled viewport, clean build. |
+| **Phase 4** | Login & Authentication Page Redesign | Local Frontend | **COMPLETED & VERIFIED** | Closed. 98/98 tests pass, unrestricted zoom, calm card aesthetics. |
+| **Phase 5** | Browser Verification & Accessibility Audit | Local End-to-End | **COMPLETED & VERIFIED** | Closed. 26 browser screenshots, CDP test report, 0 console errors. |
+| **Phase 6** | Fresh Firebase Project Setup & Seed Migration | Infrastructure | **USER-COMPLETED & VERIFIED** | Closed. Verified `vritta-app`, Admin SDK, 6 habits populated. |
+| **Phase 7** | GitHub Repository Renaming & Git Remote | Infrastructure | **USER-COMPLETED & VERIFIED** | Closed. Verified remote origin `manishborikar92/Vritta.git`. |
+| **Phase 9** | Vercel Project Renaming & Domain Setup | Infrastructure | **USER-COMPLETED & VERIFIED** | Closed. Verified `vritta` & `myvritta.vercel.app` (edge `bom1`). *Note: Live deployment is on remote commit `a6cd5d8`; local code will deploy in Phase 13.* |
+| **Phase 11** | Complete Brand Renaming to Vritta | Codebase & Docs | **READY FOR IMPLEMENTATION** | **IMMEDIATE NEXT STEP** upon user authorization. Eradicate all old "Regimen" references. |
+| **Phase 12** | Simplify Theme Selection to Icon-Only Toggle | Local Frontend | **PENDING PHASE 11** | Depends on Phase 11. Remove System theme, build shared `ThemeToggle.js`, simplify blocking script. |
+| **Phase 13** | Integration Verification & Production Parity | Release Testing | **PENDING PHASE 12** | Depends on Phase 12. Full test suite, CDP visual audit, and controlled production push to Vercel. |
+| **Phase 10** | Documentation Archival & Cleanup | Docs & Hygiene | **PENDING PHASE 13** | Depends on Phase 13. Archive old plans to `docs/archive/`, remove temporary logs, prepare for folder rename. |
+| **Phase 8** | Local Workspace Folder Renaming | Local OS / File System | **STRICTLY FINAL PHASE** | Depends on Phase 10. Execute external PowerShell rename script after closing all IDE/terminal locks. |
 
 ---
 
@@ -445,41 +461,233 @@ flowchart TD
   - Deployment Domain: `myvritta.vercel.app` (verified live HTTP 200 responses from Vercel edge `bom1`, serving title "Vritta — Personal Routine Companion").
   - **Important Deployment Distinction:** The live site at `myvritta.vercel.app` currently runs the deployment built from remote GitHub commit `a6cd5d8` on `origin/m/dev`. Local working tree is 5 commits ahead (`502851b`) containing Phases 1–5 implementations (zero purple/indigo, Guiding Sutra mark, unrestricted zoom). When Manish pushes local commits to GitHub, Vercel will build and reflect the latest verified code.
 
-#### Phase 8: Local Workspace Folder Renaming — [STATUS: EXPLICITLY DEFERRED TO FINAL HANDOVER]
-- **Status:** **EXPLICITLY DEFERRED** until the very end, after all implementation, deployment, testing, and documentation cleanup tasks are complete.
-- **Rationale:** Renaming `C:\Users\manis\Projects\Regimen` while IDE, Node.js background processes, and terminals are open causes Windows file-locking failures (`EPERM`/`EBUSY`) and breaks active IDE workspace contexts.
-- **Eventual Phase 8 Execution Runbook (Windows PowerShell):**
-  1. *Pre-flight Sanitation:* Ensure `git status` is clean, all background test servers/monitors are killed (`taskkill /f /im node.exe`).
-  2. *Close IDE & Terminals:* Close all VS Code / Antigravity windows and terminals rooted in `C:\Users\manis\Projects\Regimen`.
-  3. *Open Standalone Terminal:* Open an external Windows PowerShell window at `C:\Users\manis\Projects`.
-  4. *Execute Rename:*
-     ```powershell
-     Rename-Item -Path "C:\Users\manis\Projects\Regimen" -NewName "Vritta"
-     ```
-  5. *Reopen Workspace:* Launch IDE and terminal in `C:\Users\manis\Projects\Vritta`.
-  6. *Post-Rename Verification:*
-     - Run `git status` to verify working tree integrity and branch `m/dev`.
-     - Run `git remote -v` to confirm origin remains `https://github.com/manishborikar92/Vritta.git`.
-     - Run `npm --prefix web run test` (must pass 98/98 tests).
-     - Run `npm --prefix web run build` to verify Next.js builds cleanly at new path.
-     - Verify documentation contains zero broken relative or absolute path dependencies.
+#### Phase 11: Complete Brand Renaming to Vritta — [STATUS: READY FOR IMPLEMENTATION UPON APPROVAL]
+- **Objectives:** Eradicate all occurrences of the old brand name ("Regimen", case-insensitive) across the active codebase, manifests, configurations, metadata, visible UI copy, and active documentation. Standardize all visible branding on the canonical display name **Vritta** (exact capitalization).
+- **Prerequisites & Dependencies:** Phases 1–5 completed and verified.
+- **Working Directory:** Repository root (`c:\Users\manis\Projects\Regimen`) and `web/`.
+- **Exact Affected Files & Changes:**
+  1. `web/package.json`:
+     - Line 2: `"name": "regimen-web"` → `"name": "vritta-web"`
+  2. `web/package-lock.json`:
+     - Lines 2 & 8: `"name": "regimen-web"` → `"name": "vritta-web"`
+  3. `web/src/lib/constants/brand.js`:
+     - Line 12: `name: 'VRITTA'` → `name: 'Vritta'`
+     - Line 15: `logoAlt: 'VRITTA Logo: The Guiding Sutra'` → `logoAlt: 'Vritta Logo: The Guiding Sutra'`
+  4. `web/src/app/manifest.json`:
+     - Line 2: `"name": "VRITTA — Personal Routine Companion"` → `"name": "Vritta — Personal Routine Companion"`
+     - Line 3: `"short_name": "VRITTA"` → `"short_name": "Vritta"`
+  5. `web/src/app/icon0.svg`:
+     - SVG root: `aria-label="VRITTA Logo: The Guiding Sutra"` → `aria-label="Vritta Logo: The Guiding Sutra"`
+     - Line 2: `<desc>VRITTA — The Guiding Sutra...</desc>` → `<desc>Vritta — The Guiding Sutra...</desc>`
+  6. `web/src/components/ui/Logo.js`:
+     - Line 4 docstring: `Authoritative VRITTA Logo component` → `Authoritative Vritta Logo component`
+     - Line 15 default prop: `title = "VRITTA Logo: The Guiding Sutra"` → `title = "Vritta Logo: The Guiding Sutra"`
+  7. `web/src/lib/fixtures/exercise-plan.js`:
+     - Line 3: Update comment referencing `docs/regimen_project_brief.md` to note Vritta product brief.
+  8. `web/src/lib/fixtures/osho-library.js`:
+     - Line 3: Update comment referencing `docs/regimen_project_brief.md` to note Vritta product brief.
+  9. `README.md` (root):
+     - Line 1: `# Regimen — Daily Routine Tracker` → `# Vritta — Personal Routine Companion`
+     - Update all body references from "Regimen" to "Vritta", GitHub clone URL to `https://github.com/manishborikar92/Vritta.git`, and directory references.
+  10. `web/README.md`:
+      - Line 1: `# Regimen — Daily Routine Tracker` → `# Vritta — Personal Routine Companion`
+      - Update project description, script table, and environment setup to Vritta.
+  11. `docs/Workflow.md`:
+      - Line 22: `cd Regimen` → `cd Vritta` (with explanatory note on deferred folder rename)
+      - Update repository URLs and branch references.
+  12. `docs/firebase-setup.md`:
+      - Replace "Regimen (Vritta)" and "Regimen's runtime operations" with "Vritta".
+  13. `web/tests/brand-assets.test.mjs` & `web/tests/theme-engine.test.mjs`:
+      - Update test assertions checking for brand name constants to assert canonical `'Vritta'`.
+- **Permitted Historical Exceptions (Immutable/Preserved):**
+  - `docs/regimen_project_brief.md`: Maintained unchanged as the authoritative foundational product brief from Manish.
+  - Git commit history: Past commits containing "Regimen" are immutable and preserved.
+  - Local workspace path `C:\Users\manis\Projects\Regimen`: Retained until Phase 8.
+- **Verification Commands:**
+  - `git grep -in "regimen" web/src/` (Must return 0 occurrences).
+  - `git grep -in "regimen" web/package.json` (Must return 0 occurrences).
+  - `git grep -n "VRITTA" web/src/` (Must return 0 occurrences of all-caps brand name).
+  - `npm --prefix web run lint` (Must exit code 0).
+  - `npm --prefix web run test` (Must pass all 98 tests).
+  - `npm --prefix web run build` (Must build cleanly with code 0).
+- **Acceptance Criteria:**
+  - 0 occurrences of "regimen" across all source code, package manifests, and active root docs.
+  - Canonical display name **Vritta** renders consistently across `TopNav`, `/login`, PWA manifest, and page metadata.
+  - 0 test regressions.
+- **Rollback Strategy:** Standard git file checkout for modified files: `git checkout HEAD -- <files>`.
 
-#### Phase 10: Documentation Archival, Cleanup & Final Handover
-- **Objectives:** Execute documentation cleanup matrix; archive superseded documents to `docs/archive/`; deliver handover sign-off.
-- **Dependencies:** Phase 9 live deployment confirmed by user; Phase 8 folder rename completed.
-- **Acceptance Criteria:** All documentation updated; temporary debug files removed; obsolete plans safely archived.
+#### Phase 12: Simplify Theme Selection to Icon-Only Light/Dark Toggle — [STATUS: PENDING PHASE 11]
+- **Objectives:** Completely remove the "System" theme option, its implementation, and related UI text. Implement a single, accessible, icon-only toggle button (Sun/Moon), safe default to `'light'`, pre-paint zero-flash blocking script without `matchMedia`, and create a shared reusable `ThemeToggle` component used in `TopNav` and `/login`.
+- **Prerequisites & Dependencies:** Phase 11 complete and verified.
+- **Working Directory:** `web/`.
+- **Exact Affected Files & Changes:**
+  1. `web/src/components/ui/ThemeToggle.js` (NEW Shared Component):
+     - Single tactile button toggling strictly between `'light'` and `'dark'`.
+     - Touch target meets Level AAA standard (>= 44×44px): `w-10 h-10 min-w-[44px] min-h-[44px] p-2 rounded-xl flex items-center justify-center`.
+     - Clean icon state:
+       - In `light` mode: displays `Moon` icon (indicating clicking switches to dark), styled with `text-amber-500 hover:text-amber-600 transition-colors`, `aria-label="Switch to dark mode"`, `title="Switch to dark mode"`.
+       - In `dark` mode: displays `Sun` icon (indicating clicking switches to light), styled with `text-amber-400 hover:text-amber-300 transition-colors`, `aria-label="Switch to light mode"`, `title="Switch to light mode"`.
+     - Styling: `text-sub hover:text-main hover:bg-surface-subtle transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 border border-transparent hover:border-subtle shadow-2xs`.
+     - Client mount placeholder: when `!isMounted`, renders `<div className="w-10 h-10 min-w-[44px] min-h-[44px]" aria-hidden="true" />` to prevent layout shift.
+     - Zero text labels.
+  2. `web/src/contexts/ThemeContext.js`:
+     - Remove `'system'` from allowed theme values.
+     - Simplify initial context value: `{ theme: 'light', resolvedTheme: 'light', setTheme: () => {}, isMounted: false }`.
+     - In `getStoredTheme()`: read `localStorage.getItem('vritta-theme')`. If `'dark'`, return `'dark'`. Otherwise return `'light'` (safely converting any legacy `'system'` preference, null, or corrupted string to `'light'`).
+     - Remove `getSystemPreference()` completely.
+     - Remove `window.matchMedia('(prefers-color-scheme: dark)')` listener and media change handler completely.
+     - Keep `window.addEventListener('storage', ...)` for cross-tab synchronization.
+     - Simplify `resolvedTheme`: compute directly as `isMounted ? theme : 'light'`.
+     - In `setTheme`: validate `if (newTheme !== 'light' && newTheme !== 'dark') return;`, persist to `localStorage.setItem('vritta-theme', newTheme)`, apply `.dark` class, notify listeners.
+  3. `web/src/app/layout.js`:
+     - Update pre-paint zero-flash script in `<head>`:
+       ```javascript
+       (function(){try{var s=localStorage.getItem('vritta-theme');if(s==='dark'){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){}})()
+       ```
+     - Completely removes `window.matchMedia` and `system` check from blocking script, ensuring instant zero-flash pre-paint execution.
+  4. `web/src/components/ui/TopNav.js`:
+     - Remove `THEME_OPTIONS` array (`{ id: 'system', label: 'System', Icon: Monitor }`), `showThemeMenu` state, menu popup dropdown, menu backdrop, and 3-state radio keyboard handlers.
+     - Import and render `<ThemeToggle />`.
+     - Reduces `TopNav.js` file complexity by ~90 lines of obsolete dropdown code.
+  5. `web/src/app/(auth)/login/page.js`:
+     - Remove custom `cycleTheme` handler, `Laptop` icon import, and text label `<span className="hidden sm:inline">System</span>`.
+     - Import and render `<ThemeToggle />` in auth header.
+  6. `web/tests/theme-engine.test.mjs`:
+     - Update unit tests for `getStoredTheme`: assert that empty storage, corrupted value, or legacy `'system'` key cleanly defaults/migrates to `'light'`.
+     - Remove tests asserting 3-state keyboard menu navigation.
+     - Add unit tests for `ThemeToggle.js` asserting toggle behavior, aria-labels, touch target, and zero text.
+  7. `web/tests/phase-4-login-redesign.test.mjs`:
+     - Update assertions to verify `ThemeToggle` usage.
+- **Preservation Invariant (Unrelated Uses of "System"):**
+  - Nervous system descriptions in `web/src/components/habits/MovementCard.js` (line 194) and `web/src/lib/seed-data.js` (line 127) must remain untouched.
+  - `isSystemSeed` metadata flags in `web/src/app/(protected)/habits/page.js`, `web/src/lib/seed-data.js`, `web/src/lib/server/personal-schedule.js`, and `web/src/lib/server/sync-service.js` must remain untouched.
+- **Verification Commands:**
+  - `git grep -in "matchMedia" web/src/` (Must return 0 occurrences).
+  - `git grep -in "system" web/src/components/ui/TopNav.js` (Must return 0 occurrences).
+  - `git grep -in "system" web/src/contexts/ThemeContext.js` (Must return 0 occurrences).
+  - `git grep -in "system" web/src/app/(auth)/login/page.js` (Must return 0 occurrences).
+  - `npm --prefix web run lint` (Must exit code 0).
+  - `npm --prefix web run test` (Must pass all 98 tests).
+  - `npm --prefix web run build` (Next.js 16 webpack production build passed with code 0).
+- **Acceptance Criteria:**
+  - Single icon-only button rendered in TopNav and /login; zero text labels.
+  - Clicking toggle alternates strictly between Light and Dark mode.
+  - Safe default is `'light'`; legacy `'system'` preference is safely migrated to `'light'`.
+  - Root layout blocking script contains zero `matchMedia` calls.
+  - Zero hydration errors or theme flashes on reload.
+  - All unrelated uses of "system" remain untouched.
+- **Rollback Strategy:** Git revert `ThemeContext.js`, `layout.js`, `TopNav.js`, `login/page.js`, and delete `ThemeToggle.js`.
+
+#### Phase 13: Integration Verification & Production Release Readiness — [STATUS: PENDING PHASE 12]
+- **Objectives:** Execute rigorous end-to-end regression testing and cross-device visual audits following Phase 11 and 12 modifications, and establish the controlled production release protocol to synchronize remote GitHub and Vercel edge deployment to local code.
+- **Prerequisites & Dependencies:** Phase 11 and Phase 12 completed and verified.
+- **Verification Protocol & Execution Steps:**
+  1. *Automated Quality Gates:*
+     - Run `npm --prefix web run lint` (ESLint flat config must report 0 errors, 0 warnings).
+     - Run `npm --prefix web run test` (all unit and integration suites must pass).
+     - Run `npm --prefix web run build` (Next.js 16 webpack production build must compile with code 0; all static routes generated).
+     - Run `git diff --check` (verify 0 trailing whitespace errors).
+  2. *Live Headless Chrome CDP Browser & Accessibility Audit:*
+     - Start local production server (`npm --prefix web run start` on port 3000).
+     - Execute CDP automation script across 5 standard device viewports (375px, 390px, 412px, 768px, 1280px) in Light and Dark modes.
+     - Verify:
+       - Zero horizontal overflow (`scrollWidth === clientWidth`) across all routes (`/`, `/login`, `/dashboard`, `/habits`, `/analytics`).
+       - Theme toggle button functions cleanly: toggles theme class on `<html>`, switches icon between Sun and Moon, updates `aria-label`, and persists to `localStorage`.
+       - Touch targets >= 44×44px on all interactive buttons.
+       - Zero console errors, 0 hydration warnings, 0 failed network requests.
+       - Capture full-page screenshots and store in `docs/test-evidence/phase-13/`.
+  3. *Production Parity Audit & Controlled Release Gate:*
+     - Review local git commit history against remote tracking branch: `git log origin/m/dev..m/dev --oneline`.
+     - Confirm that all changes for Phases 1–5, 11, and 12 are committed locally.
+     - Present the release readiness gate to Manish:
+       - Repository: `https://github.com/manishborikar92/Vritta.git`
+       - Target Branch: `m/dev`
+       - Vercel Deployment Domain: `myvritta.vercel.app`
+     - **Explicit User Authorization Gate:** Under user instructions, push commits to remote origin:
+       ```powershell
+       git push origin m/dev
+       ```
+     - Monitor Vercel automatic deployment:
+       - Verify Vercel build status and edge deployment at `https://myvritta.vercel.app`.
+       - Test live edge response: HTTP 200, `<title>Vritta — Personal Routine Companion</title>`, Guiding Sutra favicon, and zero-flash Light/Dark toggle.
+- **Acceptance Criteria:**
+  - 100% test pass rate; 0 lint errors; clean production build.
+  - Live production deployment at `myvritta.vercel.app` reflects full parity with local verified code.
+
+#### Phase 10: Documentation Archival, Cleanup & Pre-Final Handover Preparation — [STATUS: PENDING PHASE 13]
+- **Objectives:** Execute documentation cleanup matrix; archive superseded exploratory documents and plans to `docs/archive/`; delete temporary CLI logs; update canonical documentation; and sanitize the repository prior to the final folder rename.
+- **Prerequisites & Dependencies:** Phase 13 integration verification and production release complete.
+- **Working Directory:** Repository root (`c:\Users\manis\Projects\Regimen`).
+- **Exact Action Matrix:**
+  1. *Archive Superseded Documents to `docs/archive/`:*
+     - Move `docs/branding-exploration/02-name-proposals.md` → `docs/archive/branding/02-name-proposals.md`.
+     - Move `docs/schedule-isolation-and-firebase-plan.md` → `docs/archive/schedule-isolation-and-firebase-plan.md`.
+     - Move `docs/rebuild-plan.md` → `docs/archive/rebuild-plan.md`.
+     - Move `docs/BODY-RESTORATION-PROTOCOL.md` → `docs/archive/BODY-RESTORATION-PROTOCOL.md`.
+     - Move discarded logo concepts (`logo-concept-[1245]*.svg`) → `docs/archive/branding/`.
+  2. *Delete Temporary Files:*
+     - Delete `web/firebase-debug.log` (stale CLI log).
+     - Delete any temporary scratch scripts or test artifacts.
+  3. *Update Canonical Architecture Documentation:*
+     - `docs/Architecture.md`: Document Vritta domain model, Restorative Juniper semantic tokens, `ThemeToggle` component, and Firebase Admin SDK structure.
+     - `docs/UserFlow.md`: Update user journeys with icon-only theme toggle and Google Sign-In flow.
+     - `docs/firebase-setup.md`: Remove deprecated `/api/schedule/personal` references; document verified `vritta-app` project.
+     - `docs/Workflow.md`: Document test commands, native test runner, and Git workflow.
+  4. *Preserve Immutable Product Brief:*
+     - `docs/regimen_project_brief.md` is strictly maintained intact as the authoritative foundational product brief.
+  5. *Pre-Rename Working Tree Check:*
+     - Run `git status` to ensure all documentation edits are cleanly accounted for.
+- **Acceptance Criteria:**
+  - `docs/archive/` contains all superseded files.
+  - Zero temporary debug logs remain.
+  - All canonical documentation accurately reflects Vritta.
+  - Working tree is clean and prepared for Phase 8.
+
+#### Phase 8: Local Workspace Folder Renaming & Final Handover — [STATUS: STRICTLY FINAL PHASE IN EXECUTION ORDER]
+- **Objectives:** Safely rename local directory `C:\Users\manis\Projects\Regimen` to `C:\Users\manis\Projects\Vritta` using an external PowerShell runbook, ensuring zero file-lock errors and seamless IDE migration.
+- **Why it is strictly final:**
+  - Modifying the folder path while Node.js servers, Playwright instances, background tasks, or IDE workspaces are open causes fatal Windows file-locking (`EBUSY` / `EPERM`) errors.
+  - Keeping it as the very last step guarantees all code, testing, deployment, and documentation work is 100% complete before touching the folder path.
+- **Exact PowerShell Runbook (Windows PowerShell):**
+  ```powershell
+  # Step 1: Terminate all running background processes and Node.js servers
+  taskkill /F /IM node.exe
+
+  # Step 2: Close all VS Code / Antigravity windows and terminals rooted in C:\Users\manis\Projects\Regimen
+
+  # Step 3: Open an external Windows PowerShell window at C:\Users\manis\Projects (NOT inside Regimen)
+  cd C:\Users\manis\Projects
+
+  # Step 4: Execute directory rename
+  Rename-Item -Path "C:\Users\manis\Projects\Regimen" -NewName "Vritta"
+
+  # Step 5: Verify folder exists at new location
+  Test-Path "C:\Users\manis\Projects\Vritta"
+
+  # Step 6: Launch IDE / Editor at the renamed location
+  # Open C:\Users\manis\Projects\Vritta in Antigravity / VS Code
+  ```
+- **Post-Rename Verification Checklist:**
+  1. Open terminal at `C:\Users\manis\Projects\Vritta`.
+  2. Run `git status` to verify working tree integrity and branch `m/dev`.
+  3. Run `git remote -v` to confirm origin remains `https://github.com/manishborikar92/Vritta.git`.
+  4. Run `npm --prefix web run test` to verify all test suites execute cleanly at new path.
+  5. Run `npm --prefix web run build` to verify Next.js builds cleanly at new path.
+  6. Final handover sign-off.
 
 ---
 
 ## 6. Comprehensive Testing Coverage Matrix
 
-The 57 automated unit tests are a logic baseline, not proof of complete UI correctness. Full verification requires testing all application routes and states:
+The 98 automated unit tests across 31 suites provide comprehensive regression coverage across design tokens, accessibility, and routine behaviors. Integration and release verification in Phase 13 requires testing all application routes and states:
 
 | Route / Component | Interaction / State Tested | Testing Method | Acceptance Criteria |
 | :--- | :--- | :--- | :--- |
-| **`/login` (Auth Page)** | Initial load (Light & Dark) | Visual / Playwright | Guiding Sutra mark crisp; zero AI glow; cards readable |
+| **Brand Renaming** | Zero "regimen" in active files | Unit test / `git grep` | Zero occurrences in `web/src/`, `package.json`, root docs |
+| **Brand Display** | Canonical display name | Unit test / Browser | Displays **Vritta** (exact capitalization) in UI and metadata |
+| **`/login` (Auth Page)** | Initial load (Light & Dark) | Visual / CDP | Guiding Sutra mark crisp; zero AI glow; cards readable |
 | **`/login` (Auth Page)** | Google Sign-In click | Manual Browser | Popup opens, authenticates, redirects to `/dashboard` |
-| **`/dashboard` (Today)** | Groups rendering | Visual / Playwright | Routines grouped into Flexible, Afternoon, Before Bed |
+| **`/dashboard` (Today)** | Groups rendering | Visual / CDP | Routines grouped into Flexible, Afternoon, Before Bed |
 | **`WorkbookCard`** | Session 1 & 2 increments | Interaction / Manual | Progress updates; complete only when review is checked |
 | **`MovementCard`** | Weekday-adaptive display | Unit test & Browser | Displays Mon/Wed/Fri workout, Tue/Thu/Sat walk, Sun rest |
 | **`OshoCard`** | Discourse catalog modal | Interaction / Manual | Modal opens, shows 30 talks across 6 groups, saves progress |
@@ -487,20 +695,15 @@ The 57 automated unit tests are a logic baseline, not proof of complete UI corre
 | **`SpeakingCard`** | ChatGPT practice toggle | Interaction / Manual | Opens practice notes, toggles binary completion |
 | **`DiaryCard`** | Private reflection modal | Interaction / Manual | Opens 5 reflection prompts; saves privately to account |
 | **`StreakCounter`** | Consistency rhythm display| Unit test & Visual | Amber accent renders; rest days excluded from streak |
-| **`TopNav`** | 3-state Theme Switcher | Interaction / Manual | Toggles Light, Dark, System; zero flash on reload |
+| **`TopNav` / `/login`** | Icon-Only Light/Dark Toggle | Interaction / Browser | Toggles Light and Dark; Sun/Moon icons; >= 44px target; zero flash |
 | **`TopNav`** | Profile menu & Sign out | Interaction / Manual | Menu opens, confirmation dialog prompts, signs out clean |
 | **`BottomNav`** | Navigation tabs (Today, Routine, Insights)| Interaction / Manual | Active tab highlighted; touch targets >= 44×44px |
 | **`/habits` (Manager)** | Add / Edit Habit modal | Interaction / Manual | Saves custom habit; displays `Personal` vs `Foundation` badge |
 | **`/habits` (Manager)** | Delete habit | Interaction / Manual | ConfirmDialog warns; habit removed; past logs preserved |
 | **`/analytics` (Insights)**| 30-day calendar heatmap | Interaction / Visual | Sunday rest excluded from denominator; heatmap colored |
-| **Loading States** | Page navigation loading | Visual / Playwright | `LoadingSpinner` centers cleanly with semantic accent |
-| **Empty States** | No habits scheduled | Visual / Playwright | Helpful empty state with link to Routine Manager |
-| **Responsive Viewports**| 375px, 390px, 412px, 768px, 1280px | Playwright / DevTools | Zero horizontal scrollbar (`scrollWidth === clientWidth`) |
-
-### Recommended Browser Automation Tooling
-- **Recommendation:** Install **Playwright** (`@playwright/test`) as a devDependency in `web/` during Phase 5.
-- **Justification:** Playwright natively supports viewport emulation (iPhone SE 375px, iPhone 14 390px, Pixel 7 412px), dark mode emulation (`colorScheme: 'dark'`), full-page screenshot capture, and automated assertion of `scrollWidth === clientWidth`.
-- **Evidence Storage:** Automated and manual screenshots will be stored in `docs/test-evidence/`.
+| **Loading States** | Page navigation loading | Visual / CDP | `LoadingSpinner` centers cleanly with semantic accent |
+| **Empty States** | No habits scheduled | Visual / CDP | Helpful empty state with link to Routine Manager |
+| **Responsive Viewports**| 375px, 390px, 412px, 768px, 1280px | Headless Chrome CDP | Zero horizontal scrollbar (`scrollWidth === clientWidth`) |
 
 ---
 
@@ -519,20 +722,19 @@ The 57 automated unit tests are a logic baseline, not proof of complete UI corre
 | `docs/branding-exploration/05-ui-ux-mockups/mockup-*.svg` | **Maintain** | High-fidelity UI mockups used for visual regression verification. |
 | `docs/branding-exploration/06-phased-implementation-plan.md` | **Maintain** | **Canonical Implementation Plan** (this document). |
 | `docs/branding-exploration/interactive-preview.html` | **Maintain** | Interactive browser preview tool for theme testing. |
-| `docs/regimen_project_brief.md` | **Maintain** | Authoritative product brief defining Manish's 6 daily practices. |
-| `docs/Architecture.md` | **Update** | Update architecture to VRITTA, Restorative Juniper tokens, and ThemeContext. |
-| `docs/firebase-setup.md` | **Update** | Remove obsolete `/api/schedule/personal` references; document new Firebase project. |
-| `docs/UserFlow.md` | **Update** | Document theme switching and updated user journeys. |
+| `docs/regimen_project_brief.md` | **Maintain** | Authoritative foundational product brief defining Manish's 6 daily practices (preserved with original filename). |
+| `docs/Architecture.md` | **Update** | Update architecture to Vritta, Restorative Juniper tokens, ThemeToggle, and ThemeContext. |
+| `docs/firebase-setup.md` | **Update** | Remove obsolete `/api/schedule/personal` references; document verified `vritta-app` project. |
+| `docs/UserFlow.md` | **Update** | Document icon-only theme toggle and updated user journeys. |
 | `docs/Workflow.md` | **Update** | Update repository URLs, Node test commands, and CLI sync instructions. |
-| `README.md` (root) | **Update** | Rewrite to feature VRITTA branding, Guiding Sutra logo, and setup instructions. |
+| `README.md` (root) | **Update** | Rewrite to feature canonical Vritta branding, Guiding Sutra logo, setup instructions, and GitHub clone URL. |
 | `web/README.md` | **Update** | Update package scripts and environment variable documentation. |
 | `web/.env.local.example` | **Update** | Update placeholders for fresh Firebase project. |
 | `docs/schedule-isolation-and-firebase-plan.md` | **Archive** | Move to `docs/archive/` (superseded Phase 5 plan). |
 | `docs/rebuild-plan.md` | **Archive** | Move to `docs/archive/` (superseded initial rebuild plan). |
 | `docs/BODY-RESTORATION-PROTOCOL.md` | **Archive** | Move to `docs/archive/` (superseded pre-rebuild schedule). |
 | `web/firebase-debug.log` | **Delete** | Temporary CLI debug log from past execution. |
-| `docs/migration-and-renaming-runbook.md` | **Create** | Dedicated operational runbook for renaming and migration execution. |
-| `docs/mobile-testing-and-release-checklist.md` | **Create** | Dedicated mobile QA protocol, screenshot log, and sign-off checklist. |
+| `docs/test-evidence/` | **Maintain** | Permanent repository for visual audit screenshots and reports. |
 
 ---
 
@@ -570,18 +772,12 @@ The 57 automated unit tests are a logic baseline, not proof of complete UI corre
 
 ## 9. Decisions Requiring User Input & Remaining Uncertainties
 
-### Decisions Requiring User Input:
-1. **Firebase Data-Preservation Strategy:**
-   - **Option A (Fresh Start):** Provision fresh project `vritta-app`, sign in once with Google to create the account, and seed the 6 personalized routines cleanly via `npm run schedule:fetch-personal`. *(Historical daily logs and streaks in `vritta-app` are not carried over).*
-   - **Option B (Preserve Required Data):** Develop and execute an Admin SDK migration script to read from `vritta-app`, translate document IDs from the old UID to the new UID, and batch-write historical logs and custom habits into the new project.
-2. **Cloud Firestore Location Selection:**
-   - **`asia-south1` (Mumbai, India):** Lowest latency for client browser queries in India; single-region (99.99% SLA).
-   - **`nam5` (US Central multi-region):** Existing location of `vritta-app`; multi-region redundancy (99.999% SLA); higher latency to India.
-   - *Note: Database location cannot be changed after creation.*
-3. **Approval to Proceed with Phase 1:**
-   - Confirmation to begin implementation strictly with **Phase 1: Design Tokens & Zero-Flash Theme Engine**.
+### Infrastructure Decisions Status:
+1. **Firebase Data-Preservation & Location:** **RESOLVED & VERIFIED.** User provisioned active project `vritta-app` connected to Cloud Firestore, seeded 6 canonical routines under UID `2W83kgjX9db8QiIWqZd5AJrc8PQ2`, and verified Admin SDK integration.
+2. **GitHub Repository:** **RESOLVED & VERIFIED.** Remote origin verified pointing to `https://github.com/manishborikar92/Vritta.git`.
+3. **Vercel Project & Domain:** **RESOLVED & VERIFIED.** Project `vritta` active on domain `myvritta.vercel.app` (serving HTTP 200).
+4. **Controlled Production Release Gate:** **PENDING.** Production edge deployment currently runs remote commit `a6cd5d8`. Synchronizing Vercel to latest local verified code (Phases 1–5, 11, and 12) will occur in Phase 13 upon explicit user authorization.
 
-### Remaining Uncertainties (to be verified in service dashboards during execution):
-1. **Vercel Current Project Name:** Whether the project is currently registered in Vercel as `Regimen` or `regimen-web` can only be inspected inside Manish's Vercel Dashboard.
-2. **Vercel Subdomain Claim:** Whether `myvritta.vercel.app` is truly available to be claimed by Manish's account can only be confirmed upon project creation or domain assignment in the Vercel Dashboard.
-3. **GitHub Target Name Availability:** Confirmed that `Vritta` will be entered in GitHub settings under `manishborikar92`.
+### Immediate Decisions Requiring User Input:
+1. **Approval of Revision 4 Implementation Plan:** Confirmation that this 13-phase implementation roadmap, brand audit findings, icon-only theme toggle architecture, and re-sequencing meet all requirements.
+2. **Authorization to Proceed with Phase 11:** Explicit authorization to begin execution of **Phase 11: Complete Brand Renaming to Vritta** as the immediate next step.
