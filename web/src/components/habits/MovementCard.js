@@ -221,7 +221,7 @@ function MovementCard({
 
               {/* Expandable Exercise Checklist: Polished Mobile-First Layout */}
               {isExpanded && (
-                <div className="space-y-2.5 pt-1 border-t border-stone-200/80 dark:border-stone-700/80">
+                <div className="space-y-2.5">
                   {currentItems.map((item, idx) => {
                     const isChecked = completedItemIds.includes(item.id);
                     const isItemDetailsOpen = expandedExerciseId === item.id;
