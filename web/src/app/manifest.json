@@ -1,6 +1,6 @@
 {
-  "name": "Vritta — Personal Routine Companion",
-  "short_name": "Vritta",
+  "name": "VRITTA — Personal Routine Companion",
+  "short_name": "VRITTA",
   "description": "A calm, flexible personal routine companion for mindful consistency.",
   "icons": [
     {
@@ -22,7 +22,7 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#4f46e5",
-  "background_color": "#f8fafc",
+  "theme_color": "#0F766E",
+  "background_color": "#F8FAFC",
   "display": "standalone"
 }

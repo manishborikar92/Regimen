@@ -1,33 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
-  <defs>
-    <linearGradient id="vrittaPurple" x1="20%" y1="10%" x2="90%" y2="90%">
-      <stop offset="0%" stop-color="#7279f5"/>
-      <stop offset="100%" stop-color="#5550e9"/>
-    </linearGradient>
-    <linearGradient id="vrittaCyan" x1="25%" y1="25%" x2="75%" y2="75%">
-      <stop offset="0%" stop-color="#38bdf8"/>
-      <stop offset="100%" stop-color="#0ea5e9"/>
-    </linearGradient>
-  </defs>
-  <!-- Purple outer arc -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%" fill="none" role="img" aria-label="VRITTA Logo: The Guiding Sutra">
+  <desc>VRITTA — The Guiding Sutra. A continuous monoline ribbon loop representing the unbroken thread connecting all daily practices.</desc>
+  <rect width="200" height="200" rx="36" fill="#F8FAFC" class="vritta-bg" />
+
+  <style>
+    @media (prefers-color-scheme: dark) {
+      .vritta-bg { fill: #090D16; }
+      .vritta-thread { stroke: #14B8A6; }
+      .vritta-dot { fill: #F59E0B; }
+    }
+  </style>
+
+  <!-- Continuous Harmonious Thread Loop (Bezier Precision) -->
   <path
-    d="M 50.05 9.92 A 40.13 40.13 0 1 1 16.02 28.78"
-    stroke="url(#vrittaPurple)"
-    stroke-width="7.83"
+    class="vritta-thread"
+    d="M 68 132 C 44 132 40 100 68 84 C 92 70 108 130 132 116 C 160 100 156 68 132 68 C 108 68 92 128 68 132 Z"
+    stroke="#0F766E"
+    stroke-width="13"
     stroke-linecap="round"
+    stroke-linejoin="round"
   />
-  <!-- Cyan inner arc -->
-  <path
-    d="M 64.70 32.40 A 24.54 24.54 0 1 1 47.65 25.51"
-    stroke="url(#vrittaCyan)"
-    stroke-width="6.79"
-    stroke-linecap="round"
-  />
-  <!-- Central seed dot -->
+
+  <!-- Center Balance Point -->
   <circle
-    cx="48.43"
-    cy="50.00"
-    r="9.14"
-    fill="#5550e9"
+    class="vritta-dot"
+    cx="100"
+    cy="100"
+    r="8"
+    fill="#D97706"
   />
 </svg>

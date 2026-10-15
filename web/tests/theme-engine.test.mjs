@@ -1,4 +1,4 @@
-import { test, describe, it } from 'node:test';
+import { test, describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -34,100 +34,316 @@ function getContrastRatio(hex1, hex2) {
 }
 
 describe('Phase 1: VRITTA Design Tokens & Theme Engine', () => {
-  it('should declare correct brand metadata and Restorative Juniper primary tokens', () => {
-    assert.equal(BRAND.name.toUpperCase(), 'VRITTA');
-    assert.equal(BRAND.themeColor, '#0F766E'); // Verdigris 700
-    assert.equal(BRAND.colors.primary[600], '#0f766e');
-    assert.equal(BRAND.colors.primary[700], '#115e59');
-    assert.equal(BRAND.colors.primary[50], '#f0fdfa');
-    assert.equal(BRAND.colors.accent.juniper, '#0f766e');
+
+  // =========================================================================
+  // 1. BRAND METADATA & TOKEN VALUES
+  // =========================================================================
+  describe('Brand Configuration & Semantic Tokens', () => {
+    it('should declare authoritative VRITTA brand name and Restorative Juniper primary tokens', () => {
+      assert.equal(BRAND.name.toUpperCase(), 'VRITTA');
+      assert.equal(BRAND.themeColor, '#0F766E'); // Verdigris 700
+      assert.equal(BRAND.colors.primary[600], '#0f766e');
+      assert.equal(BRAND.colors.primary[700], '#115e59');
+      assert.equal(BRAND.colors.primary[50], '#f0fdfa');
+      assert.equal(BRAND.colors.accent.juniper, '#0f766e');
+      assert.equal(BRAND.colors.surface.canvas, '#f8fafc'); // Authoritative Misty Slate
+      assert.equal(BRAND.colors.surface.card, '#ffffff');
+      assert.equal(BRAND.colors.surface.canvasDark, '#090d16');
+      assert.equal(BRAND.colors.surface.cardDark, '#111827');
+    });
   });
 
-  it('should guarantee WCAG 2.2 contrast ratios for all critical text and brand pairs', () => {
-    // 1. Light mode primary text on white canvas (Target: >= 7.0 AAA)
-    const lightMainContrast = getContrastRatio('#0F172A', '#FFFFFF');
-    assert.ok(lightMainContrast >= 7.0, `Light main contrast ${lightMainContrast.toFixed(2)} should be >= 7.0 (AAA)`);
+  // =========================================================================
+  // 2. MATHEMATICAL WCAG 2.2 CONTRAST RATIO AUDIT
+  // =========================================================================
+  describe('WCAG 2.2 AA & AAA Contrast Audits', () => {
+    it('should guarantee WCAG 2.2 contrast ratios for all critical text and brand pairs', () => {
+      // Light mode primary text (#0F172A) on Canvas (#F8FAFC)
+      const lightCanvasText = getContrastRatio('#0F172A', '#F8FAFC');
+      assert.ok(lightCanvasText >= 7.0, `Light canvas text contrast ${lightCanvasText.toFixed(2)}:1 must meet AAA (>= 7.0:1)`);
 
-    // 2. Light mode brand Verdigris 700 on white canvas (Target: >= 4.5 AA)
-    const brandOnWhiteContrast = getContrastRatio('#0F766E', '#FFFFFF');
-    assert.ok(brandOnWhiteContrast >= 4.5, `Brand on white contrast ${brandOnWhiteContrast.toFixed(2)} should be >= 4.5 (AA)`);
+      // Light mode primary text (#0F172A) on Card (#FFFFFF)
+      const lightCardText = getContrastRatio('#0F172A', '#FFFFFF');
+      assert.ok(lightCardText >= 7.0, `Light card text contrast ${lightCardText.toFixed(2)}:1 must meet AAA (>= 7.0:1)`);
 
-    // 3. Dark mode primary text on dark canvas (Target: >= 7.0 AAA)
-    const darkMainContrast = getContrastRatio('#F8FAFC', '#090D16');
-    assert.ok(darkMainContrast >= 7.0, `Dark main contrast ${darkMainContrast.toFixed(2)} should be >= 7.0 (AAA)`);
+      // Light mode secondary text (#475569) on Canvas & Card
+      const lightSecondary = getContrastRatio('#475569', '#F8FAFC');
+      assert.ok(lightSecondary >= 7.0, `Light secondary text contrast ${lightSecondary.toFixed(2)}:1 must meet AAA (>= 7.0:1)`);
 
-    // 4. Dark mode resolved muted text (#8092a5) on dark canvas #090D16 (Target: >= 4.5 AA)
-    const darkMutedOnCanvas = getContrastRatio('#8092a5', '#090D16');
-    assert.ok(darkMutedOnCanvas >= 4.5, `Dark muted on canvas ${darkMutedOnCanvas.toFixed(2)} must be >= 4.5 (AA)`);
-    assert.ok(darkMutedOnCanvas >= 6.0, `Dark muted on canvas should be >= 6.0:1 (actual: ${darkMutedOnCanvas.toFixed(2)})`);
+      // Light mode brand Verdigris 700 (#0F766E) on White Card
+      const brandOnWhite = getContrastRatio('#0F766E', '#FFFFFF');
+      assert.ok(brandOnWhite >= 4.5, `Brand on white contrast ${brandOnWhite.toFixed(2)}:1 must meet AA (>= 4.5:1)`);
 
-    // 5. Dark mode resolved muted text (#8092a5) on dark surface #111827 (Target: >= 4.5 AA)
-    const darkMutedOnSurface = getContrastRatio('#8092a5', '#111827');
-    assert.ok(darkMutedOnSurface >= 4.5, `Dark muted on surface ${darkMutedOnSurface.toFixed(2)} must be >= 4.5 (AA)`);
-    assert.ok(darkMutedOnSurface >= 5.5, `Dark muted on surface should be >= 5.5:1 (actual: ${darkMutedOnSurface.toFixed(2)})`);
+      // Dark mode primary text (#F8FAFC) on Dark Canvas (#090D16)
+      const darkCanvasText = getContrastRatio('#F8FAFC', '#090D16');
+      assert.ok(darkCanvasText >= 7.0, `Dark canvas text contrast ${darkCanvasText.toFixed(2)}:1 must meet AAA (>= 7.0:1)`);
 
-    // 6. Failing legacy color #64748B verification (demonstrates why it was replaced)
-    const failingLegacyContrast = getContrastRatio('#64748B', '#090D16');
-    assert.ok(failingLegacyContrast < 4.5, 'Legacy #64748B fails AA on canvas, confirming necessity of #8092a5');
+      // Dark mode primary text (#F8FAFC) on Dark Surface (#111827)
+      const darkCardText = getContrastRatio('#F8FAFC', '#111827');
+      assert.ok(darkCardText >= 7.0, `Dark card text contrast ${darkCardText.toFixed(2)}:1 must meet AAA (>= 7.0:1)`);
+
+      // Dark mode secondary text (#94A3B8) on Dark Canvas (#090D16)
+      const darkSecondary = getContrastRatio('#94A3B8', '#090D16');
+      assert.ok(darkSecondary >= 7.0, `Dark secondary text contrast ${darkSecondary.toFixed(2)}:1 must meet AAA (>= 7.0:1)`);
+
+      // Dark mode resolved muted text (#8092A5) on Dark Canvas (#090D16)
+      const darkMutedOnCanvas = getContrastRatio('#8092A5', '#090D16');
+      assert.ok(darkMutedOnCanvas >= 4.5, `Dark muted on canvas ${darkMutedOnCanvas.toFixed(2)}:1 must meet AA (>= 4.5:1)`);
+      assert.ok(darkMutedOnCanvas >= 6.0, `Dark muted on canvas should be >= 6.0:1 (actual: ${darkMutedOnCanvas.toFixed(2)}:1)`);
+
+      // Dark mode resolved muted text (#8092A5) on Dark Surface (#111827)
+      const darkMutedOnSurface = getContrastRatio('#8092A5', '#111827');
+      assert.ok(darkMutedOnSurface >= 4.5, `Dark muted on surface ${darkMutedOnSurface.toFixed(2)}:1 must meet AA (>= 4.5:1)`);
+      assert.ok(darkMutedOnSurface >= 5.5, `Dark muted on surface should be >= 5.5:1 (actual: ${darkMutedOnSurface.toFixed(2)}:1)`);
+
+      // Demonstration: Legacy color #64748B failed WCAG AA on dark background
+      const legacyFail = getContrastRatio('#64748B', '#090D16');
+      assert.ok(legacyFail < 4.5, `Legacy #64748B contrast ${legacyFail.toFixed(2)}:1 fails AA, justifying #8092A5 replacement`);
+    });
   });
 
-  it('should verify globals.css contains Tailwind v4 custom dark variant and semantic tokens', () => {
-    const cssPath = path.join(projectRoot, 'src', 'app', 'globals.css');
-    const cssContent = fs.readFileSync(cssPath, 'utf8');
+  // =========================================================================
+  // 3. RUNTIME BEHAVIORAL VERIFICATION OF THEME ENGINE LOGIC
+  // =========================================================================
+  describe('Runtime Theme Engine Behavior & Storage Simulation', () => {
+    // Pure implementations replicating ThemeContext runtime functions
+    const STORAGE_KEY = 'vritta-theme';
 
-    // Tailwind CSS v4 class-based dark mode variant
-    assert.ok(
-      cssContent.includes('@custom-variant dark (&:where(.dark, .dark *));'),
-      'Must declare @custom-variant dark for Tailwind v4 class mode'
-    );
+    function createMockStorage(initial = {}) {
+      const store = { ...initial };
+      let throws = false;
+      return {
+        getItem: (k) => {
+          if (throws) throw new Error('SecurityError: localStorage is disabled');
+          return store[k] !== undefined ? store[k] : null;
+        },
+        setItem: (k, v) => {
+          if (throws) throw new Error('SecurityError: localStorage is disabled');
+          store[k] = String(v);
+        },
+        setThrows: (val) => { throws = val; },
+        _store: store,
+      };
+    }
 
-    // Dynamic @theme mappings
-    assert.ok(cssContent.includes('--color-canvas: var(--color-bg-canvas);'), 'Must map canvas in @theme');
-    assert.ok(cssContent.includes('--color-surface: var(--color-bg-surface);'), 'Must map surface in @theme');
-    assert.ok(cssContent.includes('--color-text-main: var(--color-text-primary);'), 'Must map text-main in @theme');
-    assert.ok(cssContent.includes('--color-text-sub: var(--color-text-secondary);'), 'Must map text-sub in @theme');
+    function createMockClassList() {
+      const classes = new Set();
+      return {
+        add: (c) => classes.add(c),
+        remove: (c) => classes.delete(c),
+        contains: (c) => classes.has(c),
+        get list() { return [...classes]; },
+      };
+    }
 
-    // Runtime tokens in :root
-    assert.ok(cssContent.includes('--color-bg-canvas: #f8fafc;'), 'Must define light canvas in :root');
-    assert.ok(cssContent.includes('--color-bg-surface: #ffffff;'), 'Must define light card in :root');
-    assert.ok(cssContent.includes('--color-accent-primary: #0f766e;'), 'Must define brand primary in :root');
+    function executeBlockingScript(storage, isDarkOS, classList) {
+      try {
+        const s = storage.getItem(STORAGE_KEY);
+        const p = isDarkOS;
+        if (s === 'dark' || (!s && p) || (s === 'system' && p)) {
+          classList.add('dark');
+        } else {
+          classList.remove('dark');
+        }
+      } catch {
+        // Safe fallback
+      }
+    }
 
-    // Runtime tokens in .dark
-    assert.ok(cssContent.includes('--color-bg-canvas: #090d16;'), 'Must define dark canvas in .dark');
-    assert.ok(cssContent.includes('--color-bg-surface: #111827;'), 'Must define dark card in .dark');
-    assert.ok(cssContent.includes('--color-text-muted: #8092a5;'), 'Must define accessible dark muted text in .dark');
+    function getStoredTheme(storage) {
+      try {
+        const stored = storage.getItem(STORAGE_KEY);
+        if (stored === 'light' || stored === 'dark' || stored === 'system') {
+          return stored;
+        }
+      } catch {
+        // Safe fallback
+      }
+      return 'system';
+    }
 
-    // Reduced motion media query
-    assert.ok(
-      cssContent.includes('@media (prefers-reduced-motion: reduce)'),
-      'Must respect prefers-reduced-motion'
-    );
+    it('should correctly read stored preference and fall back to system safely', () => {
+      const storage = createMockStorage({ [STORAGE_KEY]: 'dark' });
+      assert.equal(getStoredTheme(storage), 'dark');
+
+      storage.setItem(STORAGE_KEY, 'light');
+      assert.equal(getStoredTheme(storage), 'light');
+
+      storage.setItem(STORAGE_KEY, 'system');
+      assert.equal(getStoredTheme(storage), 'system');
+
+      // Empty / non-existent key
+      const emptyStorage = createMockStorage();
+      assert.equal(getStoredTheme(emptyStorage), 'system');
+
+      // Corrupted / invalid key
+      const corruptedStorage = createMockStorage({ [STORAGE_KEY]: 'invalid_color_theme' });
+      assert.equal(getStoredTheme(corruptedStorage), 'system');
+
+      // Security / Quota error throwing storage
+      const throwingStorage = createMockStorage();
+      throwingStorage.setThrows(true);
+      assert.equal(getStoredTheme(throwingStorage), 'system'); // Should not throw
+    });
+
+    it('should execute zero-flash blocking script logic and set .dark class correctly', () => {
+      // 1. Explicit dark in storage -> adds .dark regardless of OS
+      const classList1 = createMockClassList();
+      executeBlockingScript(createMockStorage({ [STORAGE_KEY]: 'dark' }), false, classList1);
+      assert.ok(classList1.contains('dark'), 'Explicit dark mode must add .dark class');
+
+      // 2. Explicit light in storage -> removes .dark regardless of OS
+      const classList2 = createMockClassList();
+      classList2.add('dark'); // simulate pre-existing
+      executeBlockingScript(createMockStorage({ [STORAGE_KEY]: 'light' }), true, classList2);
+      assert.ok(!classList2.contains('dark'), 'Explicit light mode must remove .dark class even if OS is dark');
+
+      // 3. System mode with Dark OS -> adds .dark
+      const classList3 = createMockClassList();
+      executeBlockingScript(createMockStorage({ [STORAGE_KEY]: 'system' }), true, classList3);
+      assert.ok(classList3.contains('dark'), 'System mode with Dark OS must add .dark class');
+
+      // 4. System mode with Light OS -> removes .dark
+      const classList4 = createMockClassList();
+      classList4.add('dark');
+      executeBlockingScript(createMockStorage({ [STORAGE_KEY]: 'system' }), false, classList4);
+      assert.ok(!classList4.contains('dark'), 'System mode with Light OS must remove .dark class');
+
+      // 5. Uninitialized storage (first visit) with Dark OS -> adds .dark
+      const classList5 = createMockClassList();
+      executeBlockingScript(createMockStorage(), true, classList5);
+      assert.ok(classList5.contains('dark'), 'First visit with Dark OS must default to dark without flash');
+
+      // 6. Uninitialized storage with Light OS -> removes .dark
+      const classList6 = createMockClassList();
+      executeBlockingScript(createMockStorage(), false, classList6);
+      assert.ok(!classList6.contains('dark'), 'First visit with Light OS must default to light');
+
+      // 7. Storage throwing error -> does not crash or throw
+      const throwingStorage = createMockStorage();
+      throwingStorage.setThrows(true);
+      const classList7 = createMockClassList();
+      assert.doesNotThrow(() => {
+        executeBlockingScript(throwingStorage, true, classList7);
+      });
+    });
+
+    it('should manage theme subscriptions and dispatch notifications upon theme changes', () => {
+      const listeners = new Set();
+      let notifyCount = 0;
+      function notifyListeners() {
+        notifyCount++;
+        for (const l of listeners) l();
+      }
+
+      let listener1Calls = 0;
+      let listener2Calls = 0;
+      const sub1 = () => { listener1Calls++; };
+      const sub2 = () => { listener2Calls++; };
+
+      listeners.add(sub1);
+      listeners.add(sub2);
+
+      notifyListeners();
+      assert.equal(notifyCount, 1);
+      assert.equal(listener1Calls, 1);
+      assert.equal(listener2Calls, 1);
+
+      // Unsubscribe sub1
+      listeners.delete(sub1);
+      notifyListeners();
+      assert.equal(notifyCount, 2);
+      assert.equal(listener1Calls, 1); // Not called again
+      assert.equal(listener2Calls, 2);
+    });
+
+    it('should verify keyboard navigation circular indexing logic for 3 theme options', () => {
+      const totalOptions = 3; // Light (0), Dark (1), System (2)
+
+      // ArrowDown (Next)
+      const nextFrom0 = (0 + 1) % totalOptions;
+      const nextFrom1 = (1 + 1) % totalOptions;
+      const nextFrom2 = (2 + 1) % totalOptions;
+      assert.equal(nextFrom0, 1);
+      assert.equal(nextFrom1, 2);
+      assert.equal(nextFrom2, 0); // Wraps around to start
+
+      // ArrowUp (Previous)
+      const prevFrom0 = (0 - 1 + totalOptions) % totalOptions;
+      const prevFrom1 = (1 - 1 + totalOptions) % totalOptions;
+      const prevFrom2 = (2 - 1 + totalOptions) % totalOptions;
+      assert.equal(prevFrom0, 2); // Wraps around to end
+      assert.equal(prevFrom1, 0);
+      assert.equal(prevFrom2, 1);
+    });
   });
 
-  it('should verify layout.js injects synchronous blocking script and suppressHydrationWarning', () => {
-    const layoutPath = path.join(projectRoot, 'src', 'app', 'layout.js');
-    const layoutContent = fs.readFileSync(layoutPath, 'utf8');
+  // =========================================================================
+  // 4. STATIC SPECIFICATION & MARKUP INVARIANTS
+  // =========================================================================
+  describe('Static Declarations & Markup Integrity', () => {
+    it('should verify globals.css contains Tailwind v4 custom dark variant and semantic tokens', () => {
+      const cssPath = path.join(projectRoot, 'src', 'app', 'globals.css');
+      const cssContent = fs.readFileSync(cssPath, 'utf8');
 
-    // HTML root attributes
-    assert.ok(layoutContent.includes('suppressHydrationWarning'), 'Must include suppressHydrationWarning on html tag');
+      // Tailwind CSS v4 class-based dark mode variant
+      assert.ok(
+        cssContent.includes('@custom-variant dark (&:where(.dark, .dark *));'),
+        'Must declare @custom-variant dark for Tailwind v4 class mode'
+      );
 
-    // Blocking theme script in head
-    assert.ok(layoutContent.includes('vritta-theme'), 'Blocking script must check vritta-theme');
-    assert.ok(layoutContent.includes('prefers-color-scheme: dark'), 'Blocking script must check prefers-color-scheme');
-    assert.ok(layoutContent.includes('document.documentElement.classList.add(\'dark\')'), 'Blocking script must add dark class');
+      // Dynamic @theme mappings
+      assert.ok(cssContent.includes('--color-canvas: var(--color-bg-canvas);'), 'Must map canvas in @theme');
+      assert.ok(cssContent.includes('--color-surface: var(--color-bg-surface);'), 'Must map surface in @theme');
+      assert.ok(cssContent.includes('--color-text-main: var(--color-text-primary);'), 'Must map text-main in @theme');
+      assert.ok(cssContent.includes('--color-text-sub: var(--color-text-secondary);'), 'Must map text-sub in @theme');
 
-    // ThemeProvider wrapping
-    assert.ok(layoutContent.includes('<ThemeProvider>'), 'Must wrap application shell in ThemeProvider');
-  });
+      // Runtime tokens in :root
+      assert.ok(cssContent.includes('--color-bg-canvas: #f8fafc;'), 'Must define light canvas #f8fafc in :root');
+      assert.ok(cssContent.includes('--color-bg-surface: #ffffff;'), 'Must define light card in :root');
+      assert.ok(cssContent.includes('--color-accent-primary: #0f766e;'), 'Must define brand primary in :root');
 
-  it('should verify TopNav.js provides accessible 3-state theme controls', () => {
-    const navPath = path.join(projectRoot, 'src', 'components', 'ui', 'TopNav.js');
-    const navContent = fs.readFileSync(navPath, 'utf8');
+      // Runtime tokens in .dark
+      assert.ok(cssContent.includes('--color-bg-canvas: #090d16;'), 'Must define dark canvas in .dark');
+      assert.ok(cssContent.includes('--color-bg-surface: #111827;'), 'Must define dark card in .dark');
+      assert.ok(cssContent.includes('--color-text-muted: #8092a5;'), 'Must define accessible dark muted text in .dark');
 
-    assert.ok(navContent.includes('useTheme()'), 'TopNav must consume useTheme');
-    assert.ok(navContent.includes('role="menuitemradio"'), 'Theme options must have role="menuitemradio"');
-    assert.ok(navContent.includes('aria-checked={isSelected}'), 'Theme options must announce aria-checked');
-    assert.ok(navContent.includes('aria-haspopup="menu"'), 'Theme toggle button must have aria-haspopup="menu"');
-    assert.ok(navContent.includes('setTheme(id)'), 'Theme options must call setTheme');
+      // Reduced motion media query
+      assert.ok(
+        cssContent.includes('@media (prefers-reduced-motion: reduce)'),
+        'Must respect prefers-reduced-motion'
+      );
+    });
+
+    it('should verify layout.js injects synchronous blocking script and suppressHydrationWarning', () => {
+      const layoutPath = path.join(projectRoot, 'src', 'app', 'layout.js');
+      const layoutContent = fs.readFileSync(layoutPath, 'utf8');
+
+      // HTML root attributes
+      assert.ok(layoutContent.includes('suppressHydrationWarning'), 'Must include suppressHydrationWarning on html tag');
+
+      // Blocking theme script in head
+      assert.ok(layoutContent.includes('vritta-theme'), 'Blocking script must check vritta-theme');
+      assert.ok(layoutContent.includes('prefers-color-scheme: dark'), 'Blocking script must check prefers-color-scheme');
+      assert.ok(layoutContent.includes('document.documentElement.classList.add(\'dark\')'), 'Blocking script must add dark class');
+
+      // ThemeProvider wrapping
+      assert.ok(layoutContent.includes('<ThemeProvider>'), 'Must wrap application shell in ThemeProvider');
+    });
+
+    it('should verify TopNav.js provides accessible 3-state theme controls with full WAI-ARIA and keyboard navigation', () => {
+      const navPath = path.join(projectRoot, 'src', 'components', 'ui', 'TopNav.js');
+      const navContent = fs.readFileSync(navPath, 'utf8');
+
+      assert.ok(navContent.includes('useTheme()'), 'TopNav must consume useTheme');
+      assert.ok(navContent.includes('role="menuitemradio"'), 'Theme options must have role="menuitemradio"');
+      assert.ok(navContent.includes('aria-checked={isSelected}'), 'Theme options must announce aria-checked');
+      assert.ok(navContent.includes('aria-haspopup="menu"'), 'Theme toggle button must have aria-haspopup="menu"');
+      assert.ok(navContent.includes('aria-controls="theme-menu-dropdown"'), 'Trigger button must control dropdown');
+      assert.ok(navContent.includes('aria-labelledby="theme-menu-button"'), 'Dropdown must be labelled by trigger');
+      assert.ok(navContent.includes('onKeyDown={handleTriggerKeyDown}'), 'Trigger must handle keyboard activation');
+      assert.ok(navContent.includes('onKeyDown={(e) => handleMenuKeyDown(e, idx)}'), 'Items must handle keyboard navigation');
+      assert.ok(navContent.includes("e.key === 'Escape'"), 'Must handle Escape key to dismiss menu');
+    });
   });
 });

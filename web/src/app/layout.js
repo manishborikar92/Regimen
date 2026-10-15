@@ -17,9 +17,13 @@ export const metadata = {
   applicationName: BRAND.name,
   manifest: "/manifest.json",
   icons: {
-    icon: "/logo.svg",
-    shortcut: "/logo.svg",
-    apple: "/logo.svg",
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/icon0.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   appleWebApp: {
     capable: true,
