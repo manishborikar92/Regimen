@@ -113,7 +113,7 @@ describe('Phase 3: UI/UX Component Polish (Mobile-First)', () => {
     });
 
     it('should verify Routine Manager actions meet minimum touch targets', () => {
-      const content = readWebFile('src/app/(protected)/habits/page.js');
+      const content = readWebFile('src/components/habits/RoutineCard.js');
       assert.ok(content.includes('min-w-[44px]') && content.includes('min-h-[44px]'), 'Habit action buttons must meet min-w-[44px] min-h-[44px]');
     });
   });

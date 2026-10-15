@@ -8,6 +8,7 @@ export { default as GenericHabitCard } from './GenericHabitCard';
 export { default as OshoLibraryModal } from './OshoLibraryModal';
 export { default as HabitModal } from './HabitModal';
 export { default as TodayRhythmBanner } from './TodayRhythmBanner';
+export { default as RoutineCard } from './RoutineCard';
 
 // Backward compatibility exports
 export { default as HabitCard } from './GenericHabitCard';

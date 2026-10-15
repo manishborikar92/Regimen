@@ -101,3 +101,26 @@ export function getTimingDisplay(habit) {
   }
   return 'Anytime';
 }
+
+/**
+ * Format habit recurrence frequency for UI display.
+ * Returns human-friendly text like "Daily", "Weekdays", "Weekends", or comma-separated days.
+ * @param {string[]} [frequency]
+ * @returns {string}
+ */
+export function getFrequencyDisplay(frequency) {
+  if (!Array.isArray(frequency) || frequency.length === 0 || frequency.length >= 7) {
+    return 'Daily';
+  }
+
+  const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+  const weekends = ['Sat', 'Sun'];
+
+  const isWeekdays = frequency.length === 5 && weekdays.every(d => frequency.includes(d));
+  if (isWeekdays) return 'Weekdays';
+
+  const isWeekends = frequency.length === 2 && weekends.every(d => frequency.includes(d));
+  if (isWeekends) return 'Weekends';
+
+  return frequency.join(', ');
+}
