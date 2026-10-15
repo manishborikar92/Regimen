@@ -107,23 +107,14 @@ function MovementCard({
   return (
     <>
       <div
-        className={`relative rounded-xl border border-subtle bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
+        className={`relative rounded-xl border border-t-[3px] bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
           isSunday
-            ? 'bg-slate-50/60 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800'
+            ? 'bg-slate-50/60 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 border-t-slate-500 dark:border-t-slate-400'
             : isWorkoutComplete
-            ? 'bg-teal-50/20 dark:bg-teal-950/20 border-teal-200 dark:border-teal-800/80'
-            : ''
+            ? 'bg-teal-50/20 dark:bg-teal-950/20 border-teal-200 dark:border-teal-800/80 border-t-teal-600 dark:border-t-teal-400'
+            : 'border-subtle border-t-teal-600 dark:border-t-teal-400'
         }`}
       >
-        {/* Top accent bar */}
-        <div
-          className={`h-1.5 w-full rounded-t-xl bg-gradient-to-r ${
-            isSunday
-              ? 'from-slate-400 to-teal-600 dark:from-slate-600 dark:to-teal-500'
-              : 'from-teal-500 to-emerald-500'
-          } ${isWorkoutComplete || isSunday ? 'opacity-80' : 'opacity-40'}`}
-        />
-
         <div className="p-4 sm:p-5">
           {/* Header */}
           <div className="flex items-start justify-between gap-3">
@@ -176,7 +167,7 @@ function MovementCard({
                   }`}
                   aria-label={isWorkoutComplete ? 'Mark workout incomplete' : 'Mark workout complete'}
                 >
-                  <Check className="w-5 h-5 text-white" strokeWidth={3} />
+                  {isWorkoutComplete && <Check className="w-5 h-5 text-white" strokeWidth={3} />}
                 </button>
               )}
             </div>
@@ -200,12 +191,12 @@ function MovementCard({
           {/* Non-Sunday Movement Progress and Checklist */}
           {!isSunday && (
             <div className="mt-4 p-3.5 bg-slate-50/80 dark:bg-slate-800/40 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <div>
                   <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                     {isWorkoutDay ? 'Strength Routine Steps' : 'Walk & Mobility Steps'}
                   </span>
-                  <p className="text-sm font-bold text-teal-900 dark:text-teal-200 mt-0.5">
+                  <p className="text-xs sm:text-sm font-bold text-teal-900 dark:text-teal-200 mt-0.5">
                     {completedItemIds.length} of {currentItems.length} exercises logged
                   </p>
                 </div>

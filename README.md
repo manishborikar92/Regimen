@@ -77,7 +77,7 @@ Comprehensive technical guides and operational runbooks are maintained under the
 - 🏛️ **[Architecture & System Design](docs/architecture.md):** Deep dive into system design, data flows, theme engine, and Firestore collection schemas.
 - 💻 **[Local Development Guide](docs/development.md):** Workstation setup, package scripts, testing strategy, and troubleshooting.
 - 🔥 **[Firebase Setup & Operations Runbook](docs/firebase-setup.md):** Credential management, security rules, indexes, and service account key rotation.
-- 🚀 **[Deployment & Release Guide](docs/deployment.md):** Vercel edge deployment, Git release workflow (`m/dev` -> `main`), and verification checklists.
+- 🚀 **[Deployment & Release Guide](docs/deployment.md):** Vercel edge deployment, Git release workflow (`dev` -> `main`), and verification checklists.
 - 🗺️ **[Project Roadmap & Outstanding Actions](docs/roadmap.md):** Status tracking for the pending Phase 13 production release and Phase 8 directory rename.
 
 ---

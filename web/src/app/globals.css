@@ -3,10 +3,14 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ========================================
-   Tailwind CSS v4 Utility Theme Tokens
-   Maps semantic design tokens to dynamic CSS variables.
-   Generates utility classes: bg-canvas, text-main, text-sub, border-subtle, etc.
+   Tailwind CSS v4 Typography & Design Tokens
+   Configures Inter font binding and standard typography scale.
    ======================================== */
+@theme {
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 0.875rem;
+}
+
 /* ========================================
    Tailwind CSS v4 Utility Theme Tokens
    Maps semantic design tokens to dynamic CSS variables using @theme inline.
@@ -14,6 +18,8 @@
    Generates utility classes: bg-canvas, text-main, text-sub, border-subtle, etc.
    ======================================== */
 @theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
   --color-canvas: var(--vritta-canvas);
   --color-surface: var(--vritta-surface);
   --color-surface-subtle: var(--vritta-surface-subtle);

@@ -53,17 +53,12 @@ function OshoCard({
   return (
     <>
       <div
-        className={`relative rounded-xl border border-subtle bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
-          isCompleted ? 'bg-amber-50/20 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/80' : ''
+        className={`relative rounded-xl border border-t-[3px] bg-surface shadow-sm transition-all duration-200 hover:shadow-md ${
+          isCompleted
+            ? 'bg-amber-50/20 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/80 border-t-amber-500 dark:border-t-amber-400'
+            : 'border-subtle border-t-amber-500 dark:border-t-amber-400'
         }`}
       >
-        {/* Top accent bar */}
-        <div
-          className={`h-1.5 w-full rounded-t-xl bg-gradient-to-r from-amber-500 to-amber-600 dark:from-amber-400 dark:to-amber-500 ${
-            isCompleted ? 'opacity-80' : 'opacity-40'
-          }`}
-        />
-
         <div className="p-4 sm:p-5">
           {/* Header */}
           <div className="flex items-start justify-between gap-3">
@@ -102,7 +97,7 @@ function OshoCard({
               }`}
               aria-label={isCompleted ? 'Mark listening incomplete' : 'Mark listening complete'}
             >
-              <Check className="w-5 h-5 text-white" strokeWidth={3} />
+              {isCompleted && <Check className="w-5 h-5 text-white" strokeWidth={3} />}
             </button>
           </div>
 
@@ -113,7 +108,7 @@ function OshoCard({
                 <span className="text-2xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider">
                   Active Series
                 </span>
-                <span className="text-2xs px-1.5 py-0.2 bg-surface rounded border border-amber-200 dark:border-amber-800/60 text-amber-900 dark:text-amber-200 font-medium">
+                <span className="text-2xs px-1.5 py-0.5 bg-surface rounded border border-amber-200 dark:border-amber-800/60 text-amber-900 dark:text-amber-200 font-medium">
                   {activeSeries.language}
                 </span>
               </div>

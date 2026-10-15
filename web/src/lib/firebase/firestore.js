@@ -81,29 +81,19 @@ export async function deleteHabitDoc(habitId) {
 
 /**
  * Toggle a habit's binary completion status for a given day.
- * Creates the daily log document if it doesn't exist.
+ * Idempotently updates the daily log and creates the document if it doesn't exist.
+ * Preserves all existing granular habitProgress for other activities.
+ * 
  * @param {string} userId
  * @param {string} dateStr
  * @param {string} habitId
  * @param {boolean} isCurrentlyCompleted
- * @param {number} currentLogLength - Length of today's log
  */
-export async function toggleHabitCompletion(userId, dateStr, habitId, isCurrentlyCompleted, currentLogLength = 0) {
+export async function toggleHabitCompletion(userId, dateStr, habitId, isCurrentlyCompleted) {
     const dailyLogRef = getDailyLogRef(userId, dateStr);
 
-    if (currentLogLength === 0 && !isCurrentlyCompleted) {
-        // First completion of the day — create the document
-        return setDoc(dailyLogRef, {
-            userId,
-            date: dateStr,
-            completedHabitIds: [habitId],
-            habitProgress: {},
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
-        }, { merge: true });
-    }
-
-    // Update existing document with arrayUnion / arrayRemove
+    // Update document with arrayUnion / arrayRemove.
+    // { merge: true } creates the document if missing without overwriting habitProgress.
     return setDoc(dailyLogRef, {
         userId,
         date: dateStr,

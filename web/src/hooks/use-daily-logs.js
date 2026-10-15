@@ -69,17 +69,21 @@ export function useDailyLogs(user, todaysHabits = []) {
 
         const isCompleted = todayLog.includes(habitId);
 
-        // Optimistic update
-        const newTodayLog = isCompleted
-            ? todayLog.filter(id => id !== habitId)
-            : [...todayLog, habitId];
-        setTodayLog(newTodayLog);
+        // Optimistic update using functional state updater
+        setTodayLog(prev => isCompleted
+            ? prev.filter(id => id !== habitId)
+            : [...prev, habitId]
+        );
 
         try {
-            await toggleHabitCompletion(user.uid, today, habitId, isCompleted, todayLog.length);
+            await toggleHabitCompletion(user.uid, today, habitId, isCompleted);
         } catch (err) {
             console.error('Error toggling habit:', err);
-            setTodayLog(todayLog); // Revert on failure
+            // Revert only this specific habit to avoid stomping concurrent updates
+            setTodayLog(prev => isCompleted
+                ? [...prev, habitId]
+                : prev.filter(id => id !== habitId)
+            );
         }
     }, [user, today, todayLog]);
 
