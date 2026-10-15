@@ -122,14 +122,16 @@ describe('Phase 2: Authoritative Logo & Favicon Asset Pipeline', () => {
       }
     });
 
-    it('should verify layout.js metadata configures valid non-conflicting icon declarations', () => {
+    it('should verify file-based metadata convention delivers manifest and non-conflicting icon declarations', () => {
       const layoutPath = path.join(projectRoot, 'src', 'app', 'layout.js');
+      const manifestPath = path.join(projectRoot, 'src', 'app', 'manifest.json');
       const content = fs.readFileSync(layoutPath, 'utf8');
 
-      assert.ok(content.includes('apple-icon.png'), 'layout.js must reference apple-icon.png for iOS (PNG format required)');
-      assert.ok(content.includes('favicon.ico'), 'layout.js must reference favicon.ico');
-      assert.ok(content.includes('icon0.svg'), 'layout.js must reference vector icon0.svg');
-      assert.ok(content.includes('/manifest.json'), 'layout.js must reference /manifest.json');
+      assert.ok(fs.existsSync(manifestPath), 'manifest.json must exist in src/app for Next.js file-based metadata convention');
+      assert.ok(content.includes('apple-icon.png'), 'layout.js must document apple-icon.png for iOS');
+      assert.ok(content.includes('favicon.ico'), 'layout.js must document favicon.ico');
+      assert.ok(content.includes('icon0.svg'), 'layout.js must document vector icon0.svg');
+      assert.ok(content.includes('manifest.json'), 'layout.js must document file-based manifest.json convention');
     });
   });
 });

@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary & Provisional Brand Identity
 
-The existing application is a Next.js 16 (App Router) mobile-first Progressive Web Application previously named **Regimen**. While it established a solid client-side Firebase foundation with offline-first persistence, its domain model conflated timing with life-area categories, treated time slots as rigid deadlines, and lacked structured support for multi-step workbook sessions, progressive physical conditioning, library exploration, and private journaling.
+The existing application is a Next.js 16 (App Router) mobile-first Progressive Web Application under the previous brand name. While it established a solid client-side Firebase foundation with offline-first persistence, its domain model conflated timing with life-area categories, treated time slots as rigid deadlines, and lacked structured support for multi-step workbook sessions, progressive physical conditioning, library exploration, and private journaling.
 
 ### Provisional In-App Brand Identity: **Vritta** (वृत्त)
 - **Etymology & Concept:** In classical Sanskrit, *Vritta* signifies conduct, regular practice, rhythmic observance, and the cyclical nature of daily life (from the root *vṛt* — to turn, revolve, proceed). Unlike rigid militaristic or clinical terms, *Vritta* reflects a calm, mindful, recurring rhythm of self-cultivation.
@@ -127,7 +127,7 @@ The existing application is a Next.js 16 (App Router) mobile-first Progressive W
     - Central anchor dot: radius 9.14 at center, fill `#5550e9`.
   - Side-by-side pixel rendering verified with Cairosvg and Pillow against the original reference.
 - [x] **Consistent Logo Usage Across the Entire App:**
-  - `LoadingSpinner.js`: Replaced legacy heartbeat icon and hardcoded "REGIMEN / Syncing Data" with the Vritta logo, `BRAND.name`, and calm breathing halo.
+  - `LoadingSpinner.js`: Replaced legacy heartbeat icon and hardcoded loading text with the Vritta logo, `BRAND.name`, and calm breathing halo.
   - `TopNav.js`: Fixed container background from dark indigo gradient (which masked the purple outer ring) to a crisp white rounded card (`bg-white border border-gray-200/90 shadow-2xs`), ensuring both purple and cyan rings pop with 100% clarity.
   - `login/page.js`: Updated hero logo container to a clean white card with subtle glow, matching the brand system.
   - App icons & Favicons: Updated `web/src/app/icon0.svg` and regenerated `apple-icon.png`, `icon1.png`, `favicon.ico`, and `web-app-manifest-*.png` from the new vector geometry.

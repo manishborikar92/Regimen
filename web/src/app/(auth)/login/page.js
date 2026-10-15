@@ -8,14 +8,10 @@ import {
   Headphones,
   Lock,
   ArrowRight,
-  Sun,
-  Moon,
-  Laptop,
   AlertCircle,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useTheme } from '@/contexts/ThemeContext';
-import { LoadingSpinner, Logo } from '@/components/ui';
+import { LoadingSpinner, Logo, ThemeToggle } from '@/components/ui';
 import { BRAND } from '@/lib/constants/brand';
 
 const pillars = [
@@ -51,7 +47,6 @@ const pillars = [
 
 export default function LoginPage() {
   const { user, loading, signInWithGoogle } = useAuth();
-  const { theme, resolvedTheme, setTheme, isMounted } = useTheme();
   const router = useRouter();
   const [signingIn, setSigningIn] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -81,12 +76,6 @@ export default function LoginPage() {
     }
   };
 
-  const cycleTheme = () => {
-    if (theme === 'system') setTheme('light');
-    else if (theme === 'light') setTheme('dark');
-    else setTheme('system');
-  };
-
   return (
     <div className="flex flex-col min-h-screen bg-canvas text-main selection:bg-accent-subtle selection:text-main transition-colors">
       {/* Top Header with Brand Mark and Quick Theme Toggle */}
@@ -101,32 +90,7 @@ export default function LoginPage() {
         </div>
 
         {/* Accessible Theme Switcher */}
-        {isMounted && (
-          <button
-            type="button"
-            onClick={cycleTheme}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-subtle bg-surface hover:bg-surface-subtle text-sub hover:text-main text-xs font-medium transition-colors shadow-2xs focus-visible:outline-2 focus-visible:outline-offset-2"
-            aria-label={`Theme: ${theme}. Click to switch theme.`}
-            title={`Current theme: ${theme === 'system' ? `System (${resolvedTheme})` : theme}`}
-          >
-            {theme === 'system' ? (
-              <>
-                <Laptop className="w-3.5 h-3.5 text-muted" aria-hidden="true" />
-                <span className="hidden sm:inline">System</span>
-              </>
-            ) : resolvedTheme === 'dark' ? (
-              <>
-                <Moon className="w-4 h-4 text-amber-400" aria-hidden="true" />
-                <span className="hidden sm:inline">Dark</span>
-              </>
-            ) : (
-              <>
-                <Sun className="w-4 h-4 text-amber-600" aria-hidden="true" />
-                <span className="hidden sm:inline">Light</span>
-              </>
-            )}
-          </button>
-        )}
+        <ThemeToggle />
       </header>
 
       {/* Main Authentication Card */}

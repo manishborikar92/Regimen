@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useCallback, useMemo, useSyncExternalStore } from 'react';
 
 const ThemeContext = createContext({
-  theme: 'system',
+  theme: 'light',
   resolvedTheme: 'light',
   setTheme: () => {},
   isMounted: false,
@@ -15,37 +15,26 @@ const emptySubscribe = () => () => {};
 
 /**
  * Safely retrieve theme preference from localStorage.
- * Falls back to 'system' on SSR or if localStorage throws/is disabled.
+ * Restricts values strictly to 'light' and 'dark'.
+ * Safely converts legacy 'system' preference, missing values, or invalid strings to 'light'.
  */
-function getStoredTheme() {
-  if (typeof window === 'undefined') return 'system';
+export function getStoredTheme() {
+  if (typeof window === 'undefined') return 'light';
   try {
     const stored = localStorage.getItem(THEME_STORAGE_KEY);
-    if (stored === 'light' || stored === 'dark' || stored === 'system') {
-      return stored;
+    if (stored === 'dark') {
+      return 'dark';
     }
   } catch {
     // Graceful fallback if localStorage is disabled or throws security error
   }
-  return 'system';
-}
-
-/**
- * Check operating system color scheme preference.
- */
-function getSystemPreference() {
-  if (typeof window === 'undefined') return 'light';
-  try {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  } catch {
-    return 'light';
-  }
+  return 'light';
 }
 
 /**
  * Apply or remove the .dark class on document.documentElement
  */
-function applyThemeClass(resolved) {
+export function applyThemeClass(resolved) {
   if (typeof document === 'undefined') return;
   const root = document.documentElement;
   if (resolved === 'dark') {
@@ -70,42 +59,19 @@ function subscribeTheme(callback) {
   const handleStorage = (e) => {
     if (e.key === THEME_STORAGE_KEY) {
       const newStored = getStoredTheme();
-      const resolved = newStored === 'system' ? getSystemPreference() : newStored;
-      applyThemeClass(resolved);
-      callback();
-    }
-  };
-
-  // OS theme change listener
-  let mediaQuery;
-  const handleMediaChange = () => {
-    if (getStoredTheme() === 'system') {
-      applyThemeClass(getSystemPreference());
+      applyThemeClass(newStored);
       callback();
     }
   };
 
   if (typeof window !== 'undefined') {
     window.addEventListener('storage', handleStorage);
-    mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handleMediaChange);
-    } else if (mediaQuery.addListener) {
-      mediaQuery.addListener(handleMediaChange);
-    }
   }
 
   return () => {
     themeListeners.delete(callback);
     if (typeof window !== 'undefined') {
       window.removeEventListener('storage', handleStorage);
-      if (mediaQuery) {
-        if (mediaQuery.removeEventListener) {
-          mediaQuery.removeEventListener('change', handleMediaChange);
-        } else if (mediaQuery.removeListener) {
-          mediaQuery.removeListener(handleMediaChange);
-        }
-      }
     }
   };
 }
@@ -118,27 +84,24 @@ export function ThemeProvider({ children }) {
     () => false
   );
 
-  // Subscribe to theme store with localStorage and cross-tab/OS events
+  // Subscribe to theme store with localStorage and cross-tab storage sync
   const theme = useSyncExternalStore(
     subscribeTheme,
     getStoredTheme,
-    () => 'system'
+    () => 'light'
   );
 
-  // Compute resolvedTheme
-  const resolvedTheme = useMemo(() => {
-    if (!isMounted) return 'light';
-    return theme === 'system' ? getSystemPreference() : theme;
-  }, [theme, isMounted]);
+  // In two-state model, resolvedTheme is theme once mounted, default 'light' during SSR
+  const resolvedTheme = isMounted ? theme : 'light';
 
-  // Synchronize DOM class on mount and theme changes (DOM mutation effect without setState)
+  // Synchronize DOM class on mount and theme changes
   useEffect(() => {
     applyThemeClass(resolvedTheme);
   }, [resolvedTheme]);
 
   // Update theme with localStorage persistence and DOM class sync
   const setTheme = useCallback((newTheme) => {
-    if (newTheme !== 'light' && newTheme !== 'dark' && newTheme !== 'system') return;
+    if (newTheme !== 'light' && newTheme !== 'dark') return;
 
     try {
       localStorage.setItem(THEME_STORAGE_KEY, newTheme);
@@ -146,8 +109,7 @@ export function ThemeProvider({ children }) {
       // Storage unavailable or disabled
     }
 
-    const resolved = newTheme === 'system' ? getSystemPreference() : newTheme;
-    applyThemeClass(resolved);
+    applyThemeClass(newTheme);
     notifyThemeListeners();
   }, []);
 

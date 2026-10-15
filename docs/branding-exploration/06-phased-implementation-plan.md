@@ -181,7 +181,7 @@ All project identifiers are separated into their distinct functional contexts, r
 
 | Identifier Context | Current Repository / Service Reality | Authoritative Target Value | Verification & Operational Status |
 | :--- | :--- | :--- | :--- |
-| **Brand / Display Name** | "Vritta" in code / visible UI; old docs have "Regimen" | **Vritta** | **APPROVED & AUTHORITATIVE:** Canonical capitalization **Vritta** (Phase 11 will complete project-wide migration). |
+| **Brand / Display Name** | "Vritta" in code / visible UI; old docs had legacy brand name | **Vritta** | **APPROVED & AUTHORITATIVE:** Canonical capitalization **Vritta** (Phase 11 will complete project-wide migration). |
 | **Vercel Project Name** | Configured in Vercel | `vritta` | **USER-COMPLETED & VERIFIED:** Confirmed in user settings and live Vercel HTTP response. |
 | **Vercel Deployment Domain**| Active Vercel production edge | `myvritta.vercel.app` | **USER-COMPLETED & VERIFIED:** Serving HTTP 200 via Vercel edge `bom1`. Live deployment runs build from GitHub `origin/m/dev`. |
 | **GitHub Repository Name** | `manishborikar92/Vritta` | `manishborikar92/Vritta` | **USER-COMPLETED & VERIFIED:** `git remote -v` and `git ls-remote` confirm remote points to `Vritta.git`. |
@@ -486,17 +486,17 @@ flowchart TD
   8. `web/src/lib/fixtures/osho-library.js`:
      - Line 3: Updated comment to reference `docs/vritta_project_brief.md`.
   9. `docs/regimen_project_brief.md` → `docs/vritta_project_brief.md`:
-     - Renamed document, preserved all substantive requirements, updated title and context to Vritta (formerly Regimen).
+     - Renamed document, preserved all substantive requirements, updated title and context to Vritta.
   10. `README.md` (root):
       - Line 1: `# Regimen — Daily Routine Tracker` → `# Vritta — Personal Routine Companion`
-      - Updated body references from "Regimen" to "Vritta", clone URL to `https://github.com/manishborikar92/Vritta.git`.
+      - Updated body references from previous brand name to "Vritta", clone URL to `https://github.com/manishborikar92/Vritta.git`.
   11. `web/README.md`:
       - Line 1: `# Regimen — Daily Routine Tracker` → `# Vritta — Personal Routine Companion`
       - Updated project description, script table, and environment setup to Vritta.
   12. `docs/Workflow.md`:
       - Line 22: `cd Regimen` → `cd Vritta` (with explanatory note on deferred folder rename).
   13. `docs/firebase-setup.md`:
-      - Replaced "Regimen (Vritta)" and "Regimen's runtime operations" with "Vritta".
+      - Replaced legacy brand phrases with "Vritta".
   14. `web/tests/brand-assets.test.mjs` & `web/tests/theme-engine.test.mjs`:
       - Updated test assertions to verify canonical `'Vritta'`.
 - **Permitted Historical Exceptions (Immutable/Preserved):**
@@ -515,7 +515,7 @@ flowchart TD
   - 0 test regressions.
 - **Status:** **ACCEPTED & COMPLETE**.
 
-#### Phase 12: Simplify Theme Selection to Icon-Only Light/Dark Toggle — [STATUS: READY FOR IMPLEMENTATION UPON APPROVAL]
+#### Phase 12: Simplify Theme Selection to Icon-Only Light/Dark Toggle — [STATUS: IMPLEMENTED & VERIFIED]
 - **Objectives:** Completely remove the "System" theme option, its implementation, and related UI text. Implement a single, accessible, icon-only toggle button (Sun/Moon), safe default to `'light'`, pre-paint zero-flash blocking script without `matchMedia`, and create a shared reusable `ThemeToggle` component used in `TopNav` and `/login`.
 - **Prerequisites & Dependencies:** Phase 11 complete and verified.
 - **Working Directory:** `web/`.
@@ -558,26 +558,31 @@ flowchart TD
   7. `web/tests/phase-4-login-redesign.test.mjs`:
      - Update assertions to verify `ThemeToggle` usage.
 - **Preservation Invariant (Unrelated Uses of "System"):**
-  - Nervous system descriptions in `web/src/components/habits/MovementCard.js` (line 194) and `web/src/lib/seed-data.js` (line 127) must remain untouched.
-  - `isSystemSeed` metadata flags in `web/src/app/(protected)/habits/page.js`, `web/src/lib/seed-data.js`, `web/src/lib/server/personal-schedule.js`, and `web/src/lib/server/sync-service.js` must remain untouched.
-- **Verification Commands:**
-  - `git grep -in "matchMedia" web/src/` (Must return 0 occurrences).
-  - `git grep -in "system" web/src/components/ui/TopNav.js` (Must return 0 occurrences).
-  - `git grep -in "system" web/src/contexts/ThemeContext.js` (Must return 0 occurrences).
-  - `git grep -in "system" web/src/app/(auth)/login/page.js` (Must return 0 occurrences).
-  - `npm --prefix web run lint` (Must exit code 0).
-  - `npm --prefix web run test` (Must pass all 98 tests).
-  - `npm --prefix web run build` (Next.js 16 webpack production build passed with code 0).
-- **Acceptance Criteria:**
-  - Single icon-only button rendered in TopNav and /login; zero text labels.
-  - Clicking toggle alternates strictly between Light and Dark mode.
-  - Safe default is `'light'`; legacy `'system'` preference is safely migrated to `'light'`.
-  - Root layout blocking script contains zero `matchMedia` calls.
-  - Zero hydration errors or theme flashes on reload.
-  - All unrelated uses of "system" remain untouched.
+  - Nervous system descriptions in `web/src/components/habits/MovementCard.js` (line 194) and `web/src/lib/seed-data.js` (line 127) remain completely untouched.
+  - `isSystemSeed` metadata flags in `web/src/app/(protected)/habits/page.js`, `web/src/lib/seed-data.js`, `web/src/lib/server/personal-schedule.js`, and `web/src/lib/server/sync-service.js` remain completely untouched.
+- **Verification Commands & Results:**
+  - `git grep -in "matchMedia" web/src/` (0 occurrences).
+  - `git grep -in "system" web/src/components/ui/TopNav.js` (0 occurrences).
+  - `git grep -in "system" web/src/contexts/ThemeContext.js` (0 occurrences).
+  - `git grep -in "system" web/src/app/(auth)/login/page.js` (0 occurrences).
+  - `npm --prefix web run lint` (0 errors, 0 warnings).
+  - `npm --prefix web run test` (98/98 tests pass across 31 suites in 562ms).
+  - `npm --prefix web run build` (Next.js 16 webpack production build passed with code 0; 12 static routes generated).
+  - `git diff --check` (0 whitespace errors).
+- **Browser Evidence:**
+  - Report: `docs/test-evidence/phase-12/phase-12-browser-test-report.json` (`allChecksPassed: true`, 0 console errors, 0 failed requests).
+  - Touch target >= 44×44px confirmed on both login header toggle and TopNav header toggle.
+  - Zero visible text confirmed (`visibleText: ""` and `spanCount: 0`).
+  - Pre-paint zero-flash reload test: dark reload preserves `.dark`; legacy `'system'` reload correctly migrates to light mode with zero dark class.
+  - 8 screenshots captured across 1280px and 375px viewports in Light and Dark modes:
+    - `login-1280px-light.png`, `login-1280px-dark.png`
+    - `login-375px-light.png`, `login-375px-dark.png`
+    - `navbar-1280px-light.png`, `navbar-1280px-dark.png`
+    - `navbar-375px-light.png`, `navbar-375px-dark.png`
+- **Acceptance Status:** **ACCEPTED & COMPLETE**.
 - **Rollback Strategy:** Git revert `ThemeContext.js`, `layout.js`, `TopNav.js`, `login/page.js`, and delete `ThemeToggle.js`.
 
-#### Phase 13: Integration Verification & Production Release Readiness — [STATUS: PENDING PHASE 12]
+#### Phase 13: Integration Verification & Production Release Readiness — [STATUS: READY FOR REVIEW & APPROVAL]
 - **Objectives:** Execute rigorous end-to-end regression testing and cross-device visual audits following Phase 11 and 12 modifications, and establish the controlled production release protocol to synchronize remote GitHub and Vercel edge deployment to local code.
 - **Prerequisites & Dependencies:** Phase 11 and Phase 12 completed and verified.
 - **Verification Protocol & Execution Steps:**

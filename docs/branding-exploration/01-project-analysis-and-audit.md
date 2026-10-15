@@ -1,7 +1,7 @@
 # Project Analysis & Design Audit
 
 **Date:** 14 October 2026  
-**Subject:** Regimen / Vritta Personal Routine Companion  
+**Subject:** Legacy Brand Audit / Vritta Personal Routine Companion
 **Audience:** Manish Borikar  
 **Status:** Phase 1 Exploration Deliverable (Approval-First Gate)
 
@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary & Product Mission
 
-**Regimen** (with provisional brand identifier **Vritta**) is a mobile-first personal routine companion engineered specifically for Manish Borikar. The product is designed to foster mindful consistency, physical recovery, language mastery, and intellectual reflection through a tightly curated set of daily practices.
+The application (canonically branded **Vritta**) is a mobile-first personal routine companion engineered specifically for Manish Borikar. The product is designed to foster mindful consistency, physical recovery, language mastery, and intellectual reflection through a tightly curated set of daily practices.
 
 Unlike commercial habit trackers (such as Habitica, Streaks, or Fabulous) that rely on gamification, aggressive streak anxiety, guilt-inducing red overdue warnings, and minute-by-minute rigid time-blocking, this application is grounded in a **humane, non-punitive, completion-first philosophy**:
 - **Completion precedes clock-time:** Preferred periods (e.g., Afternoon workout, Bedtime reading) are flexible targets, never unforgiving deadlines. Completing an afternoon workout at 7:00 PM is a full success.
@@ -35,10 +35,10 @@ Unlike commercial habit trackers (such as Habitica, Streaks, or Fabulous) that r
 ## 3. Current Branding & Visual Identity Audit
 
 ### 3.1 Naming Inconsistency & Cognitive Dissonance
-- **Current Name:** The repository, package name (`regimen-web`), and documentation are primarily titled **Regimen**.
+- **Legacy Name:** The repository, original package name, and initial documentation were originally titled under the previous brand name.
 - **Provisional Name:** `src/lib/constants/brand.js` and recent UI banners reference **Vritta** (वृत्त).
 - **The Problem:** 
-  1. *Regimen* evokes clinical convalescence, medical prescriptions, military discipline, or dietary rigidity ("a prescribed course of medical treatment or diet"). This contradicts the app's spirit of gentle rhythm, deep awareness, and sustainable consistency.
+  1. The legacy brand name evokes clinical convalescence, medical prescriptions, military discipline, or dietary rigidity ("a prescribed course of medical treatment or diet"). This contradicts the app's spirit of gentle rhythm, deep awareness, and sustainable consistency.
   2. *Vritta* is Sanskrit for conduct/cycle, but market research reveals established phonetic confusion with **Vritti** (an existing iOS/Android breathwork and meditation app) and pronunciation ambiguity for non-Sanskrit speakers.
   3. A decisive, inspiring, distinctive brand name is required.
 

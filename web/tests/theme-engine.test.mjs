@@ -166,11 +166,10 @@ describe('Phase 1: VRITTA Design Tokens & Theme Engine', () => {
       };
     }
 
-    function executeBlockingScript(storage, isDarkOS, classList) {
+    function executeBlockingScript(storage, classList) {
       try {
         const s = storage.getItem(STORAGE_KEY);
-        const p = isDarkOS;
-        if (s === 'dark' || (!s && p) || (s === 'system' && p)) {
+        if (s === 'dark') {
           classList.add('dark');
         } else {
           classList.remove('dark');
@@ -183,78 +182,70 @@ describe('Phase 1: VRITTA Design Tokens & Theme Engine', () => {
     function getStoredTheme(storage) {
       try {
         const stored = storage.getItem(STORAGE_KEY);
-        if (stored === 'light' || stored === 'dark' || stored === 'system') {
-          return stored;
+        if (stored === 'dark') {
+          return 'dark';
         }
       } catch {
         // Safe fallback
       }
-      return 'system';
+      return 'light';
     }
 
-    it('should correctly read stored preference and fall back to system safely', () => {
+    it('should correctly read stored preference and default/migrate legacy values to light safely', () => {
       const storage = createMockStorage({ [STORAGE_KEY]: 'dark' });
       assert.equal(getStoredTheme(storage), 'dark');
 
       storage.setItem(STORAGE_KEY, 'light');
       assert.equal(getStoredTheme(storage), 'light');
 
+      // Legacy 'system' value must be safely migrated to 'light'
       storage.setItem(STORAGE_KEY, 'system');
-      assert.equal(getStoredTheme(storage), 'system');
+      assert.equal(getStoredTheme(storage), 'light');
 
-      // Empty / non-existent key
+      // Empty / non-existent key defaults to 'light'
       const emptyStorage = createMockStorage();
-      assert.equal(getStoredTheme(emptyStorage), 'system');
+      assert.equal(getStoredTheme(emptyStorage), 'light');
 
-      // Corrupted / invalid key
+      // Corrupted / invalid key defaults to 'light'
       const corruptedStorage = createMockStorage({ [STORAGE_KEY]: 'invalid_color_theme' });
-      assert.equal(getStoredTheme(corruptedStorage), 'system');
+      assert.equal(getStoredTheme(corruptedStorage), 'light');
 
-      // Security / Quota error throwing storage
+      // Security / Quota error throwing storage defaults safely to 'light'
       const throwingStorage = createMockStorage();
       throwingStorage.setThrows(true);
-      assert.equal(getStoredTheme(throwingStorage), 'system'); // Should not throw
+      assert.equal(getStoredTheme(throwingStorage), 'light'); // Should not throw
     });
 
     it('should execute zero-flash blocking script logic and set .dark class correctly', () => {
-      // 1. Explicit dark in storage -> adds .dark regardless of OS
+      // 1. Explicit dark in storage -> adds .dark
       const classList1 = createMockClassList();
-      executeBlockingScript(createMockStorage({ [STORAGE_KEY]: 'dark' }), false, classList1);
+      executeBlockingScript(createMockStorage({ [STORAGE_KEY]: 'dark' }), classList1);
       assert.ok(classList1.contains('dark'), 'Explicit dark mode must add .dark class');
 
-      // 2. Explicit light in storage -> removes .dark regardless of OS
+      // 2. Explicit light in storage -> removes .dark
       const classList2 = createMockClassList();
       classList2.add('dark'); // simulate pre-existing
-      executeBlockingScript(createMockStorage({ [STORAGE_KEY]: 'light' }), true, classList2);
-      assert.ok(!classList2.contains('dark'), 'Explicit light mode must remove .dark class even if OS is dark');
+      executeBlockingScript(createMockStorage({ [STORAGE_KEY]: 'light' }), classList2);
+      assert.ok(!classList2.contains('dark'), 'Explicit light mode must remove .dark class');
 
-      // 3. System mode with Dark OS -> adds .dark
+      // 3. Legacy system in storage -> removes .dark (migrates/defaults to light)
       const classList3 = createMockClassList();
-      executeBlockingScript(createMockStorage({ [STORAGE_KEY]: 'system' }), true, classList3);
-      assert.ok(classList3.contains('dark'), 'System mode with Dark OS must add .dark class');
+      classList3.add('dark');
+      executeBlockingScript(createMockStorage({ [STORAGE_KEY]: 'system' }), classList3);
+      assert.ok(!classList3.contains('dark'), 'Legacy system mode must default to light without flash');
 
-      // 4. System mode with Light OS -> removes .dark
+      // 4. Uninitialized storage (first visit) -> removes .dark (defaults to light)
       const classList4 = createMockClassList();
       classList4.add('dark');
-      executeBlockingScript(createMockStorage({ [STORAGE_KEY]: 'system' }), false, classList4);
-      assert.ok(!classList4.contains('dark'), 'System mode with Light OS must remove .dark class');
+      executeBlockingScript(createMockStorage(), classList4);
+      assert.ok(!classList4.contains('dark'), 'First visit must default to light without flash');
 
-      // 5. Uninitialized storage (first visit) with Dark OS -> adds .dark
-      const classList5 = createMockClassList();
-      executeBlockingScript(createMockStorage(), true, classList5);
-      assert.ok(classList5.contains('dark'), 'First visit with Dark OS must default to dark without flash');
-
-      // 6. Uninitialized storage with Light OS -> removes .dark
-      const classList6 = createMockClassList();
-      executeBlockingScript(createMockStorage(), false, classList6);
-      assert.ok(!classList6.contains('dark'), 'First visit with Light OS must default to light');
-
-      // 7. Storage throwing error -> does not crash or throw
+      // 5. Storage throwing error -> does not crash or throw
       const throwingStorage = createMockStorage();
       throwingStorage.setThrows(true);
-      const classList7 = createMockClassList();
+      const classList5 = createMockClassList();
       assert.doesNotThrow(() => {
-        executeBlockingScript(throwingStorage, true, classList7);
+        executeBlockingScript(throwingStorage, classList5);
       });
     });
 
@@ -287,24 +278,24 @@ describe('Phase 1: VRITTA Design Tokens & Theme Engine', () => {
       assert.equal(listener2Calls, 2);
     });
 
-    it('should verify keyboard navigation circular indexing logic for 3 theme options', () => {
-      const totalOptions = 3; // Light (0), Dark (1), System (2)
+    it('should verify two-state theme toggle alternation and ThemeToggle component invariants', () => {
+      // Toggle alternation logic
+      const toggle = (current) => (current === 'dark' ? 'light' : 'dark');
+      assert.equal(toggle('light'), 'dark');
+      assert.equal(toggle('dark'), 'light');
 
-      // ArrowDown (Next)
-      const nextFrom0 = (0 + 1) % totalOptions;
-      const nextFrom1 = (1 + 1) % totalOptions;
-      const nextFrom2 = (2 + 1) % totalOptions;
-      assert.equal(nextFrom0, 1);
-      assert.equal(nextFrom1, 2);
-      assert.equal(nextFrom2, 0); // Wraps around to start
+      // ThemeToggle component source verification
+      const togglePath = path.join(projectRoot, 'src', 'components', 'ui', 'ThemeToggle.js');
+      assert.ok(fs.existsSync(togglePath), 'ThemeToggle.js component must exist');
+      const toggleContent = fs.readFileSync(togglePath, 'utf8');
 
-      // ArrowUp (Previous)
-      const prevFrom0 = (0 - 1 + totalOptions) % totalOptions;
-      const prevFrom1 = (1 - 1 + totalOptions) % totalOptions;
-      const prevFrom2 = (2 - 1 + totalOptions) % totalOptions;
-      assert.equal(prevFrom0, 2); // Wraps around to end
-      assert.equal(prevFrom1, 0);
-      assert.equal(prevFrom2, 1);
+      assert.ok(toggleContent.includes('useTheme()'), 'ThemeToggle must consume useTheme');
+      assert.ok(toggleContent.includes('min-h-[44px]'), 'ThemeToggle must satisfy min 44px touch height');
+      assert.ok(toggleContent.includes('min-w-[44px]'), 'ThemeToggle must satisfy min 44px touch width');
+      assert.ok(toggleContent.includes('aria-label='), 'ThemeToggle must define accessible aria-label');
+      assert.ok(toggleContent.includes('Sun') && toggleContent.includes('Moon'), 'ThemeToggle must render Sun and Moon icons');
+      assert.ok(!/<span>/i.test(toggleContent), 'ThemeToggle must be icon-only with zero text spans');
+      assert.ok(!toggleContent.toLowerCase().includes('system'), 'ThemeToggle must not contain system theme references');
     });
   });
 
@@ -376,8 +367,9 @@ describe('Phase 1: VRITTA Design Tokens & Theme Engine', () => {
 
       // Blocking theme script in head
       assert.ok(layoutContent.includes('vritta-theme'), 'Blocking script must check vritta-theme');
-      assert.ok(layoutContent.includes('prefers-color-scheme: dark'), 'Blocking script must check prefers-color-scheme');
-      assert.ok(layoutContent.includes('document.documentElement.classList.add(\'dark\')'), 'Blocking script must add dark class');
+      assert.ok(layoutContent.includes("s==='dark'"), 'Blocking script must check s === dark');
+      assert.ok(!layoutContent.includes('matchMedia'), 'Blocking script must not call matchMedia');
+      assert.ok(layoutContent.includes("document.documentElement.classList.add('dark')"), 'Blocking script must add dark class');
 
       // ThemeProvider wrapping
       assert.ok(layoutContent.includes('<ThemeProvider>'), 'Must wrap application shell in ThemeProvider');
@@ -388,19 +380,18 @@ describe('Phase 1: VRITTA Design Tokens & Theme Engine', () => {
       assert.ok(!layoutContent.includes('userScalable'), 'Must not disable browser pinch-to-zoom with userScalable');
     });
 
-    it('should verify TopNav.js provides accessible 3-state theme controls with full WAI-ARIA and keyboard navigation', () => {
+    it('should verify TopNav.js and ThemeToggle provide accessible icon-only theme toggle', () => {
       const navPath = path.join(projectRoot, 'src', 'components', 'ui', 'TopNav.js');
+      const togglePath = path.join(projectRoot, 'src', 'components', 'ui', 'ThemeToggle.js');
       const navContent = fs.readFileSync(navPath, 'utf8');
+      const toggleContent = fs.readFileSync(togglePath, 'utf8');
 
-      assert.ok(navContent.includes('useTheme()'), 'TopNav must consume useTheme');
-      assert.ok(navContent.includes('role="menuitemradio"'), 'Theme options must have role="menuitemradio"');
-      assert.ok(navContent.includes('aria-checked={isSelected}'), 'Theme options must announce aria-checked');
-      assert.ok(navContent.includes('aria-haspopup="menu"'), 'Theme toggle button must have aria-haspopup="menu"');
-      assert.ok(navContent.includes('aria-controls="theme-menu-dropdown"'), 'Trigger button must control dropdown');
-      assert.ok(navContent.includes('aria-labelledby="theme-menu-button"'), 'Dropdown must be labelled by trigger');
-      assert.ok(navContent.includes('onKeyDown={handleTriggerKeyDown}'), 'Trigger must handle keyboard activation');
-      assert.ok(navContent.includes('onKeyDown={(e) => handleMenuKeyDown(e, idx)}'), 'Items must handle keyboard navigation');
-      assert.ok(navContent.includes("e.key === 'Escape'"), 'Must handle Escape key to dismiss menu');
+      assert.ok(navContent.includes('<ThemeToggle'), 'TopNav must render shared ThemeToggle component');
+      assert.ok(!navContent.includes('THEME_OPTIONS'), 'TopNav must not contain 3-state THEME_OPTIONS array');
+      assert.ok(!navContent.includes('showThemeMenu'), 'TopNav must not contain theme menu dropdown state');
+      assert.ok(toggleContent.includes('aria-label='), 'ThemeToggle must define accessible aria-label');
+      assert.ok(toggleContent.includes('min-h-[44px]'), 'ThemeToggle must satisfy min 44px touch height');
+      assert.ok(toggleContent.includes('min-w-[44px]'), 'ThemeToggle must satisfy min 44px touch width');
     });
   });
 });
