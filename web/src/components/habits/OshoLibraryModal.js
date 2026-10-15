@@ -27,7 +27,7 @@ export default function OshoLibraryModal({
   });
 
   return (
-    <div className="fixed inset-0 bg-black/60 dark:bg-black/80 z-50 flex items-center justify-center p-3 sm:p-4">
+    <div className="fixed inset-0 bg-black/60 dark:bg-black/80 z-50 flex items-center justify-center p-3 sm:p-4 z-[100]">
       <div className="bg-surface rounded-2xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-subtle">
         {/* Header */}
         <div className="p-4 sm:p-5 border-b border-subtle flex items-center justify-between bg-amber-50/40 dark:bg-amber-950/30">
