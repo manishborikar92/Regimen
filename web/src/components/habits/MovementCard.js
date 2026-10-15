@@ -200,12 +200,12 @@ function MovementCard({
           {/* Non-Sunday Movement Progress and Checklist */}
           {!isSunday && (
             <div className="mt-4 p-3.5 bg-slate-50/80 dark:bg-slate-800/40 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <div>
                   <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                     {isWorkoutDay ? 'Strength Routine Steps' : 'Walk & Mobility Steps'}
                   </span>
-                  <p className="text-sm font-bold text-teal-900 dark:text-teal-200 mt-0.5">
+                  <p className="text-xs sm:text-sm font-bold text-teal-900 dark:text-teal-200 mt-0.5">
                     {completedItemIds.length} of {currentItems.length} exercises logged
                   </p>
                 </div>

@@ -113,7 +113,7 @@ function OshoCard({
                 <span className="text-2xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider">
                   Active Series
                 </span>
-                <span className="text-2xs px-1.5 py-0.2 bg-surface rounded border border-amber-200 dark:border-amber-800/60 text-amber-900 dark:text-amber-200 font-medium">
+                <span className="text-2xs px-1.5 py-0.5 bg-surface rounded border border-amber-200 dark:border-amber-800/60 text-amber-900 dark:text-amber-200 font-medium">
                   {activeSeries.language}
                 </span>
               </div>

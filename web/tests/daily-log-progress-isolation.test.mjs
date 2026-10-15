@@ -246,6 +246,10 @@ describe('Daily Log Progress Isolation & Regression Tests', () => {
     let testDocRef = null;
 
     before(async () => {
+      // Safety guard: only execute live cloud mutations if explicitly opted-in
+      if (process.env.RUN_LIVE_FIRESTORE_TESTS !== 'true') {
+        return;
+      }
       const credPath = 'C:/Users/manis/.credentials/vritta-app-firebase-adminsdk.json';
       if (fs.existsSync(credPath)) {
         const { createRequire } = await import('node:module');
@@ -271,7 +275,7 @@ describe('Daily Log Progress Isolation & Regression Tests', () => {
 
     it('should verify live Firestore setDoc with merge: true preserves habitProgress when toggling completion', async (t) => {
       if (!db || !testDocRef) {
-        t.skip('Firebase admin credentials not available in environment');
+        t.skip('Live Firestore backend tests skipped by default. Set RUN_LIVE_FIRESTORE_TESTS=true to run against live cloud instance.');
         return;
       }
 
@@ -328,7 +332,7 @@ describe('Daily Log Progress Isolation & Regression Tests', () => {
 
     it('should contrast against buggy payload to prove that writing habitProgress: {} wipes Firestore data', async (t) => {
       if (!db || !testDocRef) {
-        t.skip('Firebase admin credentials not available in environment');
+        t.skip('Live Firestore backend tests skipped by default. Set RUN_LIVE_FIRESTORE_TESTS=true to run against live cloud instance.');
         return;
       }
 
@@ -366,7 +370,7 @@ describe('Daily Log Progress Isolation & Regression Tests', () => {
 
     it('should verify live Firestore retains multiple activities across repeated toggles and untoggles', async (t) => {
       if (!db || !testDocRef) {
-        t.skip('Firebase admin credentials not available in environment');
+        t.skip('Live Firestore backend tests skipped by default. Set RUN_LIVE_FIRESTORE_TESTS=true to run against live cloud instance.');
         return;
       }
 
@@ -428,7 +432,7 @@ describe('Daily Log Progress Isolation & Regression Tests', () => {
 
     it('should verify concurrent writes to different habits merge correctly in live Firestore', async (t) => {
       if (!db || !testDocRef) {
-        t.skip('Firebase admin credentials not available in environment');
+        t.skip('Live Firestore backend tests skipped by default. Set RUN_LIVE_FIRESTORE_TESTS=true to run against live cloud instance.');
         return;
       }
 
