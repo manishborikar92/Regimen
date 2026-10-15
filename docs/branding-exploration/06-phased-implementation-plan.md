@@ -258,26 +258,32 @@ To eliminate ambiguity, all project identifiers are separated into their distinc
 
 ```mermaid
 flowchart TD
-    Gate["Approval Gate (User Authorizes Plan)"] --> P1["Phase 1: Design Tokens & Theme Engine (Local)"]
-    P1 --> P2["Phase 2: Master Vector Assets Migration (Local)"]
-    P2 --> P3["Phase 3: UI/UX Component Polish (Local)"]
-    P3 --> P4["Phase 4: Login Page Redesign (Local)"]
-    P4 --> P5["Phase 5: Browser Verification & Accessibility Audit (Local)"]
-    P5 --> Checkpoint["Recovery Checkpoint (Clean Git Tree & Local Tests Pass)"]
-    Checkpoint --> P6["Phase 6: Fresh Firebase Setup & Staging Validation (Cloud/Preview)"]
-    P6 --> P7["Phase 7: GitHub Repository Renaming & Git Remote Update"]
-    P7 --> P8["Phase 8: Local Folder Renaming (External PowerShell)"]
-    P8 --> P9["Phase 9: Vercel Project Renaming & Production Cutover"]
-    P9 --> P10["Phase 10: Documentation Archival, Cleanup & Final Handover"]
+    Gate["Approval Gate (User Authorizes Plan)"] --> P1["Phase 1: Design Tokens & Theme Engine [VERIFIED]"]
+    P1 --> P2["Phase 2: Master Vector Assets Migration [VERIFIED]"]
+    P2 --> P3["Phase 3: UI/UX Component Polish [VERIFIED]"]
+    P3 --> P4["Phase 4: Login Page Redesign [VERIFIED]"]
+    P4 --> P5["Phase 5: Browser Verification & Accessibility Audit [VERIFIED]"]
+
+    subgraph UserCompletedInfra["User-Completed Infrastructure Operations (Verified)"]
+        P6["Phase 6: Fresh Firebase Setup & Seed Migration [VERIFIED]"]
+        P7["Phase 7: GitHub Repository Renaming & Git Remote [VERIFIED]"]
+        P9["Phase 9: Vercel Project & Domain Setup [VERIFIED]"]
+    end
+
+    P5 --> UserCompletedInfra
+    UserCompletedInfra --> Checkpoint["Production Deployment & Code Sync Checkpoint"]
+    Checkpoint --> P8["Phase 8: Local Folder Renaming (DEFERRED TO FINAL STEP)"]
+    P8 --> P10["Phase 10: Documentation Archival, Cleanup & Final Handover"]
 ```
 
-### Why This Sequence is Safest:
-1. **Phases 1–5 (Local Frontend Polish):** Completely decoupled from external cloud infrastructure. Developed and tested on the working local environment.
-2. **Recovery Checkpoint:** Before modifying external repositories or databases, `git status` verifies a clean working tree and all 57 tests pass.
-3. **Phase 6 (Firebase Setup in Isolation):** New project is created and validated in Preview staging. Production remains on `vritta-app`.
-4. **Phases 7–8 (Repository & Folder Renaming):** Executed in a dedicated maintenance window. Git remote is updated before Vercel builds from the new URL.
-5. **Phase 9 (Vercel Cutover):** Triggered only after frontend code, Firebase project, and GitHub repository are completely verified.
-6. **Phase 10 (Cleanup):** Archival occurs only after production is live and verified.
+### Actual Execution Sequence & Status Highlights:
+1. **Phases 1–4 (Local Frontend Implementation):** Fully implemented, tested, and verified on local working tree (98 passing tests, zero purple/indigo, Guiding Sutra branding).
+2. **Phase 5 (Comprehensive Browser Verification & Accessibility Audit):** Executed and verified using headless Chrome CDP with live authenticated sessions across 5 viewports, 5 routes, and dark/light modes.
+3. **Phase 6 (Firebase Project `vritta-app`):** Completed by Manish; verified active project `vritta-app`, Admin SDK connection, and 6 canonical habits seeded in Cloud Firestore under UID `2W83kgjX9db8QiIWqZd5AJrc8PQ2`.
+4. **Phase 7 (GitHub Repository `Vritta`):** Completed by Manish; verified `origin` remote points to `https://github.com/manishborikar92/Vritta.git`.
+5. **Phase 9 (Vercel Project `vritta` & Domain `myvritta.vercel.app`):** Completed by Manish; verified live HTTP 200 response from Vercel edge `bom1`. Deployed commit reflects remote GitHub `origin/m/dev`, while local working tree contains the latest Phase 1–5 code.
+6. **Phase 8 (Local Workspace Folder Renaming):** **Explicitly deferred to the very end**, after all code, deployment, and documentation tasks are fully verified, preventing breaking active IDE, path, or terminal locks.
+7. **Phase 10 (Final Archival & Handover):** Final phase to archive exploration docs and verify end-to-end operational readiness.
 
 ---
 
@@ -389,68 +395,78 @@ flowchart TD
     - 1280×800 (Desktop): `login-1280px-light.png`, `login-1280px-dark.png`
 - **Acceptance Status:** **ACCEPTED & COMPLETE**. Zero horizontal overflow across all 5 viewports in both themes (`scrollWidth === clientWidth`); Google Sign-In button height = 50px (exceeds WCAG 48px minimum); body background resolves to `#F8FAFC` in light mode and `#090D16` in dark mode; card background resolves to `#111827` in dark mode. Zero prohibited colors.
 
-#### Phase 5: Browser Verification & Accessibility Audit
-- **Objectives:** Comprehensive visual and functional audit across viewports.
-- **Dependencies:** Phases 1–4 complete.
-- **Verification Commands:**
-  - `npm --prefix web run test` (57/57 pass).
-  - `npm --prefix web run build` (Next.js build in `--webpack` mode compiles with 0 errors).
-  - Execute viewport matrix audit (375px, 390px, 412px, 768px, 1280px).
-- **Acceptance Criteria:** Zero element overflow (`scrollWidth === innerWidth`); contrast ratios verified; focus outlines clear.
+#### Phase 5: Browser Verification & Accessibility Audit — [STATUS: IMPLEMENTED & VERIFIED]
+- **Objectives:** Execute exhaustive visual and functional browser audit across 5 standard device viewports (375px, 390px, 412px, 768px, 1280px) in Light, Dark, and System modes on live Next.js production server with authentic user authentication.
+- **Audited Routes & States:**
+  - `/` (Root route): Verified automatic client-side redirect to `/dashboard` when authenticated.
+  - `/login`: Unrestricted browser zoom (`width=device-width, initial-scale=1`), 50px tactile Google button, centered Guiding Sutra mark, 4 routine pillars.
+  - `/dashboard`: Streak counter, today's rhythm stats, 6 routine cards (MovementCard, WorkbookCard, OshoCard, ReadingCard, SpeakingCard, DiaryCard).
+  - `/habits`: Routine Manager list, category badges, soft-guidance philosophy banner.
+  - `/analytics`: 30-day activity heatmap, weekly breakdown, rest day tokens.
+  - Interactive Modals & Workflows:
+    - `OshoLibraryModal`: Verified opening and dialog rendering (`modal-osho-library-375px-dark.png`, `modal-osho-library-1280px-dark.png`).
+    - `HabitModal`: Verified opening for routine editing (`modal-habit-edit-375px-dark.png`, `modal-habit-edit-1280px-dark.png`).
+    - `ConfirmDialog`: Verified opening delete confirmation prompt (`modal-confirm-dialog-375px-dark.png`).
+    - `WorkbookCard`: Stepper session increment interaction (`interaction-workbook-stepper-375px-dark.png`).
+    - `ReadingCard`: Timer start and running state (`interaction-reading-timer-375px-dark.png`).
+    - Habit Toggle: Routine completion toggling (`interaction-habit-toggled-375px-dark.png`).
+- **Accessibility & Contrast Verification:**
+  - Viewport Invariant: `<meta name="viewport" content="width=device-width, initial-scale=1"/>` (unrestricted browser zoom confirmed per WCAG 2.2 SC 1.4.4 and W3C ACT Rule `b4f0c3`).
+  - Zero Horizontal Overflow: `scrollWidth === clientWidth` on all viewports in Light and Dark modes.
+  - WCAG Relative Luminance Contrast: All 7 pairs exceed standards (Light Main Text 17.06:1 AAA, Light Sub Text 7.24:1 AAA, Dark Main Text 18.57:1 AAA, Dark Sub Text 13.09:1 AAA, Dark Surface 16.96:1 AAA, Luminous Teal 7.81:1 AAA, Warm Amber 6.10:1 AA).
+  - Clean Console: 0 browser console errors, 0 hydration warnings, 0 failed network requests.
+- **Verification Commands & Results:**
+  - `npm --prefix web run lint` (0 errors, 0 warnings).
+  - `npm --prefix web run test` (98/98 tests pass across 31 suites in 375ms).
+  - `npm --prefix web run build` (Next.js 16 webpack production build passed with code 0; 12/12 static routes generated).
+  - `git diff --check` (0 whitespace errors).
+- **Screenshot Evidence:** 26 full-page screenshots and structured report stored in `docs/test-evidence/phase-5/phase-5-browser-test-report.json`.
 
-#### Recovery Checkpoint
-- Perform clean working-tree check: `git status` must show only planned local changes.
-- Ensure all 57 tests pass and build succeeds.
+#### Phase 6: Fresh Firebase Project Setup & Seed Migration — [STATUS: USER-COMPLETED & VERIFIED]
+- **Status:** Completed by Manish; verified independently via Admin SDK and client configuration.
+- **Verified Configuration:**
+  - Active Firebase project: `vritta-app` (configured in `web/.firebaserc`).
+  - Client Environment: `NEXT_PUBLIC_FIREBASE_*` variables in `web/.env.local` configured for `vritta-app`.
+  - Admin SDK Credentials: `GOOGLE_APPLICATION_CREDENTIALS` points to live service account key for `vritta-app` (`vritta-app.iam.gserviceaccount.com`).
+  - Live Database & Collections: Connected and verified collections `dailyLogs`, `habits`, and `users`.
+  - User Record & Seed Data: Verified `manishborikar92@gmail.com` registered with UID `2W83kgjX9db8QiIWqZd5AJrc8PQ2` (`emailVerified: true`). The 6 canonical personalized routines are seeded in `/habits`.
+  - Security Rules & Indexes: `web/firestore.rules` (v2 owner-scoped) and `web/firestore.indexes.json` deployed.
 
-#### Phase 6: Fresh Firebase Project Setup & Staging Validation
-- **Objectives:** Provision fresh Firebase project, deploy security rules and indexes, configure Admin SDK credentials, and validate in Preview.
-- **Dependencies:** Phase 5 verified; user decision on Option A vs Option B confirmed.
-- **Tasks:**
-  1. Create Firebase project in Firebase Console.
-  2. Enable Google Authentication; add authorized domains (`localhost`, `127.0.0.1`, Vercel domains).
-  3. Provision Firestore Database in confirmed location (`asia-south1` or `nam5`).
-  4. Deploy rules: `firebase deploy --only firestore:rules --project <new-id>`.
-  5. Deploy indexes: `firebase deploy --only firestore:indexes --project <new-id>`.
-  6. Generate Admin SDK service account key; store in `%USERPROFILE%\.credentials\`.
-  7. Update `web/.firebaserc` and `web/.env.local`. Remove hardcoded fallbacks in `firebase-admin.js`.
-  8. Execute data strategy (Option A: seed routines via `npm run schedule:fetch-personal`; Option B: execute migration script).
-  9. Deploy to Vercel Preview environment and validate end-to-end.
-- **Acceptance Criteria:** Sign-in and habit tracking verified on local dev server and Vercel Preview.
+#### Phase 7: GitHub Repository Renaming & Git Remote Update — [STATUS: USER-COMPLETED & VERIFIED]
+- **Status:** Completed by Manish; verified independently via Git CLI.
+- **Verified Configuration:**
+  - Remote Origin URL: `https://github.com/manishborikar92/Vritta.git` (verified fetch and push URLs).
+  - Tracking Configuration: Branch `m/dev` tracks `origin/m/dev` (verified via `git remote -v` and `git ls-remote`).
 
-#### Phase 7: GitHub Repository Renaming & Git Remote Update
-- **Objectives:** Rename GitHub repository and update local Git remotes safely.
-- **Dependencies:** Phase 6 complete.
-- **Tasks:**
-  1. Go to GitHub repo settings: Rename repository from `Regimen` to `Vritta`.
-  2. Update local Git remote: `git remote set-url origin https://github.com/manishborikar92/Vritta.git`.
-  3. Verify with `git remote -v` and `git fetch origin`.
-  4. Check Vercel Project Settings > Git to confirm repository link is active.
-- **Acceptance Criteria:** `git remote -v` reflects `Vritta.git`; fetch succeeds.
+#### Phase 9: Vercel Project Renaming & Domain Setup — [STATUS: USER-COMPLETED & VERIFIED]
+- **Status:** Completed by Manish; verified independently via live HTTP inspection.
+- **Verified Configuration:**
+  - Vercel Project Name: `vritta`.
+  - Deployment Domain: `myvritta.vercel.app` (verified live HTTP 200 responses from Vercel edge `bom1`, serving title "Vritta — Personal Routine Companion").
+  - **Important Deployment Distinction:** The live site at `myvritta.vercel.app` currently runs the deployment built from remote GitHub commit `a6cd5d8` on `origin/m/dev`. Local working tree is 5 commits ahead (`502851b`) containing Phases 1–5 implementations (zero purple/indigo, Guiding Sutra mark, unrestricted zoom). When Manish pushes local commits to GitHub, Vercel will build and reflect the latest verified code.
 
-#### Phase 8: Local Folder Renaming
-- **Objectives:** Safely rename local workspace directory on Windows.
-- **Dependencies:** Phase 7 complete.
-- **Tasks:**
-  1. Terminate all Node.js and terminal processes running in `C:\Users\manis\Projects\Regimen`.
-  2. Open an external PowerShell window at `C:\Users\manis\Projects`.
-  3. Execute: `Rename-Item -Path "C:\Users\manis\Projects\Regimen" -NewName "Vritta"`.
-  4. Reopen project at `C:\Users\manis\Projects\Vritta` and verify `git status`.
-- **Acceptance Criteria:** Directory is `Vritta`; git working tree is intact.
-
-#### Phase 9: Vercel Project Renaming & Production Cutover
-- **Objectives:** Rename Vercel project, configure production domain, update Sensitive env vars, and cut over Production.
-- **Dependencies:** Phases 6–8 complete.
-- **Tasks:**
-  1. In Vercel Dashboard, update Project Name to `vritta-app` (provisional).
-  2. Add production domain in Vercel Domains.
-  3. Add production domain to Firebase Auth Authorized Domains.
-  4. Update Production environment variables in Vercel (`FIREBASE_SERVICE_ACCOUNT_KEY` Sensitive, `NEXT_PUBLIC_FIREBASE_*`).
-  5. Trigger production redeployment.
-- **Acceptance Criteria:** Production deployment succeeds; Google Sign-In authenticates on live domain; routines load.
+#### Phase 8: Local Workspace Folder Renaming — [STATUS: EXPLICITLY DEFERRED TO FINAL HANDOVER]
+- **Status:** **EXPLICITLY DEFERRED** until the very end, after all implementation, deployment, testing, and documentation cleanup tasks are complete.
+- **Rationale:** Renaming `C:\Users\manis\Projects\Regimen` while IDE, Node.js background processes, and terminals are open causes Windows file-locking failures (`EPERM`/`EBUSY`) and breaks active IDE workspace contexts.
+- **Eventual Phase 8 Execution Runbook (Windows PowerShell):**
+  1. *Pre-flight Sanitation:* Ensure `git status` is clean, all background test servers/monitors are killed (`taskkill /f /im node.exe`).
+  2. *Close IDE & Terminals:* Close all VS Code / Antigravity windows and terminals rooted in `C:\Users\manis\Projects\Regimen`.
+  3. *Open Standalone Terminal:* Open an external Windows PowerShell window at `C:\Users\manis\Projects`.
+  4. *Execute Rename:*
+     ```powershell
+     Rename-Item -Path "C:\Users\manis\Projects\Regimen" -NewName "Vritta"
+     ```
+  5. *Reopen Workspace:* Launch IDE and terminal in `C:\Users\manis\Projects\Vritta`.
+  6. *Post-Rename Verification:*
+     - Run `git status` to verify working tree integrity and branch `m/dev`.
+     - Run `git remote -v` to confirm origin remains `https://github.com/manishborikar92/Vritta.git`.
+     - Run `npm --prefix web run test` (must pass 98/98 tests).
+     - Run `npm --prefix web run build` to verify Next.js builds cleanly at new path.
+     - Verify documentation contains zero broken relative or absolute path dependencies.
 
 #### Phase 10: Documentation Archival, Cleanup & Final Handover
 - **Objectives:** Execute documentation cleanup matrix; archive superseded documents to `docs/archive/`; deliver handover sign-off.
-- **Dependencies:** Phase 9 live and verified.
+- **Dependencies:** Phase 9 live deployment confirmed by user; Phase 8 folder rename completed.
 - **Acceptance Criteria:** All documentation updated; temporary debug files removed; obsolete plans safely archived.
 
 ---
