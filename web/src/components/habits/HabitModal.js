@@ -453,7 +453,7 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
             <button
               type="submit"
               disabled={saving}
-              className="min-h-[44px] px-5 py-2 bg-teal-700 dark:bg-teal-600 text-white rounded-xl text-xs font-semibold hover:bg-teal-800 dark:hover:bg-teal-500 transition-colors disabled:opacity-50 shadow-2xs"
+              className="px-5 py-2 bg-teal-700 dark:bg-teal-600 text-white rounded-xl text-xs font-semibold hover:bg-teal-800 dark:hover:bg-teal-500 transition-colors disabled:opacity-50 shadow-2xs"
             >
               {saving ? 'Saving...' : habit ? 'Update Routine' : 'Create Routine'}
             </button>
