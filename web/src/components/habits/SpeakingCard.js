@@ -82,20 +82,27 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
     onToggle(habit.id);
   };
 
-  // Immediate flush on unmount (e.g. page navigation or activity unmount)
+  // Immediate flush on unmount (e.g. client-side page navigation or activity unmount)
   useEffect(() => {
     return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-      if (latestNotesRef.current !== lastSavedNotesRef.current) {
-        onUpdateProgress(habit.id, {
-          ...latestProgressRef.current,
-          notes: latestNotesRef.current,
-        }, isCompletedRef.current);
-      }
+      flushSave();
     };
-  }, [habit.id, onUpdateProgress]);
+  }, [flushSave]);
+
+  // Immediate flush on tab switch or page unload
+  useEffect(() => {
+    const handleVisibilityOrUnload = () => {
+      flushSave();
+    };
+
+    window.addEventListener('visibilitychange', handleVisibilityOrUnload);
+    window.addEventListener('beforeunload', handleVisibilityOrUnload);
+
+    return () => {
+      window.removeEventListener('visibilitychange', handleVisibilityOrUnload);
+      window.removeEventListener('beforeunload', handleVisibilityOrUnload);
+    };
+  }, [flushSave]);
 
   return (
     <div
