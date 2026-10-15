@@ -181,65 +181,65 @@ export default function DashboardPage() {
         <StreakCounter />
 
         {/* Today's Progress Banner */}
-        <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-2xs border border-gray-100">
+        <div className="bg-white dark:bg-[#111827] rounded-2xl p-4 sm:p-5 shadow-2xs border border-slate-200/80 dark:border-slate-800/80 transition-colors">
           <div className="flex items-center justify-between mb-2.5">
             <div>
-              <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 Today&apos;s Rhythm
               </span>
-              <p className="text-sm font-semibold text-gray-900 mt-0.5">
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 mt-0.5">
                 {todayStats.completed} of {todayStats.total} planned activities completed
               </p>
             </div>
-            <span className="text-sm font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">
+            <span className="text-sm font-extrabold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 px-2.5 py-1 rounded-full border border-teal-200 dark:border-teal-800/60">
               {todayStats.percentage}%
             </span>
           </div>
 
-          <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+          <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
             <div
-              className="bg-gradient-to-r from-indigo-500 to-teal-500 h-2.5 rounded-full transition-all duration-300"
+              className="bg-gradient-to-r from-teal-600 to-teal-400 dark:from-teal-500 dark:to-teal-300 h-2.5 rounded-full transition-all duration-300"
               style={{ width: `${todayStats.percentage}%` }}
             />
           </div>
 
           {allCompletedToday && (
-            <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-emerald-800 bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+            <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
               <span>All planned activities completed for today! Relax and enjoy your evening.</span>
             </div>
           )}
         </div>
 
         {error && (
-          <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs">
+          <div className="p-3.5 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900/60 rounded-xl text-rose-800 dark:text-rose-200 text-xs">
             {error}
           </div>
         )}
 
         {/* Empty state: If no habits exist in account */}
         {habits.length === 0 ? (
-          <div className="text-center py-12 px-4 bg-white rounded-2xl border border-gray-100 shadow-2xs space-y-4">
-            <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto text-indigo-600 shadow-2xs">
+          <div className="text-center py-12 px-4 bg-white dark:bg-[#111827] rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-4">
+            <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 rounded-2xl flex items-center justify-center mx-auto text-teal-700 dark:text-teal-400 shadow-2xs">
               <Compass className="w-7 h-7" />
             </div>
             <div className="max-w-sm mx-auto space-y-1.5">
-              <h3 className="text-base font-bold text-gray-900">Welcome to {BRAND.name}</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Welcome to {BRAND.name}</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                 Build your daily rhythm by exploring recommended foundation routines or creating custom habits.
               </p>
             </div>
             <Link
               href="/habits"
-              className="inline-flex items-center justify-center px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-xs sm:text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-2xs mx-auto"
+              className="inline-flex items-center justify-center px-5 py-2.5 bg-teal-700 dark:bg-teal-600 text-white rounded-xl text-xs sm:text-sm font-semibold hover:bg-teal-800 dark:hover:bg-teal-500 transition-colors shadow-2xs mx-auto"
             >
               Open Routine Manager
             </Link>
           </div>
         ) : todaysHabits.length === 0 ? (
-          <div className="text-center py-12 px-4 bg-white rounded-2xl border border-gray-100 shadow-2xs space-y-2">
-            <p className="text-sm font-bold text-gray-800">No activities scheduled for today.</p>
-            <p className="text-xs text-gray-500">Enjoy your unscheduled day! Take rest and recharge.</p>
+          <div className="text-center py-12 px-4 bg-white dark:bg-[#111827] rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-2">
+            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">No activities scheduled for today.</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Enjoy your unscheduled day! Take rest and recharge.</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -247,10 +247,10 @@ export default function DashboardPage() {
             {groupedHabits.anytime.length > 0 && (
               <section className="space-y-3">
                 <div className="flex items-center gap-2 px-1">
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                     Flexible / Anytime
                   </span>
-                  <div className="h-px bg-gray-200 flex-1" />
+                  <div className="h-px bg-slate-200 dark:bg-slate-800 flex-1" />
                 </div>
                 <div className="space-y-3">
                   {groupedHabits.anytime.map(renderHabitCard)}
@@ -262,10 +262,10 @@ export default function DashboardPage() {
             {groupedHabits.afternoon.length > 0 && (
               <section className="space-y-3">
                 <div className="flex items-center gap-2 px-1">
-                  <span className="text-xs font-bold text-amber-800 uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-amber-800 dark:text-amber-400 uppercase tracking-wider">
                     Afternoon (Preferred)
                   </span>
-                  <div className="h-px bg-amber-200 flex-1" />
+                  <div className="h-px bg-amber-200 dark:bg-amber-900/50 flex-1" />
                 </div>
                 <div className="space-y-3">
                   {groupedHabits.afternoon.map(renderHabitCard)}
@@ -277,10 +277,10 @@ export default function DashboardPage() {
             {groupedHabits.beforeBed.length > 0 && (
               <section className="space-y-3">
                 <div className="flex items-center gap-2 px-1">
-                  <span className="text-xs font-bold text-indigo-800 uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-teal-800 dark:text-teal-300 uppercase tracking-wider">
                     Before Bed (Relative)
                   </span>
-                  <div className="h-px bg-indigo-200 flex-1" />
+                  <div className="h-px bg-teal-200 dark:bg-teal-900/50 flex-1" />
                 </div>
                 <div className="space-y-3">
                   {groupedHabits.beforeBed.map(renderHabitCard)}
@@ -292,10 +292,10 @@ export default function DashboardPage() {
             {groupedHabits.other.length > 0 && (
               <section className="space-y-3">
                 <div className="flex items-center gap-2 px-1">
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                     Additional Routines
                   </span>
-                  <div className="h-px bg-gray-200 flex-1" />
+                  <div className="h-px bg-slate-200 dark:bg-slate-800 flex-1" />
                 </div>
                 <div className="space-y-3">
                   {groupedHabits.other.map(renderHabitCard)}

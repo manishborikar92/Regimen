@@ -12,6 +12,19 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Isolated local preview mode for headless visual verification
+    if (typeof window !== 'undefined' && localStorage.getItem('vritta-preview-auth') === 'true') {
+      queueMicrotask(() => {
+        setUser({
+          uid: 'preview-manish',
+          email: 'manishborikar92@gmail.com',
+          displayName: 'Manish Borikar',
+        });
+        setLoading(false);
+      });
+      return;
+    }
+
     if (!auth) {
       queueMicrotask(() => setLoading(false));
       return;

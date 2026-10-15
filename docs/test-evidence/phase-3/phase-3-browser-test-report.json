@@ -1,0 +1,107 @@
+{
+  "timestamp": "2026-10-15T04:27:53.790Z",
+  "viewportsAudited": [
+    "1280x800 (Desktop)",
+    "375x812 (Mobile-First)"
+  ],
+  "pagesAudited": [
+    "/dashboard",
+    "/habits",
+    "/analytics"
+  ],
+  "themesAudited": [
+    "light",
+    "dark"
+  ],
+  "capturedScreenshots": [
+    "dashboard-1280px-light.png",
+    "dashboard-1280px-dark.png",
+    "dashboard-375px-light.png",
+    "dashboard-375px-dark.png",
+    "habits-1280px-light.png",
+    "habits-1280px-dark.png",
+    "habits-375px-light.png",
+    "habits-375px-dark.png",
+    "analytics-1280px-light.png",
+    "analytics-1280px-dark.png",
+    "analytics-375px-light.png",
+    "analytics-375px-dark.png"
+  ],
+  "audits": {
+    "dashboard": {
+      "desktopLight": {
+        "scrollWidth": 1280,
+        "clientWidth": 1280,
+        "bodyBg": "rgb(248, 250, 252)",
+        "overflowX": true
+      },
+      "desktopDark": {
+        "bodyBg": "rgb(9, 13, 22)",
+        "containerBg": "rgb(9, 13, 22)",
+        "overflowX": true
+      },
+      "mobileLight": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "hasHorizontalOverflow": false,
+        "smallButtonCount": 8
+      },
+      "mobileDark": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "hasHorizontalOverflow": false
+      }
+    },
+    "habits": {
+      "desktopLight": {
+        "scrollWidth": 1280,
+        "clientWidth": 1280,
+        "bodyBg": "rgb(248, 250, 252)",
+        "overflowX": true
+      },
+      "desktopDark": {
+        "bodyBg": "rgb(9, 13, 22)",
+        "containerBg": "rgb(9, 13, 22)",
+        "overflowX": true
+      },
+      "mobileLight": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "hasHorizontalOverflow": false,
+        "smallButtonCount": 0
+      },
+      "mobileDark": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "hasHorizontalOverflow": false
+      }
+    },
+    "analytics": {
+      "desktopLight": {
+        "scrollWidth": 1280,
+        "clientWidth": 1280,
+        "bodyBg": "rgb(248, 250, 252)",
+        "overflowX": true
+      },
+      "desktopDark": {
+        "bodyBg": "rgb(9, 13, 22)",
+        "containerBg": "rgb(9, 13, 22)",
+        "overflowX": true
+      },
+      "mobileLight": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "hasHorizontalOverflow": false,
+        "smallButtonCount": 2
+      },
+      "mobileDark": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "hasHorizontalOverflow": false
+      }
+    }
+  },
+  "consoleErrors": [],
+  "failedRequests": [],
+  "allChecksPassed": true
+}

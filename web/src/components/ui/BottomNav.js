@@ -15,7 +15,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-100 pb-safe z-50"
+      className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-[#090D16]/95 backdrop-blur-md border-t border-slate-200/90 dark:border-slate-800/90 pb-safe z-50 transition-colors"
       aria-label="Main navigation"
     >
       <div className="max-w-md mx-auto flex justify-around px-2 py-1.5">
@@ -25,10 +25,10 @@ export default function BottomNav() {
             <Link
               key={href}
               href={href}
-              className={`flex flex-col items-center py-1.5 px-5 rounded-xl transition-all ${
+              className={`flex flex-col items-center justify-center min-h-[44px] min-w-[56px] py-1.5 px-4 rounded-xl transition-all ${
                 isActive
-                  ? 'text-indigo-600 font-bold bg-indigo-50/70'
-                  : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50 font-medium'
+                  ? 'text-teal-700 dark:text-teal-300 font-bold bg-teal-50 dark:bg-teal-950/60'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/70 dark:hover:bg-slate-800/60 font-medium'
               }`}
               aria-current={isActive ? 'page' : undefined}
             >

@@ -20,13 +20,13 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
 
   return (
     <div
-      className={`relative rounded-xl border border-gray-100 bg-white shadow-sm transition-all duration-200 hover:shadow-md ${
-        isCompleted ? 'bg-sky-50/20 border-sky-200' : ''
+      className={`relative rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#111827] shadow-sm transition-all duration-200 hover:shadow-md ${
+        isCompleted ? 'bg-sky-50/20 dark:bg-sky-950/20 border-sky-200 dark:border-sky-800/80' : ''
       }`}
     >
       {/* Top accent bar */}
       <div
-        className={`h-1.5 w-full rounded-t-xl bg-gradient-to-r from-sky-500 to-blue-500 ${
+        className={`h-1.5 w-full rounded-t-xl bg-gradient-to-r from-sky-500 to-teal-500 dark:from-sky-400 dark:to-teal-400 ${
           isCompleted ? 'opacity-80' : 'opacity-40'
         }`}
       />
@@ -39,22 +39,22 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
               <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium border ${config.badgeClasses}`}>
                 {habit.category}
               </span>
-              <span className="flex items-center gap-1 text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded-md">
-                <Clock className="w-3 h-3 text-gray-400" />
+              <span className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
+                <Clock className="w-3 h-3 text-slate-400" />
                 Anytime
               </span>
-              <span className="flex items-center gap-1 text-xs text-sky-800 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-200 font-medium">
-                <Bot className="w-3 h-3 text-sky-600" />
+              <span className="flex items-center gap-1 text-xs text-sky-800 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/60 px-2 py-0.5 rounded-md border border-sky-200 dark:border-sky-800/60 font-medium">
+                <Bot className="w-3 h-3 text-sky-600 dark:text-sky-400" />
                 ChatGPT Conversation
               </span>
             </div>
 
-            <h3 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-sky-600 flex-shrink-0" />
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-sky-600 dark:text-sky-400 flex-shrink-0" />
               {habit.title}
             </h3>
 
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
               Practise speaking English with ChatGPT voice. Flexible duration—focus on natural conversation.
             </p>
           </div>
@@ -63,10 +63,10 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
           <button
             type="button"
             onClick={() => onToggle(habit.id)}
-            className={`w-9 h-9 rounded-full border-2 flex items-center justify-center transition-all ${
+            className={`w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border-2 flex items-center justify-center transition-all ${
               isCompleted
                 ? 'bg-sky-600 border-sky-600 text-white shadow-xs'
-                : 'border-gray-300 hover:border-sky-500 text-transparent'
+                : 'border-slate-300 dark:border-slate-600 hover:border-sky-500 text-transparent'
             }`}
             aria-label={isCompleted ? 'Mark speaking incomplete' : 'Mark speaking complete'}
           >
@@ -75,11 +75,11 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
         </div>
 
         {/* Optional Notes Toggle */}
-        <div className="mt-3 pt-2 border-t border-gray-100">
+        <div className="mt-3 pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
           <button
             type="button"
             onClick={() => setShowNotes(!showNotes)}
-            className="flex items-center gap-1 text-xs font-medium text-sky-700 hover:text-sky-900"
+            className="flex items-center gap-1 text-xs font-medium text-sky-700 dark:text-sky-400 hover:text-sky-900 dark:hover:text-sky-300"
           >
             <PenLine className="w-3.5 h-3.5" />
             {showNotes ? 'Hide conversation notes' : 'Add conversation topics / notes (optional)'}
@@ -92,7 +92,7 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
                 onChange={(e) => handleNotesChange(e.target.value)}
                 placeholder="What topics did you talk about today? Any new phrases or pronunciation points learned?"
                 rows={2}
-                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-800 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-sky-500 focus:border-transparent placeholder-slate-400"
               />
             </div>
           )}

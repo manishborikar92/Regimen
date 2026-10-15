@@ -312,20 +312,34 @@ flowchart TD
 - **Verification Commands:** `npm --prefix web run test` (57/57 pass); inspect browser tab at 16×16 and 32×32.
 - **Acceptance Criteria:** Favicon renders clearly in browser tabs; PWA manifest loads without error.
 
-#### Phase 3: UI/UX Component Polish (Mobile-First)
-- **Objectives:** Apply semantic tokens and mobile touch ergonomics (>= 44px) across core views; remove uppercase eyebrow clutter.
+#### Phase 3: UI/UX Component Polish (Mobile-First) — [STATUS: IMPLEMENTED & VERIFIED]
+- **Objectives:** Apply semantic tokens and mobile touch ergonomics (>= 44px) across core views; remove uppercase eyebrow clutter; eradicate prohibited Heather Purple and legacy indigo across all protected components; support Dark Mode (Deep Obsidian `#090D16`) seamlessly.
 - **Affected Files:**
-  - `web/src/app/(protected)/dashboard/page.js`: Clean grouping (Flexible, Afternoon Movement, Before Bed Reading); replace hardcoded gradients; eliminate excessive uppercase eyebrows.
-  - `web/src/components/habits/WorkbookCard.js`: Dual-session buttons with tactile `:active` state.
-  - `web/src/components/habits/MovementCard.js`: Weekday-adaptive card and Sunday rest banner using slate/juniper tokens.
-  - `web/src/components/habits/OshoCard.js`, `ReadingCard.js`, `SpeakingCard.js`, `DiaryCard.js`: Semantic surface/text styling.
-  - `web/src/components/habits/StreakCounter.js`: Warm Amber rhythm styling.
-  - `web/src/components/ui/BottomNav.js`: 44px touch targets; normalized 2.0px stroke icons.
-  - `web/src/app/(protected)/habits/page.js`: Routine Manager list and modal styling.
-  - `web/src/app/(protected)/analytics/page.js`: 30-day heatmap with Restorative Juniper activity tokens.
-- **Dependencies:** Phases 1–2 complete.
-- **Verification Commands:** `npm --prefix web run lint` (exit 0); `npm --prefix web run test` (57/57 pass).
-- **Acceptance Criteria:** Zero horizontal overflow across mobile viewports; touch targets >= 44×44px; tactile active states.
+  - `web/src/app/(protected)/dashboard/page.js`: Clean grouping (Flexible, Afternoon Movement, Before Bed Reading); calm typography; dark surfaces and borders.
+  - `web/src/components/habits/StreakCounter.js`: Warm Amber (`#D97706`) sparkles accent with Luminous Teal completed badge on dark obsidian / porcelain cards.
+  - `web/src/components/habits/WorkbookCard.js`: Dual-session buttons with expanded 40×40px targets (`w-10 h-10 min-w-[40px] min-h-[40px]`), progress bar, and dark mode support.
+  - `web/src/components/habits/MovementCard.js`: Weekday-adaptive card and Sunday rest banner using slate/teal tokens; 44×44px primary toggle button (`w-11 h-11 min-w-[44px] min-h-[44px]`).
+  - `web/src/components/habits/OshoCard.js`, `ReadingCard.js`, `SpeakingCard.js`, `DiaryCard.js`: Semantic surface/text styling; 44×44px primary toggle buttons.
+  - `web/src/components/habits/GenericHabitCard.js`: 44×44px primary toggle button; dark mode checklist step styling.
+  - `web/src/components/habits/HabitModal.js`: 44px action buttons; teal focus rings; dark mode modal styling.
+  - `web/src/components/ui/BottomNav.js`: 44px touch targets (`min-h-[44px] min-w-[56px]`); active Luminous Teal states (`text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60`); Deep Obsidian backdrop (`dark:bg-[#090D16]/95`).
+  - `web/src/components/ui/ConfirmDialog.js`: Dark mode dialog surfaces; teal non-danger accents; 44px action buttons.
+  - `web/src/components/ui/LoadingSpinner.js`: Teal breathing halo and spinning ring; dark obsidian backdrop and card.
+  - `web/src/app/(protected)/habits/page.js`: Routine Manager list and modal styling; 44px edit/delete touch targets.
+  - `web/src/app/(protected)/analytics/page.js`: 30-day heatmap with Restorative Juniper activity tokens; slate rest day styling.
+  - `web/src/app/(protected)/layout.js`: Deep Obsidian dark canvas container (`dark:bg-[#090D16]`).
+  - `web/src/lib/constants/categories.js`: Complete elimination of Heather Purple and legacy indigo; dark mode badge classes.
+- **Verification Commands & Results:**
+  - `npm --prefix web run lint` (0 errors, 0 warnings).
+  - `npm --prefix web run test` (87/87 pass across 26 test suites, including `phase-3-component-polish.test.mjs`).
+  - `npm --prefix web run build` (compiled in 3.9s; 12/12 routes static generated).
+- **Browser Evidence:**
+  - Audit report: `docs/test-evidence/phase-3/phase-3-browser-test-report.json` (`allChecksPassed: true`, 0 console errors, 0 failed requests).
+  - 12 screenshots captured across Desktop (1280×800) and Mobile (375×812) viewports in Light and Dark modes:
+    - `/dashboard`: `dashboard-1280px-light.png`, `dashboard-1280px-dark.png`, `dashboard-375px-light.png`, `dashboard-375px-dark.png`
+    - `/habits`: `habits-1280px-light.png`, `habits-1280px-dark.png`, `habits-375px-light.png`, `habits-375px-dark.png`
+    - `/analytics`: `analytics-1280px-light.png`, `analytics-1280px-dark.png`, `analytics-375px-light.png`, `analytics-375px-dark.png`
+- **Acceptance Status:** **ACCEPTED & COMPLETE**. Zero horizontal overflow (`hasHorizontalOverflow: false`); primary mobile touch targets >= 44×44px; 0 occurrences of prohibited purple or indigo.
 
 #### Phase 4: Login & Authentication Page Redesign
 - **Objectives:** Replace the animated AI glowing blob with a calm, dignified authentication experience.

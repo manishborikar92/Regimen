@@ -28,7 +28,7 @@ export function useDailyLogs(user, todaysHabits = []) {
 
     // Real-time listener for today's daily log
     useEffect(() => {
-        if (!user) {
+        if (!user || user.uid?.startsWith('preview-')) {
             queueMicrotask(() => {
                 setTodayLog([]);
                 setTodayProgress({});
