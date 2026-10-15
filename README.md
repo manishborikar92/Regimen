@@ -1,80 +1,101 @@
 # Vritta — Personal Routine Companion
 
-Vritta (वृत्त) is a modern Progressive Web Application (PWA) designed to foster mindful consistency, physical recovery, language mastery, and intellectual reflection through a tightly curated set of daily practices. Built with Next.js 16, React 19, and Firebase, it features a clean, responsive mobile-first UI with robust offline support and Restorative Juniper design tokens.
+[![Next.js](https://img.shields.io/badge/Next.js-16.1.0-black?logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.2.3-blue?logo=react)](https://react.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![Firebase](https://img.shields.io/badge/Firebase-v12.7.0-FFCA28?logo=firebase)](https://firebase.google.com/)
+[![License](https://img.shields.io/badge/License-Proprietary-red)](#license)
 
-## Features
+**Vritta** (वृत्त — classical Sanskrit for mindful rhythm, conduct, and cyclical observance) is a modern Progressive Web Application (PWA) designed to foster mindful consistency, physical conditioning, language learning, and reflection through a tightly curated set of daily practices.
 
-- **Routine Architecture**: Mindful daily routines grouped into Flexible, Afternoon Movement, and Before Bed practices.
-- **Physical Conditioning & Recovery**: Weekday-adaptive movement schedules (workout, walk, active rest) with explicit Sunday recovery.
-- **Workbook & Practice Tracking**: Multi-step session tracking with partial progress indicators.
-- **Contemplative Focus**: Integrated 30-entry Osho Listening catalog and bedtime reading timer.
-- **Streak & Rhythm**: Real-time consistency calculations that respect planned rest days without guilt mechanics.
-- **Analytics & Insights**: 30-day activity heatmap and weekly consistency metrics.
-- **Offline-First Persistence**: Firestore offline persistence ensures seamless operation even without connectivity.
-- **Authoritative Identity**: Guiding Sutra monoline mark, Deep Obsidian and Luminous Teal palette, zero-flash theme engine.
-- **Accessibility**: Built to WCAG 2.2 Level AA / AAA standards with >= 44px touch targets.
+Built with Next.js 16, React 19, Tailwind CSS v4, and Firebase, it features a clean mobile-first interface, offline persistence, and a two-state zero-flash theme engine.
 
-## Tech Stack
+---
 
-- **Framework**: [Next.js](https://nextjs.org/) (App Router, React 19)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
-- **Database & Auth**: [Firebase](https://firebase.google.com/) (Firestore, Authentication, Admin SDK)
-- **Icons**: [Lucide React](https://lucide.dev/)
+## Core Capabilities
 
-## Architecture Overview
+- **Routine Architecture:** Mindful daily practices grouped by life area and natural periods (Anytime, Afternoon, Before Bed) rather than rigid clock deadlines.
+- **Physical Conditioning & Recovery:** Weekday-adaptive movement schedules (workout, walk, active recovery) with explicit Sunday rest.
+- **Interactive Habit Subsystems:**
+  - **`WorkbookCard`:** Multi-step session tracking with partial progress indicators.
+  - **`MovementCard`:** Weekday-adaptive exercise and active recovery tracker.
+  - **`OshoCard`:** Integrated 30-entry contemplative listening library across 6 thematic groups.
+  - **`ReadingCard`:** Dedicated 30-minute bedtime reading countdown timer.
+  - **`SpeakingCard`:** Structured ChatGPT voice practice prompts.
+  - **`DiaryCard`:** Private encrypted journal with 5 rotating reflection prompts.
+- **Guilt-Free Consistency Rhythm:** Consistency calculations that exclude scheduled rest days from denominators, eliminating artificial streak failures.
+- **Two-State Theme Engine:** Binary Light/Dark mode with a tactile icon-only toggle (`ThemeToggle`) meeting WCAG 2.2 Level AAA touch target standards (>= 44×44px) and zero-flash pre-paint execution.
+- **Authoritative Visual Identity:** The Guiding Sutra monoline mark, Deep Obsidian (`#090D16`), Luminous Teal (`#14B8A6`), and Warm Amber (`#D97706`).
+- **Offline-First Persistence:** Cloud Firestore persistent local cache enables seamless operation without active network connectivity.
 
-Vritta uses a modular, professional-grade architectural structure:
-- **`src/app`**: Next.js App Router for all application routing, including separate route groups for `(auth)` and `(protected)` areas.
-- **`src/hooks`**: Domain-specific logic encapsulated safely out of the UI. Hook boundaries exist for `useHabits`, `useDailyLogs`, `useStreak`, and `useAnalytics`.
-- **`src/components/ui`**: Base presentation components and centralized reusable layout pieces (e.g. `TopNav`, `BottomNav`, `ConfirmDialog`, `LoadingSpinner`, `Logo`).
-- **`src/lib/firebase`**: Client and server Firebase access cleanly isolated from component logic.
-- **`src/contexts`**: Standard React Contexts for application-wide scoped state (`AuthContext`, `DataContext`, `ThemeContext`, `ToastContext`).
+---
 
-## Local Development Setup
+## Technology Stack
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/manishborikar92/Vritta.git
-   ```
+| Layer | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Framework** | [Next.js 16 (App Router)](https://nextjs.org/) | Modern React framework with server components and static route generation. |
+| **UI Library** | [React 19](https://react.dev/) | Client component hierarchy and external store synchronization. |
+| **Styling** | [Tailwind CSS v4](https://tailwindcss.com/) | CSS variables, semantic design tokens, and fluid responsive design. |
+| **Backend & Database** | [Cloud Firestore](https://firebase.google.com/docs/firestore) | Real-time NoSQL database with offline persistence and owner-scoped security rules. |
+| **Authentication** | [Firebase Auth](https://firebase.google.com/docs/auth) | Google OAuth identity provider with secure session management. |
+| **Admin Operations** | [Firebase Admin SDK v14](https://firebase.google.com/docs/admin/setup) | Privileged CLI routine seeding and customization preservation. |
+| **Iconography** | [Lucide React](https://lucide.dev/) | Lightweight, accessible iconography. |
+| **Hosting & CI/CD** | [Vercel](https://vercel.com/) | Edge deployment network (`myvritta.vercel.app`) with atomic rollouts. |
 
-2. **Navigate to the web directory:**
-   ```bash
-   cd Vritta/web
-   # (Or cd Regimen/web prior to Phase 8 local folder rename)
-   ```
+---
 
-3. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+## Quick Start
 
-4. **Environment Configuration:**
-   Create a `.env.local` file in `web/` and add your Firebase configuration:
-   ```env
-   NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-   NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
-   ```
+### 1. Clone & Install
+```bash
+git clone https://github.com/manishborikar92/Vritta.git
+cd Vritta/web
+npm install
+```
 
-5. **Deploy Security Rules:**
-   Use the Firebase CLI from the **`web/` directory** to initialize your project link and deploy local security rules and index files:
-   ```bash
-   npm install -g firebase-tools
-   firebase login
-   firebase init firestore
-   firebase deploy --only firestore
-   ```
+### 2. Configure Environment Variables
+Copy the template and configure your Firebase project credentials in `web/.env.local`:
+```bash
+cp .env.local.example .env.local
+```
 
-6. **Run the development server:**
-   ```bash
-   npm run dev
-   ```
+### 3. Start Development Server
+```bash
+npm run dev
+```
 
-   The app will be accessible at [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000) to view the application.
+
+---
+
+## Documentation Suite
+
+Comprehensive technical guides and operational runbooks are maintained under the [`docs/`](docs/) directory:
+
+- 📖 **[Documentation Index](docs/README.md):** Complete navigation map for all project documentation.
+- 🏛️ **[Architecture & System Design](docs/architecture.md):** Deep dive into system design, data flows, theme engine, and Firestore collection schemas.
+- 💻 **[Local Development Guide](docs/development.md):** Workstation setup, package scripts, testing strategy, and troubleshooting.
+- 🔥 **[Firebase Setup & Operations Runbook](docs/firebase-setup.md):** Credential management, security rules, indexes, and service account key rotation.
+- 🚀 **[Deployment & Release Guide](docs/deployment.md):** Vercel edge deployment, Git release workflow (`m/dev` -> `main`), and verification checklists.
+- 🗺️ **[Project Roadmap & Outstanding Actions](docs/roadmap.md):** Status tracking for the pending Phase 13 production release and Phase 8 directory rename.
+
+---
+
+## Verification & Quality Gates
+
+Run all project checks before committing:
+
+```bash
+# From project root
+npm --prefix web run test    # 98 automated unit tests across 31 suites
+npm --prefix web run lint    # Next.js flat ESLint verification
+npm --prefix web run build   # Production webpack build compilation
+git diff --check             # Whitespace and formatting verification
+```
+
+---
 
 ## License
 
-This project is proprietary and confidential. Ensure proper credentials before deploying.
+This project is proprietary and confidential. All rights reserved.
