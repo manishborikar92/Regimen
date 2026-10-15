@@ -125,7 +125,7 @@ export default function HabitsPage() {
         onConfirm={() => handleDelete(deleteConfirm)}
         title="Delete Routine?"
         message="This routine will be removed from your upcoming schedule. Historical logs and past completions are safely preserved."
-        confirmText="Delete Routine"
+        confirmText="Delete"
         isDanger={true}
         isLoading={isDeleting}
       />
