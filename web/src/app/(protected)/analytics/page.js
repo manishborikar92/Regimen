@@ -157,7 +157,7 @@ export default function AnalyticsPage() {
             <div className="flex items-center justify-between">
               <h3 className="text-xs sm:text-sm font-bold text-main flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-                Domain Consistency Highlights
+                Consistency Highlights
               </h3>
               <span className="text-2xs text-muted">
                 {analyticsData.categories.length} {analyticsData.categories.length === 1 ? 'category' : 'categories'} active
