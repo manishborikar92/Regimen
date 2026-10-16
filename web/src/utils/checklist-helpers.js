@@ -89,12 +89,98 @@ export function normalizeChecklistItems(items = []) {
 }
 
 /**
+ * Safely normalizes an array of completed step identifiers against a checklist definition.
+ * - Stable step IDs (e.g. 'step_water') are preserved.
+ * - Legacy numeric indices (e.g. 0) and stringified indices (e.g. '0') are mapped
+ *   to the corresponding item's stable ID using the original item positions.
+ * - Legacy index-prefixed slugs (e.g. 'step_0_water') are mapped to the canonical item ID.
+ * - Out-of-bounds indices are discarded to prevent cross-step pollution.
+ *
+ * @param {Array<string|number>} [completedSteps=[]] - Raw completedSteps from daily log
+ * @param {Array<Object>} [checklistItems=[]] - Checklist items definition
+ * @returns {string[]} Array of normalized, stable step ID strings
+ */
+export function normalizeCompletedSteps(completedSteps = [], checklistItems = []) {
+  if (!Array.isArray(completedSteps) || completedSteps.length === 0) {
+    return [];
+  }
+
+  const items = Array.isArray(checklistItems) ? checklistItems : [];
+  const normalized = new Set();
+
+  for (const step of completedSteps) {
+    if (step === null || step === undefined) continue;
+
+    // 1. Raw numeric index: 0, 1, 2...
+    if (typeof step === 'number' && Number.isInteger(step)) {
+      if (step >= 0 && step < items.length) {
+        normalized.add(getStepId(items[step], step));
+      }
+      continue;
+    }
+
+    // 2. Stringified numeric index: '0', '1', '2'...
+    if (typeof step === 'string' && /^\d+$/.test(step.trim())) {
+      const idx = parseInt(step.trim(), 10);
+      if (idx >= 0 && idx < items.length) {
+        normalized.add(getStepId(items[idx], idx));
+      }
+      continue;
+    }
+
+    const strStep = String(step);
+
+    // 3. Legacy index-prefixed slug: 'step_0_water'
+    const indexPrefixMatch = strStep.match(/^step_(\d+)_(.+)$/);
+    if (indexPrefixMatch) {
+      const idx = parseInt(indexPrefixMatch[1], 10);
+      const slug = indexPrefixMatch[2].toLowerCase();
+      // Check if item at idx matches by ID, label slug, or prefix
+      if (idx >= 0 && idx < items.length) {
+        const itemAtIdx = items[idx];
+        const itemLabelSlug = String(itemAtIdx?.label || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_');
+        const itemIdLower = getStepId(itemAtIdx, idx).toLowerCase();
+        if (
+          itemAtIdx.id === strStep ||
+          itemIdLower.includes(slug) ||
+          slug.includes(itemIdLower) ||
+          itemLabelSlug.includes(slug) ||
+          slug.includes(itemLabelSlug)
+        ) {
+          normalized.add(getStepId(itemAtIdx, idx));
+          continue;
+        }
+      }
+      const matchedItem = items.find((it, i) => {
+        const itemLabelSlug = String(it?.label || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_');
+        const itemIdLower = getStepId(it, i).toLowerCase();
+        return (
+          it.id === strStep ||
+          itemIdLower.includes(slug) ||
+          slug.includes(itemIdLower) ||
+          itemLabelSlug.includes(slug) ||
+          slug.includes(itemLabelSlug)
+        );
+      });
+      if (matchedItem) {
+        normalized.add(getStepId(matchedItem));
+        continue;
+      }
+    }
+
+    // 4. Canonical stable ID (or arbitrary persistent string ID)
+    normalized.add(strStep);
+  }
+
+  return Array.from(normalized);
+}
+
+/**
  * Determines whether a specific step is completed.
  * Fully backward-compatible with:
  * - Stable step ID strings (e.g. 'step_water', 'step_drink_1_2_glasses')
  * - Legacy index-prefixed slug strings (e.g. 'step_0_water')
- * - Numerical indices (e.g. 0, 1, 2)
- * - Stringified numerical indices (e.g. '0', '1', '2')
+ * - Legacy numerical/string indices mapped safely through checklist context
  * - Legacy boolean completion: if isHabitCompleted is true and no step progress was saved,
  *   all steps default to checked.
  *
@@ -102,22 +188,34 @@ export function normalizeChecklistItems(items = []) {
  * @param {number} index - Item index
  * @param {Array<string|number>} [completedSteps=[]] - Persisted completedSteps array
  * @param {boolean} [isHabitCompleted=false] - Whether the overall habit is completed
+ * @param {Array<Object>} [allItems=null] - Full checklist context for safe legacy mapping
  * @returns {boolean}
  */
-export function isStepCompleted(item, index, completedSteps = [], isHabitCompleted = false) {
+export function isStepCompleted(item, index, completedSteps = [], isHabitCompleted = false, allItems = null) {
   const stepId = getStepId(item, index);
+  const itemId = item?.id ? String(item.id) : null;
 
   if (Array.isArray(completedSteps) && completedSteps.length > 0) {
     if (completedSteps.includes(stepId)) return true;
-    if (item?.id && completedSteps.includes(String(item.id))) return true;
+    if (itemId && completedSteps.includes(itemId)) return true;
 
     // Backward-compatible check for legacy index-prefixed slug
     const legacyIndexSlug = `step_${index}_${String(item?.label || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 24)}`;
     if (completedSteps.includes(legacyIndexSlug)) return true;
 
-    // Backward-compatible fallback for legacy numeric index logs
-    if (completedSteps.includes(index)) return true;
-    if (completedSteps.includes(String(index))) return true;
+    // Safe contextual mapping for legacy numeric or stringified indices
+    const contextItems = Array.isArray(allItems) && allItems.length > 0 ? allItems : null;
+    if (contextItems) {
+      const normalized = normalizeCompletedSteps(completedSteps, contextItems);
+      if (normalized.includes(stepId)) return true;
+      if (itemId && normalized.includes(itemId)) return true;
+    } else {
+      // In isolated tests without full array context, allow numeric match only if item has no explicit ID
+      if (!itemId && (completedSteps.includes(index) || completedSteps.includes(String(index)))) {
+        return true;
+      }
+    }
+
     return false;
   }
 
@@ -150,9 +248,11 @@ export function calculateChecklistProgress(items = [], completedSteps = [], isHa
     };
   }
 
+  const normalized = normalizeCompletedSteps(completedSteps, checklist);
+
   let completedCount = 0;
   for (let i = 0; i < totalCount; i++) {
-    if (isStepCompleted(checklist[i], i, completedSteps, isHabitCompleted)) {
+    if (isStepCompleted(checklist[i], i, normalized, isHabitCompleted, checklist)) {
       completedCount++;
     }
   }
@@ -183,7 +283,7 @@ export function toggleChecklistStep(items = [], currentCompletedSteps = [], targ
   const totalCount = checklist.length;
   if (totalCount === 0 || targetIndex < 0 || targetIndex >= totalCount) {
     return {
-      nextCompletedSteps: currentCompletedSteps || [],
+      nextCompletedSteps: normalizeCompletedSteps(currentCompletedSteps, checklist),
       completedCount: 0,
       totalCount,
       percent: 0,
@@ -193,7 +293,8 @@ export function toggleChecklistStep(items = [], currentCompletedSteps = [], targ
 
   const targetItem = checklist[targetIndex];
   const targetId = getStepId(targetItem, targetIndex);
-  const wasChecked = isStepCompleted(targetItem, targetIndex, currentCompletedSteps, isHabitCompleted);
+  const normalizedSteps = normalizeCompletedSteps(currentCompletedSteps, checklist);
+  const wasChecked = isStepCompleted(targetItem, targetIndex, normalizedSteps, isHabitCompleted, checklist);
 
   // If transitioning from a legacy completed state where completedSteps was empty/unrecorded,
   // expand all steps first so only targetIndex is unchecked
@@ -201,25 +302,15 @@ export function toggleChecklistStep(items = [], currentCompletedSteps = [], targ
   if (isHabitCompleted && (!currentCompletedSteps || currentCompletedSteps.length === 0)) {
     baseSteps = checklist.map((it, idx) => getStepId(it, idx));
   } else {
-    // Normalize currentCompletedSteps to canonical IDs
-    baseSteps = (currentCompletedSteps || []).map((id, idx) => {
-      if (typeof id === 'number' || (typeof id === 'string' && /^\d+$/.test(id))) {
-        const numIdx = parseInt(id, 10);
-        if (numIdx >= 0 && numIdx < checklist.length) {
-          return getStepId(checklist[numIdx], numIdx);
-        }
-      }
-      return String(id);
-    });
+    baseSteps = normalizedSteps;
   }
 
   let nextCompletedSteps;
   if (wasChecked) {
-    // Remove target step identifier and its legacy index equivalents
+    // Remove target step identifier
     nextCompletedSteps = baseSteps.filter(id => {
       if (id === targetId) return false;
       if (targetItem?.id && id === String(targetItem.id)) return false;
-      if (id === targetIndex || id === String(targetIndex)) return false;
       return true;
     });
   } else {

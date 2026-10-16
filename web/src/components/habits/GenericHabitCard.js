@@ -10,6 +10,7 @@ import {
   calculateChecklistProgress,
   toggleChecklistStep,
   toggleAllChecklistSteps,
+  normalizeCompletedSteps,
 } from '@/utils/checklist-helpers';
 
 function GenericHabitCard({
@@ -24,7 +25,8 @@ function GenericHabitCard({
   const hasChecklist = items.length > 0;
   const timingText = getTimingDisplay(habit);
 
-  const completedSteps = progress?.completedSteps || [];
+  const rawCompletedSteps = progress?.completedSteps || [];
+  const completedSteps = normalizeCompletedSteps(rawCompletedSteps, items);
   const { completedCount, totalCount, percent, isAllCompleted } = calculateChecklistProgress(
     items,
     completedSteps,
@@ -161,7 +163,7 @@ function GenericHabitCard({
             {isExpanded && (
               <div className="space-y-1.5 pt-1">
                 {items.map((item, index) => {
-                  const isChecked = isStepCompleted(item, index, completedSteps, isCompleted);
+                  const isChecked = isStepCompleted(item, index, completedSteps, isCompleted, items);
                   const stepId = getStepId(item, index);
                   const inputId = `step_${habit.id}_${stepId}`;
 

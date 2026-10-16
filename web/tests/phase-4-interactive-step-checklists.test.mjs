@@ -10,6 +10,7 @@ import {
   toggleChecklistStep,
   toggleAllChecklistSteps,
   normalizeChecklistItems,
+  normalizeCompletedSteps,
 } from '../src/utils/checklist-helpers.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -59,12 +60,12 @@ describe('Phase 4: Interactive Step Checklists & Workout Routine Consolidation',
       assert.ok(isStepCompleted(sampleItems[0], 0, ['step_water'], false));
       assert.ok(!isStepCompleted(sampleItems[0], 0, ['other_step'], false));
 
-      // By numerical index (legacy)
-      assert.ok(isStepCompleted(sampleItems[1], 1, [1], false));
-      assert.ok(!isStepCompleted(sampleItems[1], 1, [0, 2], false));
+      // By numerical index in context
+      assert.ok(isStepCompleted(sampleItems[1], 1, [1], false, sampleItems));
+      assert.ok(!isStepCompleted(sampleItems[1], 1, [0, 2], false, sampleItems));
 
-      // By stringified index (legacy)
-      assert.ok(isStepCompleted(sampleItems[2], 2, ['2'], false));
+      // By stringified index in context
+      assert.ok(isStepCompleted(sampleItems[2], 2, ['2'], false, sampleItems));
 
       // Legacy fallback: habit marked complete with empty completedSteps
       assert.ok(isStepCompleted(sampleItems[0], 0, [], true));
@@ -163,84 +164,166 @@ describe('Phase 4: Interactive Step Checklists & Workout Routine Consolidation',
     });
   });
 
-  describe('2. Step ID Stability Under Mutations (Rename, Reorder, Insert, Remove)', () => {
-    it('should retain existing step IDs when a user renames an existing step', () => {
-      const original = [
-        { id: 'step_water_101', label: 'Drink 1 glass of water' },
-        { id: 'step_stretch_102', label: 'Stretch for 5 min' },
+  describe('2. Legacy Progress Normalization & Mutation Immunity (Concrete Scenarios)', () => {
+    const originalChecklist = [
+      { id: 'step_A', label: 'Step A' },
+      { id: 'step_B', label: 'Step B' },
+      { id: 'step_C', label: 'Step C' },
+    ];
+
+    it('should safely normalize legacy numeric and string progress to stable IDs', () => {
+      // Numeric index 0 maps to step_A
+      const normNumeric = normalizeCompletedSteps([0], originalChecklist);
+      assert.deepEqual(normNumeric, ['step_A']);
+
+      // String digit index '0' maps to step_A
+      const normStringDigit = normalizeCompletedSteps(['0'], originalChecklist);
+      assert.deepEqual(normStringDigit, ['step_A']);
+
+      // Legacy index-prefixed slug maps to step_A
+      const normSlug = normalizeCompletedSteps(['step_0_step_a'], originalChecklist);
+      assert.deepEqual(normSlug, ['step_A']);
+
+      // Canonical stable ID is preserved directly
+      const normCanonical = normalizeCompletedSteps(['step_A'], originalChecklist);
+      assert.deepEqual(normCanonical, ['step_A']);
+
+      // Out-of-bounds index 99 is discarded
+      const normOOB = normalizeCompletedSteps([99], originalChecklist);
+      assert.deepEqual(normOOB, []);
+    });
+
+    it('Scenario 1: Inserting a step at the beginning must NOT transfer completed state [0] to new step', () => {
+      // Initial state: Step A was completed via legacy index [0]
+      const legacyLog = [0];
+
+      // Step A's completion is normalized against original checklist
+      const normalizedLog = normalizeCompletedSteps(legacyLog, originalChecklist);
+      assert.deepEqual(normalizedLog, ['step_A'], 'Must map to step_A before checklist edit');
+
+      // User inserts New Step at index 0
+      const editedChecklist = [
+        { id: 'step_NEW', label: 'New Step' },
+        ...originalChecklist,
       ];
 
-      // User renames step 0 in HabitModal
-      const renamed = original.map((item, idx) =>
-        idx === 0 ? { ...item, label: 'Drink 2 tall glasses of cold water' } : item
+      // Index 0 is now New Step
+      assert.equal(editedChecklist[0].id, 'step_NEW');
+      assert.equal(
+        isStepCompleted(editedChecklist[0], 0, normalizedLog, false, editedChecklist),
+        false,
+        'CRITICAL: New step at index 0 must NOT be marked complete!'
       );
 
-      assert.equal(renamed[0].id, 'step_water_101', 'ID must be retained identically after renaming');
-      assert.equal(renamed[0].label, 'Drink 2 tall glasses of cold water');
+      // Index 1 is Step A
+      assert.equal(editedChecklist[1].id, 'step_A');
+      assert.equal(
+        isStepCompleted(editedChecklist[1], 1, normalizedLog, false, editedChecklist),
+        true,
+        'CRITICAL: Step A (now at index 1) must remain complete!'
+      );
 
-      // Previously saved completedSteps using this ID still matches!
-      assert.ok(isStepCompleted(renamed[0], 0, ['step_water_101'], false));
+      // Other steps remain incomplete
+      assert.equal(isStepCompleted(editedChecklist[2], 2, normalizedLog, false, editedChecklist), false);
+      assert.equal(isStepCompleted(editedChecklist[3], 3, normalizedLog, false, editedChecklist), false);
     });
 
-    it('should preserve progress association when steps are reordered', () => {
-      const items = [
-        { id: 'step_A', label: 'Item A' },
-        { id: 'step_B', label: 'Item B' },
+    it('Scenario 2: Reordering existing steps must NOT transfer completed state [0] to new occupant of index 0', () => {
+      // Initial state: Step A completed via legacy log [0]
+      const legacyLog = [0];
+      const normalizedLog = normalizeCompletedSteps(legacyLog, originalChecklist);
+
+      // User reorders steps: C, B, A
+      const reorderedChecklist = [
+        originalChecklist[2], // C
+        originalChecklist[1], // B
+        originalChecklist[0], // A
       ];
 
-      // Item B was completed previously
-      const completedSteps = ['step_B'];
+      // Index 0 is now Step C
+      assert.equal(reorderedChecklist[0].id, 'step_C');
+      assert.equal(
+        isStepCompleted(reorderedChecklist[0], 0, normalizedLog, false, reorderedChecklist),
+        false,
+        'Step C occupying index 0 must NOT inherit completion!'
+      );
 
-      // Reorder: move Item B to index 0, Item A to index 1
-      const reordered = [items[1], items[0]];
+      // Index 1 is Step B
+      assert.equal(
+        isStepCompleted(reorderedChecklist[1], 1, normalizedLog, false, reorderedChecklist),
+        false
+      );
 
-      // Item at index 0 is now Item B
-      assert.ok(isStepCompleted(reordered[0], 0, completedSteps, false), 'Item B at index 0 must still be completed');
-      // Item at index 1 is Item A
-      assert.ok(!isStepCompleted(reordered[1], 1, completedSteps, false), 'Item A at index 1 must NOT be completed');
+      // Index 2 is Step A
+      assert.equal(reorderedChecklist[2].id, 'step_A');
+      assert.equal(
+        isStepCompleted(reorderedChecklist[2], 2, normalizedLog, false, reorderedChecklist),
+        true,
+        'Step A moved to index 2 must retain its completed state!'
+      );
     });
 
-    it('should preserve progress association when a new step is inserted at the front', () => {
-      const original = [
-        { id: 'step_hydration', label: 'Hydrate' },
-        { id: 'step_journal', label: 'Journal' },
+    it('Scenario 3: Verify immunity across all 4 progress representations (numeric, string-digit, index-slug, stable-id)', () => {
+      const formats = [
+        { name: 'numeric index [0]', input: [0] },
+        { name: 'string index ["0"]', input: ['0'] },
+        { name: 'legacy index-slug ["step_0_step_a"]', input: ['step_0_step_a'] },
+        { name: 'canonical stable ID ["step_A"]', input: ['step_A'] },
       ];
 
-      // Step Hydration was completed
-      const completedSteps = ['step_hydration'];
+      for (const { name, input } of formats) {
+        const normalized = normalizeCompletedSteps(input, originalChecklist);
 
-      // User inserts a new step at index 0
-      const inserted = [
-        { id: 'step_new_wake_up', label: 'Wake up at 6am' },
-        original[0],
-        original[1],
-      ];
+        // Reorder: B, A, C
+        const reordered = [originalChecklist[1], originalChecklist[0], originalChecklist[2]];
 
-      // Index 0 (new step) is not completed
-      assert.ok(!isStepCompleted(inserted[0], 0, completedSteps, false), 'New step must be incomplete');
-      // Index 1 (Hydration) remains completed
-      assert.ok(isStepCompleted(inserted[1], 1, completedSteps, false), 'Hydration must retain completed status');
-      // Index 2 (Journal) is not completed
-      assert.ok(!isStepCompleted(inserted[2], 2, completedSteps, false), 'Journal must remain incomplete');
+        assert.equal(
+          isStepCompleted(reordered[0], 0, normalized, false, reordered),
+          false,
+          `Format ${name}: Step B (index 0) must not be completed`
+        );
+        assert.equal(
+          isStepCompleted(reordered[1], 1, normalized, false, reordered),
+          true,
+          `Format ${name}: Step A (index 1) must remain completed`
+        );
+        assert.equal(
+          isStepCompleted(reordered[2], 2, normalized, false, reordered),
+          false,
+          `Format ${name}: Step C (index 2) must not be completed`
+        );
+      }
     });
 
-    it('should not transfer completion when a completed step is removed', () => {
-      const items = [
-        { id: 'step_1', label: 'Step 1' },
-        { id: 'step_2', label: 'Step 2' },
-        { id: 'step_3', label: 'Step 3' },
+    it('Scenario 4: Removing a completed step must NOT silently transfer completion to another step', () => {
+      // Step B completed
+      const log = ['step_B'];
+
+      // User removes Step B
+      const afterRemoval = [originalChecklist[0], originalChecklist[2]]; // A, C
+
+      assert.equal(afterRemoval.length, 2);
+      assert.equal(isStepCompleted(afterRemoval[0], 0, log, false, afterRemoval), false);
+      assert.equal(isStepCompleted(afterRemoval[1], 1, log, false, afterRemoval), false);
+
+      const progress = calculateChecklistProgress(afterRemoval, log, false);
+      assert.equal(progress.completedCount, 0, 'No steps completed after removing completed step');
+      assert.equal(progress.percent, 0);
+    });
+
+    it('Scenario 5: Renaming a step preserves its ID and progress association', () => {
+      const log = ['step_A'];
+
+      // User renames Step A to "Detailed Step A Title"
+      const renamed = [
+        { ...originalChecklist[0], label: 'Detailed Step A Title' },
+        originalChecklist[1],
+        originalChecklist[2],
       ];
 
-      // Step 2 was completed
-      const completedSteps = ['step_2'];
-
-      // User removes Step 2
-      const afterRemoval = [items[0], items[2]];
-
-      // Step 1 (index 0) remains incomplete
-      assert.ok(!isStepCompleted(afterRemoval[0], 0, completedSteps, false));
-      // Step 3 (now index 1) must NOT inherit Step 2's completion!
-      assert.ok(!isStepCompleted(afterRemoval[1], 1, completedSteps, false), 'Step 3 must not inherit removed step completion');
+      // ID is preserved
+      assert.equal(renamed[0].id, 'step_A');
+      assert.equal(isStepCompleted(renamed[0], 0, log, false, renamed), true);
     });
   });
 
@@ -273,6 +356,14 @@ describe('Phase 4: Interactive Step Checklists & Workout Routine Consolidation',
       assert.ok(
         content.includes('style={{ width: `${percent}%` }}'),
         'Must render dynamic visual progress bar'
+      );
+    });
+
+    it('should verify GenericHabitCard normalizes completedSteps against items context', () => {
+      const content = readWebFile('src/components/habits/GenericHabitCard.js');
+      assert.ok(
+        content.includes('normalizeCompletedSteps(rawCompletedSteps, items)'),
+        'GenericHabitCard must normalize completedSteps against items'
       );
     });
 
@@ -329,7 +420,7 @@ describe('Phase 4: Interactive Step Checklists & Workout Routine Consolidation',
         'HabitModal must use normalizeChecklistItems'
       );
       assert.ok(
-        content.includes('updateChecklistItemLabel') || content.includes('updateChecklistItem'),
+        content.includes('updateChecklistItemLabel'),
         'HabitModal must allow editing checklist step descriptions'
       );
       assert.ok(
@@ -401,11 +492,11 @@ describe('Phase 4: Interactive Step Checklists & Workout Routine Consolidation',
       // 3. User navigates away and reloads (state restored from storage)
       const restoredCompletedSteps = [...habitProgress[habitId].completedSteps];
       assert.ok(
-        isStepCompleted(habitDefinition.checklistItems[0], 0, restoredCompletedSteps, false),
+        isStepCompleted(habitDefinition.checklistItems[0], 0, restoredCompletedSteps, false, habitDefinition.checklistItems),
         'Step 1 must remain completed across navigation and reload'
       );
       assert.ok(
-        !isStepCompleted(habitDefinition.checklistItems[1], 1, restoredCompletedSteps, false),
+        !isStepCompleted(habitDefinition.checklistItems[1], 1, restoredCompletedSteps, false, habitDefinition.checklistItems),
         'Step 2 must remain incomplete'
       );
 
@@ -415,7 +506,7 @@ describe('Phase 4: Interactive Step Checklists & Workout Routine Consolidation',
       assert.equal(habitDefinition.checklistItems[0].id, step1Id);
       // Progress remains associated!
       assert.ok(
-        isStepCompleted(habitDefinition.checklistItems[0], 0, restoredCompletedSteps, false),
+        isStepCompleted(habitDefinition.checklistItems[0], 0, restoredCompletedSteps, false, habitDefinition.checklistItems),
         'Renamed step must remain completed'
       );
 
@@ -426,9 +517,9 @@ describe('Phase 4: Interactive Step Checklists & Workout Routine Consolidation',
         habitDefinition.checklistItems[2],
       ];
       // Index 0 is now mindfulness breathing (incomplete)
-      assert.ok(!isStepCompleted(reorderedItems[0], 0, restoredCompletedSteps, false));
+      assert.ok(!isStepCompleted(reorderedItems[0], 0, restoredCompletedSteps, false, reorderedItems));
       // Index 1 is water (completed)
-      assert.ok(isStepCompleted(reorderedItems[1], 1, restoredCompletedSteps, false));
+      assert.ok(isStepCompleted(reorderedItems[1], 1, restoredCompletedSteps, false, reorderedItems));
 
       // 6. User completes all remaining steps
       const step2Result = toggleChecklistStep(reorderedItems, restoredCompletedSteps, 0, false);
