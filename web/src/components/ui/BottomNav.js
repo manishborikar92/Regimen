@@ -11,43 +11,58 @@ const navItems = [
   { href: '/analytics', label: 'Insights', Icon: LineChart },
 ];
 
+// Match the section, not just the exact URL, so /habits/123 still highlights "Routine"
+const isRouteActive = (pathname, href) =>
+  pathname === href || pathname?.startsWith(`${href}/`);
+
 export default function BottomNav() {
   const pathname = usePathname();
-  const { playTabSwitchCue } = useSound();
+  // Guard against a missing provider so the nav never crashes the page
+  const { playTabSwitchCue } = useSound() ?? {};
 
   const handleNavClick = (href) => {
-    if (pathname !== href) {
+    if (!isRouteActive(pathname, href)) {
       playTabSwitchCue?.();
     }
   };
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur-md border-t border-subtle/90 pb-safe z-50 transition-colors"
+      className="fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur-md border-t border-subtle/90 z-50 transition-colors"
+      // Real CSS instead of the custom `pb-safe` class (silently does nothing if undefined).
+      // Requires <meta viewport ... viewport-fit=cover> / Next `viewport.viewportFit = 'cover'`.
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       aria-label="Main navigation"
     >
-      <div className="max-w-md mx-auto flex justify-around px-2 py-1.5">
+      {/* max-w-2xl matches the TopNav container so both bars align on tablet/desktop */}
+      <ul className="max-w-2xl mx-auto flex items-stretch gap-1 px-2 py-1.5">
         {navItems.map(({ href, label, Icon }) => {
-          const isActive = pathname === href;
+          const isActive = isRouteActive(pathname, href);
           return (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => handleNavClick(href)}
-              className={`flex flex-col items-center justify-center min-w-[56px] py-1.5 px-4 rounded-xl transition-all ${
-                isActive
-                  ? 'text-teal-700 dark:text-teal-300 font-bold bg-teal-50 dark:bg-teal-950/60'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/70 dark:hover:bg-slate-800/60 font-medium'
-              }`}
-              aria-current={isActive ? 'page' : undefined}
-            >
-              <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.3]' : 'stroke-[1.8]'}`} />
-              <span className="text-2xs mt-1 tracking-tight">{label}</span>
-            </Link>
+            <li key={href} className="flex-1 min-w-0">
+              <Link
+                href={href}
+                onClick={() => handleNavClick(href)}
+                aria-current={isActive ? 'page' : undefined}
+                className={`flex flex-col items-center justify-center w-full min-h-[52px] py-1.5 px-2 rounded-xl transition-colors motion-safe:active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+                  isActive
+                    ? 'text-accent bg-accent-subtle/40'
+                    : 'text-muted hover:text-main hover:bg-surface-subtle'
+                }`}
+              >
+                <Icon
+                  className={`w-5 h-5 ${isActive ? 'stroke-[2.3]' : 'stroke-[1.8]'}`}
+                  aria-hidden="true"
+                />
+                {/* constant weight: switching bold/medium changed the label width and made the bar jitter */}
+                <span className="text-2xs font-semibold mt-1 tracking-tight truncate max-w-full">
+                  {label}
+                </span>
+              </Link>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </nav>
   );
 }
-
