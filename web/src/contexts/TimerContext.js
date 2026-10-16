@@ -1,9 +1,10 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { unlockAudio, playCompletionChime } from '@/utils/audio-chime';
+import { unlockAudio } from '@/utils/audio-chime';
 import { requestNotificationPermission, sendTimerNotification } from '@/utils/timer-notifications';
 import { useData } from '@/contexts/DataContext';
+import { useSound } from '@/contexts/SoundContext';
 
 const STORAGE_KEY = 'vritta_active_timers';
 const TimerContext = createContext(null);
@@ -70,6 +71,7 @@ export function TimerProvider({ children }) {
   const callbacksRef = useRef({});
   const finishingTimersRef = useRef(new Set());
   const { updateProgress, todayLog, toggleHabit } = useData() || {};
+  const { playStartCue, playCompletionCue } = useSound();
 
   // Save active timers state to localStorage (omits finished timers to prevent repeated re-alerting)
   const saveToStorage = useCallback((updatedTimers) => {
@@ -97,8 +99,10 @@ export function TimerProvider({ children }) {
   }, []);
 
   // Single authoritative completion handler for a finished timer session
-  const handleTimerFinished = useCallback((habitId, targetMinutes) => {
-    playCompletionChime();
+  const handleTimerFinished = useCallback((habitId, targetMinutes, isSilent = false) => {
+    if (!isSilent && playCompletionCue) {
+      playCompletionCue();
+    }
 
     if (typeof document !== 'undefined' && document.hidden) {
       sendTimerNotification(
@@ -120,7 +124,7 @@ export function TimerProvider({ children }) {
     if (registered?.onFinish) {
       registered.onFinish({ habitId, targetMinutes });
     }
-  }, [updateProgress, toggleHabit, todayLog]);
+  }, [playCompletionCue, updateProgress, toggleHabit, todayLog]);
 
   // Handle reload recovery once on mount if any running timer expired while the app was closed
   useEffect(() => {
@@ -130,7 +134,7 @@ export function TimerProvider({ children }) {
     Object.entries(initial).forEach(([id, t]) => {
       if (t.expiredWhileAway) {
         hasExpired = true;
-        handleTimerFinished(id, t.targetMinutes);
+        handleTimerFinished(id, t.targetMinutes, true /* isSilent: strictly silent on reload recovery */);
       }
     });
 
@@ -225,11 +229,20 @@ export function TimerProvider({ children }) {
       const targetMinutes = durationMinutes || current?.targetMinutes || 30;
       const targetSeconds = targetMinutes * 60;
 
-      const currentRemaining = current?.isPaused && current.secondsRemaining > 0
-        ? current.secondsRemaining
-        : targetSeconds;
+      const isResuming = Boolean(
+        current?.isPaused &&
+        typeof current?.secondsRemaining === 'number' &&
+        current.secondsRemaining > 0 &&
+        current.secondsRemaining < targetSeconds
+      );
 
+      const currentRemaining = isResuming ? current.secondsRemaining : targetSeconds;
       const targetEndTime = Date.now() + currentRemaining * 1000;
+
+      // Only genuinely new sessions play start cue
+      if (!isResuming && playStartCue) {
+        playStartCue();
+      }
 
       const updated = {
         ...prev,
@@ -247,9 +260,9 @@ export function TimerProvider({ children }) {
       saveToStorage(updated);
       return updated;
     });
-  }, [saveToStorage]);
+  }, [saveToStorage, playStartCue]);
 
-  // Pause a running timer
+  // Pause a running timer (strictly silent)
   const pauseTimer = useCallback((habitId) => {
     setTimers((prev) => {
       const current = prev[habitId];
@@ -275,7 +288,7 @@ export function TimerProvider({ children }) {
     });
   }, [saveToStorage]);
 
-  // Reset a timer back to full target duration
+  // Reset a timer back to full target duration (strictly silent)
   const resetTimer = useCallback((habitId, fallbackMinutes = 30) => {
     finishingTimersRef.current.delete(habitId);
 

@@ -9,6 +9,7 @@ import { BRAND } from '@/lib/constants/brand';
 import ConfirmDialog from './ConfirmDialog';
 import Logo from './Logo';
 import ThemeToggle from './ThemeToggle';
+import SoundControl from './SoundControl';
 
 export default function TopNav({ title, subtitle }) {
   const { user, signInWithGoogle, logout } = useAuth();
@@ -72,6 +73,9 @@ export default function TopNav({ title, subtitle }) {
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
+            {/* Accessible Sound Settings Control */}
+            <SoundControl />
+
             {/* Accessible Icon-Only Light/Dark Toggle */}
             <ThemeToggle />
 

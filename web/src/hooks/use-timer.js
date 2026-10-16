@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTimerContext } from '@/contexts/TimerContext';
-import { unlockAudio, playCompletionChime } from '@/utils/audio-chime';
+import { unlockAudio, playStartCue, playCompletionChime } from '@/utils/audio-chime';
 import { requestNotificationPermission, sendTimerNotification } from '@/utils/timer-notifications';
 
 /**
@@ -194,9 +194,14 @@ export function useTimer({
     unlockAudio();
     requestNotificationPermission().catch(() => {});
 
-    const remaining = localIsPaused && localSecondsRemaining > 0 ? localSecondsRemaining : localTargetSeconds;
+    const isResuming = Boolean(localIsPaused && localSecondsRemaining > 0 && localSecondsRemaining < localTargetSeconds);
+    const remaining = isResuming ? localSecondsRemaining : localTargetSeconds;
     const endTime = Date.now() + remaining * 1000;
     targetEndTimeRef.current = endTime;
+
+    if (!isResuming) {
+      playStartCue();
+    }
 
     setLocalSecondsRemaining(remaining);
     setLocalTimerActive(true);
