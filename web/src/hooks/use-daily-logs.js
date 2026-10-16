@@ -9,6 +9,7 @@ import {
     fetchHistoricalLogs,
 } from '@/lib/firebase/firestore';
 import { getTodayString, getDayOfWeek } from '@/utils/date-helpers';
+import { isHabitRequiredOnDay } from '@/utils/analytics-helpers';
 
 /**
  * Hook for managing daily logs — binary toggles, granular progress updates,
@@ -134,13 +135,9 @@ export function useDailyLogs(user, todaysHabits = []) {
     }, [user]);
 
     // Today's completion stats:
-    // Important: Sunday exercise is a planned rest day, so it is excluded from the denominator!
+    // Exclude planned rest days from denominator using centralized isHabitRequiredOnDay
     const todayStats = useMemo(() => {
-        // Exclude planned rest days from the completion denominator
-        const activeRequiredHabits = todaysHabits.filter(h => {
-            const isSundayRest = currentDow === 'Sun' && (h.completionMethod === 'exercise_plan' || h.category === 'Movement & Strength');
-            return !isSundayRest;
-        });
+        const activeRequiredHabits = todaysHabits.filter(h => isHabitRequiredOnDay(h, currentDow));
 
         const total = activeRequiredHabits.length;
         const completed = activeRequiredHabits.filter(h => todayLog.includes(h.id)).length;
