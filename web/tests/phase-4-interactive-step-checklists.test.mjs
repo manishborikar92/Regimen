@@ -9,6 +9,7 @@ import {
   calculateChecklistProgress,
   toggleChecklistStep,
   toggleAllChecklistSteps,
+  normalizeChecklistItems,
 } from '../src/utils/checklist-helpers.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -32,10 +33,25 @@ describe('Phase 4: Interactive Step Checklists & Workout Routine Consolidation',
       assert.equal(getStepId(sampleItems[0], 0), 'step_water');
       // Label-slug fallback for items without id
       const id1 = getStepId(sampleItems[1], 1);
-      assert.ok(id1.startsWith('step_1_5_minutes_of_quiet'), 'Must derive deterministic slug');
+      assert.ok(id1.startsWith('step_5_minutes_of_quiet'), 'Must derive deterministic content slug');
       // Empty item fallback
-      assert.equal(getStepId({}, 2), 'step_2_2');
-      assert.equal(getStepId(null, 3), 'step_3_3');
+      assert.equal(getStepId({}, 2), 'step_2');
+      assert.equal(getStepId(null, 3), 'step_3');
+    });
+
+    it('should normalize checklist items with stable IDs', () => {
+      const raw = [
+        { label: 'Step 1' },
+        { id: 'custom_id_2', label: 'Step 2' },
+        { label: 'Step 1' }, // duplicate label
+      ];
+      const normalized = normalizeChecklistItems(raw);
+      assert.equal(normalized.length, 3);
+      assert.equal(normalized[0].id, 'step_step_1');
+      assert.equal(normalized[1].id, 'custom_id_2');
+      assert.equal(normalized[2].id, 'step_step_1_2', 'Duplicate label must have collision suffix');
+      assert.equal(normalized[0].label, 'Step 1');
+      assert.equal(normalized[1].label, 'Step 2');
     });
 
     it('should accurately verify step completion with backward compatibility', () => {
@@ -43,11 +59,11 @@ describe('Phase 4: Interactive Step Checklists & Workout Routine Consolidation',
       assert.ok(isStepCompleted(sampleItems[0], 0, ['step_water'], false));
       assert.ok(!isStepCompleted(sampleItems[0], 0, ['other_step'], false));
 
-      // By numerical index
+      // By numerical index (legacy)
       assert.ok(isStepCompleted(sampleItems[1], 1, [1], false));
       assert.ok(!isStepCompleted(sampleItems[1], 1, [0, 2], false));
 
-      // By stringified index
+      // By stringified index (legacy)
       assert.ok(isStepCompleted(sampleItems[2], 2, ['2'], false));
 
       // Legacy fallback: habit marked complete with empty completedSteps
@@ -147,7 +163,88 @@ describe('Phase 4: Interactive Step Checklists & Workout Routine Consolidation',
     });
   });
 
-  describe('2. GenericHabitCard Interactive Checklist Architecture', () => {
+  describe('2. Step ID Stability Under Mutations (Rename, Reorder, Insert, Remove)', () => {
+    it('should retain existing step IDs when a user renames an existing step', () => {
+      const original = [
+        { id: 'step_water_101', label: 'Drink 1 glass of water' },
+        { id: 'step_stretch_102', label: 'Stretch for 5 min' },
+      ];
+
+      // User renames step 0 in HabitModal
+      const renamed = original.map((item, idx) =>
+        idx === 0 ? { ...item, label: 'Drink 2 tall glasses of cold water' } : item
+      );
+
+      assert.equal(renamed[0].id, 'step_water_101', 'ID must be retained identically after renaming');
+      assert.equal(renamed[0].label, 'Drink 2 tall glasses of cold water');
+
+      // Previously saved completedSteps using this ID still matches!
+      assert.ok(isStepCompleted(renamed[0], 0, ['step_water_101'], false));
+    });
+
+    it('should preserve progress association when steps are reordered', () => {
+      const items = [
+        { id: 'step_A', label: 'Item A' },
+        { id: 'step_B', label: 'Item B' },
+      ];
+
+      // Item B was completed previously
+      const completedSteps = ['step_B'];
+
+      // Reorder: move Item B to index 0, Item A to index 1
+      const reordered = [items[1], items[0]];
+
+      // Item at index 0 is now Item B
+      assert.ok(isStepCompleted(reordered[0], 0, completedSteps, false), 'Item B at index 0 must still be completed');
+      // Item at index 1 is Item A
+      assert.ok(!isStepCompleted(reordered[1], 1, completedSteps, false), 'Item A at index 1 must NOT be completed');
+    });
+
+    it('should preserve progress association when a new step is inserted at the front', () => {
+      const original = [
+        { id: 'step_hydration', label: 'Hydrate' },
+        { id: 'step_journal', label: 'Journal' },
+      ];
+
+      // Step Hydration was completed
+      const completedSteps = ['step_hydration'];
+
+      // User inserts a new step at index 0
+      const inserted = [
+        { id: 'step_new_wake_up', label: 'Wake up at 6am' },
+        original[0],
+        original[1],
+      ];
+
+      // Index 0 (new step) is not completed
+      assert.ok(!isStepCompleted(inserted[0], 0, completedSteps, false), 'New step must be incomplete');
+      // Index 1 (Hydration) remains completed
+      assert.ok(isStepCompleted(inserted[1], 1, completedSteps, false), 'Hydration must retain completed status');
+      // Index 2 (Journal) is not completed
+      assert.ok(!isStepCompleted(inserted[2], 2, completedSteps, false), 'Journal must remain incomplete');
+    });
+
+    it('should not transfer completion when a completed step is removed', () => {
+      const items = [
+        { id: 'step_1', label: 'Step 1' },
+        { id: 'step_2', label: 'Step 2' },
+        { id: 'step_3', label: 'Step 3' },
+      ];
+
+      // Step 2 was completed
+      const completedSteps = ['step_2'];
+
+      // User removes Step 2
+      const afterRemoval = [items[0], items[2]];
+
+      // Step 1 (index 0) remains incomplete
+      assert.ok(!isStepCompleted(afterRemoval[0], 0, completedSteps, false));
+      // Step 3 (now index 1) must NOT inherit Step 2's completion!
+      assert.ok(!isStepCompleted(afterRemoval[1], 1, completedSteps, false), 'Step 3 must not inherit removed step completion');
+    });
+  });
+
+  describe('3. GenericHabitCard Interactive Checklist Architecture', () => {
     it('should verify GenericHabitCard exists and exports a memoized component', () => {
       const content = readWebFile('src/components/habits/GenericHabitCard.js');
       assert.ok(content.includes('export default memo(GenericHabitCard)'));
@@ -179,6 +276,18 @@ describe('Phase 4: Interactive Step Checklists & Workout Routine Consolidation',
       );
     });
 
+    it('should verify GenericHabitCard does not write redundant completedCount or totalCount to progress payloads', () => {
+      const content = readWebFile('src/components/habits/GenericHabitCard.js');
+      assert.ok(
+        !content.includes('completedCount: nextCompletedSteps.length'),
+        'Must not write redundant completedCount to progress payloads'
+      );
+      assert.ok(
+        !content.includes('totalCount: items.length'),
+        'Must not write redundant totalCount to progress payloads'
+      );
+    });
+
     it('should verify primary circular completion button satisfies min 44x44px touch target', () => {
       const content = readWebFile('src/components/habits/GenericHabitCard.js');
       assert.ok(
@@ -200,7 +309,7 @@ describe('Phase 4: Interactive Step Checklists & Workout Routine Consolidation',
     });
   });
 
-  describe('3. DashboardPage Card Dispatch & Wiring', () => {
+  describe('4. DashboardPage Card Dispatch & Wiring', () => {
     it('should verify DashboardPage passes progress and onUpdateProgress to GenericHabitCard', () => {
       const content = readWebFile('src/app/(protected)/dashboard/page.js');
       assert.ok(
@@ -212,23 +321,38 @@ describe('Phase 4: Interactive Step Checklists & Workout Routine Consolidation',
     });
   });
 
-  describe('4. HabitModal Step ID Stability', () => {
-    it('should verify HabitModal ensures stable IDs for checklist items', () => {
+  describe('5. HabitModal Step ID Stability, Renaming, and Reordering', () => {
+    it('should verify HabitModal ensures stable IDs and normalizes checklist items', () => {
       const content = readWebFile('src/components/habits/HabitModal.js');
       assert.ok(
-        content.includes('id: stableId') || content.includes('item.id || `step_'),
-        'HabitModal must assign stable IDs to checklist items'
+        content.includes('normalizeChecklistItems'),
+        'HabitModal must use normalizeChecklistItems'
+      );
+      assert.ok(
+        content.includes('updateChecklistItemLabel') || content.includes('updateChecklistItem'),
+        'HabitModal must allow editing checklist step descriptions'
+      );
+      assert.ok(
+        content.includes('moveChecklistItem'),
+        'HabitModal must support reordering checklist steps'
       );
     });
   });
 
-  describe('5. Workout Routine Coordination (MovementCard)', () => {
-    it('should verify MovementCard harmonizes completedCount and totalCount in progress payloads', () => {
+  describe('6. Workout Routine Coordination (MovementCard)', () => {
+    it('should verify MovementCard dispatches clean progress payload without redundant counters', () => {
       const content = readWebFile('src/components/habits/MovementCard.js');
       assert.ok(
-        content.includes('completedCount: updatedIds.length') &&
-        content.includes('totalCount: currentItems.length'),
-        'MovementCard must emit completedCount and totalCount matching checklist progress schema'
+        content.includes('completedItemIds: updatedIds'),
+        'MovementCard must emit completedItemIds'
+      );
+      assert.ok(
+        !content.includes('completedCount: updatedIds.length'),
+        'MovementCard must NOT write redundant completedCount to database'
+      );
+      assert.ok(
+        !content.includes('totalCount: currentItems.length'),
+        'MovementCard must NOT write redundant totalCount to database'
       );
     });
 
@@ -241,58 +365,108 @@ describe('Phase 4: Interactive Step Checklists & Workout Routine Consolidation',
     });
   });
 
-  describe('6. Daily Log Progress Model Lifecycle & Isolation', () => {
-    it('should simulate full checklist completion and unchecking in dailyLog state', () => {
-      const habitId = 'habit_morning_routine';
-      const items = [
-        { id: 'step_1', label: 'Hydrate' },
-        { id: 'step_2', label: 'Stretch' },
+  describe('7. End-to-End Simulation of Real-World User Workflows', () => {
+    it('should simulate partial step completion, persistence, rename, reorder, auto-complete, and uncheck', () => {
+      const habitId = 'habit_custom_routine';
+
+      // 1. User creates a checklist habit with 3 steps
+      const habitDefinition = {
+        id: habitId,
+        title: 'Morning Awakening Routine',
+        category: 'Reflection',
+        checklistItems: normalizeChecklistItems([
+          { label: 'Drink 500ml water' },
+          { label: '5 minutes mindfulness breathing' },
+          { label: 'Joint mobility stretches' },
+        ]),
+      };
+
+      const step1Id = habitDefinition.checklistItems[0].id;
+      const step2Id = habitDefinition.checklistItems[1].id;
+      const step3Id = habitDefinition.checklistItems[2].id;
+
+      assert.ok(step1Id && step2Id && step3Id, 'All steps must have stable IDs');
+
+      // 2. User completes only step 1
+      let todayLog = [];
+      let habitProgress = {};
+
+      const step1Result = toggleChecklistStep(habitDefinition.checklistItems, [], 0, false);
+      habitProgress[habitId] = { completedSteps: step1Result.nextCompletedSteps };
+      if (step1Result.isAllCompleted) todayLog.push(habitId);
+
+      assert.equal(todayLog.includes(habitId), false, 'Habit is not completed yet with 1 of 3 steps');
+      assert.deepEqual(habitProgress[habitId].completedSteps, [step1Id]);
+
+      // 3. User navigates away and reloads (state restored from storage)
+      const restoredCompletedSteps = [...habitProgress[habitId].completedSteps];
+      assert.ok(
+        isStepCompleted(habitDefinition.checklistItems[0], 0, restoredCompletedSteps, false),
+        'Step 1 must remain completed across navigation and reload'
+      );
+      assert.ok(
+        !isStepCompleted(habitDefinition.checklistItems[1], 1, restoredCompletedSteps, false),
+        'Step 2 must remain incomplete'
+      );
+
+      // 4. User renames step 1 to 'Drink 750ml lukewarm water'
+      habitDefinition.checklistItems[0].label = 'Drink 750ml lukewarm water';
+      // Step ID is unchanged!
+      assert.equal(habitDefinition.checklistItems[0].id, step1Id);
+      // Progress remains associated!
+      assert.ok(
+        isStepCompleted(habitDefinition.checklistItems[0], 0, restoredCompletedSteps, false),
+        'Renamed step must remain completed'
+      );
+
+      // 5. User reorders: moves step 1 down to index 1
+      const reorderedItems = [
+        habitDefinition.checklistItems[1],
+        habitDefinition.checklistItems[0],
+        habitDefinition.checklistItems[2],
       ];
+      // Index 0 is now mindfulness breathing (incomplete)
+      assert.ok(!isStepCompleted(reorderedItems[0], 0, restoredCompletedSteps, false));
+      // Index 1 is water (completed)
+      assert.ok(isStepCompleted(reorderedItems[1], 1, restoredCompletedSteps, false));
 
-      // Simulated local state
-      const state = {
-        todayLog: [],
-        habitProgress: {},
-      };
+      // 6. User completes all remaining steps
+      const step2Result = toggleChecklistStep(reorderedItems, restoredCompletedSteps, 0, false);
+      const step3Result = toggleChecklistStep(reorderedItems, step2Result.nextCompletedSteps, 2, false);
 
-      // Step 1 checked
-      const step1Toggle = toggleChecklistStep(items, [], 0, false);
-      state.habitProgress[habitId] = {
-        completedSteps: step1Toggle.nextCompletedSteps,
-        completedCount: step1Toggle.completedCount,
-        totalCount: step1Toggle.totalCount,
-      };
-      if (step1Toggle.isAllCompleted) {
-        state.todayLog.push(habitId);
+      habitProgress[habitId] = { completedSteps: step3Result.nextCompletedSteps };
+      if (step3Result.isAllCompleted) todayLog.push(habitId);
+
+      assert.ok(todayLog.includes(habitId), 'Completing every step triggers automatic habit completion');
+      assert.equal(step3Result.percent, 100);
+
+      // 7. User unchecks one step
+      const uncheckResult = toggleChecklistStep(reorderedItems, habitProgress[habitId].completedSteps, 1, true);
+      habitProgress[habitId] = { completedSteps: uncheckResult.nextCompletedSteps };
+      if (!uncheckResult.isAllCompleted) {
+        todayLog = todayLog.filter(id => id !== habitId);
       }
-      assert.equal(state.todayLog.includes(habitId), false, 'Habit must not be complete with 1/2 steps');
-      assert.equal(state.habitProgress[habitId].completedCount, 1);
 
-      // Step 2 checked -> auto-completed
-      const step2Toggle = toggleChecklistStep(items, state.habitProgress[habitId].completedSteps, 1, false);
-      state.habitProgress[habitId] = {
-        completedSteps: step2Toggle.nextCompletedSteps,
-        completedCount: step2Toggle.completedCount,
-        totalCount: step2Toggle.totalCount,
-      };
-      if (step2Toggle.isAllCompleted && !state.todayLog.includes(habitId)) {
-        state.todayLog.push(habitId);
-      }
-      assert.equal(state.todayLog.includes(habitId), true, 'Habit must auto-complete when all steps are done');
-      assert.equal(state.habitProgress[habitId].completedCount, 2);
+      assert.ok(!todayLog.includes(habitId), 'Unchecking any step marks overall habit incomplete');
+      assert.equal(uncheckResult.completedCount, 2);
 
-      // Step 1 unchecked -> auto-uncompleted
-      const step1Uncheck = toggleChecklistStep(items, state.habitProgress[habitId].completedSteps, 0, true);
-      state.habitProgress[habitId] = {
-        completedSteps: step1Uncheck.nextCompletedSteps,
-        completedCount: step1Uncheck.completedCount,
-        totalCount: step1Uncheck.totalCount,
-      };
-      if (!step1Uncheck.isAllCompleted) {
-        state.todayLog = state.todayLog.filter(id => id !== habitId);
-      }
-      assert.equal(state.todayLog.includes(habitId), false, 'Habit must mark incomplete when a step is unchecked');
-      assert.equal(state.habitProgress[habitId].completedCount, 1);
+      // 8. User clicks overall habit toggle to mark all complete
+      const batchComplete = toggleAllChecklistSteps(reorderedItems, true);
+      habitProgress[habitId] = { completedSteps: batchComplete.nextCompletedSteps };
+      todayLog.push(habitId);
+
+      assert.equal(batchComplete.completedCount, 3);
+      assert.equal(batchComplete.percent, 100);
+      assert.ok(todayLog.includes(habitId));
+
+      // 9. User clicks overall habit toggle to mark all incomplete
+      const batchReset = toggleAllChecklistSteps(reorderedItems, false);
+      habitProgress[habitId] = { completedSteps: batchReset.nextCompletedSteps };
+      todayLog = todayLog.filter(id => id !== habitId);
+
+      assert.equal(batchReset.completedCount, 0);
+      assert.deepEqual(habitProgress[habitId].completedSteps, []);
+      assert.ok(!todayLog.includes(habitId));
     });
   });
 });

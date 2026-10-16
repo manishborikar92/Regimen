@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { X, Trash2, Clock, Info, Sparkles, Sunrise, Moon } from 'lucide-react';
+import { X, Trash2, Clock, Info, Sparkles, Sunrise, Moon, ChevronUp, ChevronDown } from 'lucide-react';
 import { CATEGORIES } from '@/lib/constants/categories';
+import { normalizeChecklistItems } from '@/utils/checklist-helpers';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -78,10 +79,7 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
         time: habit.time || 'Flexible',
         instructions: habit.instructions || '',
         frequency: habit.frequency || [...DAYS],
-        checklistItems: (habit.checklistItems || []).map((item, idx) => ({
-          ...item,
-          id: item.id || `step_${idx}_${String(item.label || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 16)}`,
-        })),
+        checklistItems: normalizeChecklistItems(habit.checklistItems),
         targetMinutes: getReadingTargetMinutes(habit),
         order: habit.order || 1,
         stableKey: habit.stableKey || null,
@@ -125,6 +123,7 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
       ...formData,
       time: displayTime,
       targetMinutes,
+      checklistItems: normalizeChecklistItems(formData.checklistItems),
       metadata: cleanMetadata,
     };
 
@@ -153,6 +152,24 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
       checklistItems: [...prev.checklistItems, { id: stableId, label: newChecklistItem.trim() }],
     }));
     setNewChecklistItem('');
+  };
+
+  const updateChecklistItemLabel = (index, newLabel) => {
+    setFormData(prev => ({
+      ...prev,
+      checklistItems: prev.checklistItems.map((item, i) =>
+        i === index ? { ...item, label: newLabel } : item
+      ),
+    }));
+  };
+
+  const moveChecklistItem = (index, direction) => {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= formData.checklistItems.length) return;
+    const items = [...formData.checklistItems];
+    const [moved] = items.splice(index, 1);
+    items.splice(targetIndex, 0, moved);
+    setFormData(prev => ({ ...prev, checklistItems: items }));
   };
 
   const removeChecklistItem = (index) => {
@@ -441,16 +458,49 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
                 </label>
                 <div className="space-y-1.5">
                   {formData.checklistItems.map((item, index) => (
-                    <div key={index} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
-                      <span className="flex-1 text-xs text-slate-800 dark:text-slate-200">{item.label}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeChecklistItem(index)}
-                        className="text-rose-500 hover:text-rose-700 p-1 min-w-[32px] min-h-[32px] flex items-center justify-center"
-                        aria-label="Remove item"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                    <div
+                      key={item.id || index}
+                      className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/80 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700"
+                    >
+                      <span className="text-2xs font-bold text-slate-400 w-4 text-center select-none flex-shrink-0">
+                        {index + 1}.
+                      </span>
+                      <input
+                        type="text"
+                        value={item.label}
+                        onChange={(e) => updateChecklistItemLabel(index, e.target.value)}
+                        className="flex-1 text-xs bg-transparent text-slate-800 dark:text-slate-200 border-0 focus:outline-none focus:ring-1 focus:ring-teal-500 rounded px-1.5 py-1"
+                        placeholder="Step description..."
+                        aria-label={`Step ${index + 1} description`}
+                      />
+                      <div className="flex items-center gap-0.5 flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => moveChecklistItem(index, -1)}
+                          disabled={index === 0}
+                          className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed rounded"
+                          aria-label={`Move step ${index + 1} up`}
+                        >
+                          <ChevronUp className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveChecklistItem(index, 1)}
+                          disabled={index === formData.checklistItems.length - 1}
+                          className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed rounded"
+                          aria-label={`Move step ${index + 1} down`}
+                        >
+                          <ChevronDown className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeChecklistItem(index)}
+                          className="w-7 h-7 flex items-center justify-center text-rose-500 hover:text-rose-700 rounded"
+                          aria-label={`Remove step ${index + 1}`}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   ))}
 

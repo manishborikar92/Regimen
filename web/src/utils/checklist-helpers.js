@@ -16,12 +16,15 @@
 
 /**
  * Derives a stable, deterministic step identifier for a checklist item.
+ * If an explicit `id` or `key` is present on the item, it is strictly preserved.
+ * For legacy items without an ID, a content-based slug is derived so the ID
+ * remains stable across reordering or insertion.
  *
  * @param {Object} item - Checklist item object
- * @param {number} index - Index within checklistItems array
+ * @param {number} [index=0] - Fallback index within checklistItems array
  * @returns {string} Stable identifier string
  */
-export function getStepId(item, index) {
+export function getStepId(item, index = 0) {
   if (item && item.id) return String(item.id);
   if (item && item.key) return String(item.key);
 
@@ -29,15 +32,67 @@ export function getStepId(item, index) {
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '_')
-    .slice(0, 24);
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 32);
 
-  return `step_${index}_${labelSlug || index}`;
+  return labelSlug ? `step_${labelSlug}` : `step_${index}`;
+}
+
+/**
+ * Normalizes an array of checklist items to guarantee stable, persistent IDs.
+ * Retains existing IDs without regeneration.
+ * Generates deterministic slug IDs for legacy items missing IDs.
+ *
+ * @param {Array<Object|string>} items - Raw checklist items
+ * @returns {Array<{ id: string, label: string }>} Normalized checklist items with stable IDs
+ */
+export function normalizeChecklistItems(items = []) {
+  if (!Array.isArray(items)) return [];
+  const seenIds = new Set();
+
+  return items.map((item, index) => {
+    if (!item) {
+      const fallbackId = `step_${index}`;
+      seenIds.add(fallbackId);
+      return { id: fallbackId, label: '' };
+    }
+
+    const label = typeof item === 'string' ? item : (item.label || '');
+    let id = item.id || item.key;
+
+    if (!id) {
+      const slug = String(label)
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '')
+        .slice(0, 32);
+
+      const base = slug ? `step_${slug}` : `step_${index}`;
+      id = base;
+      let counter = 1;
+      while (seenIds.has(id)) {
+        counter++;
+        id = `${base}_${counter}`;
+      }
+    }
+
+    const finalId = String(id);
+    seenIds.add(finalId);
+
+    return {
+      ...(typeof item === 'object' ? item : {}),
+      id: finalId,
+      label: String(label),
+    };
+  });
 }
 
 /**
  * Determines whether a specific step is completed.
  * Fully backward-compatible with:
- * - Stable step ID strings (e.g. 'step_1_water')
+ * - Stable step ID strings (e.g. 'step_water', 'step_drink_1_2_glasses')
+ * - Legacy index-prefixed slug strings (e.g. 'step_0_water')
  * - Numerical indices (e.g. 0, 1, 2)
  * - Stringified numerical indices (e.g. '0', '1', '2')
  * - Legacy boolean completion: if isHabitCompleted is true and no step progress was saved,
@@ -55,6 +110,12 @@ export function isStepCompleted(item, index, completedSteps = [], isHabitComplet
   if (Array.isArray(completedSteps) && completedSteps.length > 0) {
     if (completedSteps.includes(stepId)) return true;
     if (item?.id && completedSteps.includes(String(item.id))) return true;
+
+    // Backward-compatible check for legacy index-prefixed slug
+    const legacyIndexSlug = `step_${index}_${String(item?.label || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 24)}`;
+    if (completedSteps.includes(legacyIndexSlug)) return true;
+
+    // Backward-compatible fallback for legacy numeric index logs
     if (completedSteps.includes(index)) return true;
     if (completedSteps.includes(String(index))) return true;
     return false;

@@ -51,8 +51,6 @@ function GenericHabitCard({
       {
         ...progress,
         completedSteps: nextCompletedSteps,
-        completedCount: nextCompletedSteps.length,
-        totalCount: items.length,
       },
       nextAllDone
     );
@@ -72,8 +70,6 @@ function GenericHabitCard({
       {
         ...progress,
         completedSteps: nextCompletedSteps,
-        completedCount: nextCompletedSteps.length,
-        totalCount: items.length,
       },
       nextCompleted
     );
