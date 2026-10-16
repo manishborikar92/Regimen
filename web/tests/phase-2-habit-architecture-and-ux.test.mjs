@@ -174,33 +174,33 @@ describe('Phase 2: Habit Architecture & UX Simplification', () => {
 
   describe('4. Standardized Timing Rhythm Sorting and Grouping', () => {
     it('should correctly calculate timing sort weights for daily human rhythm', () => {
-      // 10: Morning
-      assert.equal(getTimingSortWeight({ preferredPeriod: 'Morning' }), 10);
-      assert.equal(getTimingSortWeight({ time: 'Morning' }), 10);
-      assert.equal(getTimingSortWeight({ relativeTiming: 'After waking' }), 10);
-      assert.equal(getTimingSortWeight({ timingType: 'exact', time: '08:00 AM' }), 10);
+      // 10: Flexible / Anytime (First position)
+      assert.equal(getTimingSortWeight({ timingType: 'anytime' }), 10);
+      assert.equal(getTimingSortWeight({ time: 'Flexible' }), 10);
+      assert.equal(getTimingSortWeight({}), 10);
+      assert.equal(getTimingSortWeight(null), 10);
 
-      // 20: Afternoon
-      assert.equal(getTimingSortWeight({ preferredPeriod: 'Afternoon' }), 20);
-      assert.equal(getTimingSortWeight({ relativeTiming: 'After lunch' }), 20);
-      assert.equal(getTimingSortWeight({ timingType: 'exact', time: '02:00 PM' }), 20);
+      // 20: Morning
+      assert.equal(getTimingSortWeight({ preferredPeriod: 'Morning' }), 20);
+      assert.equal(getTimingSortWeight({ time: 'Morning' }), 20);
+      assert.equal(getTimingSortWeight({ relativeTiming: 'After waking' }), 20);
+      assert.equal(getTimingSortWeight({ timingType: 'exact', time: '08:00 AM' }), 20);
 
-      // 30: Evening
-      assert.equal(getTimingSortWeight({ preferredPeriod: 'Evening' }), 30);
-      assert.equal(getTimingSortWeight({ relativeTiming: 'Evening wind-down' }), 30);
-      assert.equal(getTimingSortWeight({ timingType: 'exact', time: '07:30 PM' }), 30);
+      // 30: Afternoon
+      assert.equal(getTimingSortWeight({ preferredPeriod: 'Afternoon' }), 30);
+      assert.equal(getTimingSortWeight({ relativeTiming: 'After lunch' }), 30);
+      assert.equal(getTimingSortWeight({ timingType: 'exact', time: '02:00 PM' }), 30);
 
-      // 40: Before Bed / Night
-      assert.equal(getTimingSortWeight({ relativeTiming: 'Before bed' }), 40);
-      assert.equal(getTimingSortWeight({ preferredPeriod: 'Night' }), 40);
-      assert.equal(getTimingSortWeight({ time: 'Before bed' }), 40);
-      assert.equal(getTimingSortWeight({ timingType: 'exact', time: '10:00 PM' }), 40);
+      // 40: Evening
+      assert.equal(getTimingSortWeight({ preferredPeriod: 'Evening' }), 40);
+      assert.equal(getTimingSortWeight({ relativeTiming: 'Evening wind-down' }), 40);
+      assert.equal(getTimingSortWeight({ timingType: 'exact', time: '07:30 PM' }), 40);
 
-      // 50: Flexible / Anytime
-      assert.equal(getTimingSortWeight({ timingType: 'anytime' }), 50);
-      assert.equal(getTimingSortWeight({ time: 'Flexible' }), 50);
-      assert.equal(getTimingSortWeight({}), 50);
-      assert.equal(getTimingSortWeight(null), 50);
+      // 50: Before Bed / Night
+      assert.equal(getTimingSortWeight({ relativeTiming: 'Before bed' }), 50);
+      assert.equal(getTimingSortWeight({ preferredPeriod: 'Night' }), 50);
+      assert.equal(getTimingSortWeight({ time: 'Before bed' }), 50);
+      assert.equal(getTimingSortWeight({ timingType: 'exact', time: '10:00 PM' }), 50);
     });
 
     it('should predictably sort habits by timing sequence with title tie-breaker', () => {
@@ -214,11 +214,11 @@ describe('Phase 2: Habit Architecture & UX Simplification', () => {
 
       habits.sort(sortHabitsByTiming);
 
-      assert.equal(habits[0].title, 'Morning Hydration');
-      assert.equal(habits[1].title, 'Afternoon Movement');
-      assert.equal(habits[2].title, 'Evening Reflection');
-      assert.equal(habits[3].title, 'Bedtime Reading');
-      assert.equal(habits[4].title, 'English Workbook');
+      assert.equal(habits[0].title, 'English Workbook');
+      assert.equal(habits[1].title, 'Morning Hydration');
+      assert.equal(habits[2].title, 'Afternoon Movement');
+      assert.equal(habits[3].title, 'Evening Reflection');
+      assert.equal(habits[4].title, 'Bedtime Reading');
     });
 
     it('should verify useHabits hook applies sortHabitsByTiming on real-time snapshot', () => {
@@ -233,7 +233,7 @@ describe('Phase 2: Habit Architecture & UX Simplification', () => {
       );
     });
 
-    it('should verify Dashboard renders all 5 standardized daily rhythm sections', () => {
+    it('should verify Dashboard renders all 5 standardized daily rhythm sections in correct order', () => {
       const content = readWebFile(dashboardPath);
       assert.ok(content.includes('groupedHabits.morning'), 'Must group morning habits');
       assert.ok(content.includes('groupedHabits.afternoon'), 'Must group afternoon habits');
@@ -241,12 +241,25 @@ describe('Phase 2: Habit Architecture & UX Simplification', () => {
       assert.ok(content.includes('groupedHabits.beforeBed'), 'Must group before-bed habits');
       assert.ok(content.includes('groupedHabits.flexible'), 'Must group flexible habits');
 
+      // Verify rendering order: Flexible -> Morning -> Afternoon -> Evening -> Before Bed
+      const idxFlexible = content.indexOf('groupedHabits.flexible.map');
+      const idxMorning = content.indexOf('groupedHabits.morning.map');
+      const idxAfternoon = content.indexOf('groupedHabits.afternoon.map');
+      const idxEvening = content.indexOf('groupedHabits.evening.map');
+      const idxBeforeBed = content.indexOf('groupedHabits.beforeBed.map');
+
+      assert.ok(idxFlexible !== -1 && idxMorning !== -1, 'Flexible and Morning sections must exist in JSX');
+      assert.ok(idxFlexible < idxMorning, 'Flexible must render before Morning');
+      assert.ok(idxMorning < idxAfternoon, 'Morning must render before Afternoon');
+      assert.ok(idxAfternoon < idxEvening, 'Afternoon must render before Evening');
+      assert.ok(idxEvening < idxBeforeBed, 'Evening must render before Before Bed');
+
       // Verify clean section headers
-      assert.ok(/Morning/.test(content) && content.includes('groupedHabits.morning'), 'Must render Morning section header');
-      assert.ok(/Afternoon \(Preferred\)/.test(content) && content.includes('groupedHabits.afternoon'), 'Must render Afternoon header');
-      assert.ok(/Evening/.test(content) && content.includes('groupedHabits.evening'), 'Must render Evening header');
-      assert.ok(/Before Bed/.test(content) && content.includes('groupedHabits.beforeBed'), 'Must render Before Bed header');
-      assert.ok(/Flexible \/ Anytime/.test(content) && content.includes('groupedHabits.flexible'), 'Must render Flexible header');
+      assert.ok(/Flexible \/ Anytime/.test(content), 'Must render Flexible header');
+      assert.ok(/Morning/.test(content), 'Must render Morning section header');
+      assert.ok(/Afternoon \(Preferred\)/.test(content), 'Must render Afternoon header');
+      assert.ok(/Evening/.test(content), 'Must render Evening header');
+      assert.ok(/Before Bed/.test(content), 'Must render Before Bed header');
 
       // Verify elimination of arbitrary "Additional Routines" dumping
       assert.ok(

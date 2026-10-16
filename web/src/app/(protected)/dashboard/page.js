@@ -26,7 +26,6 @@ export default function DashboardPage() {
     todaysHabits,
     todayLog,
     todayProgress,
-    todayStats,
     userProfile,
     loading,
     error,
@@ -48,8 +47,14 @@ export default function DashboardPage() {
       const period = String(habit.preferredPeriod || habit.time || '').toLowerCase();
       const relative = String(habit.relativeTiming || '').toLowerCase();
 
-      // 1. Before Bed / Night
+      // 1. Flexible / Anytime
       if (
+        timingType === 'anytime' ||
+        period === 'flexible' ||
+        (!period && !relative && timingType !== 'exact')
+      ) {
+        flexible.push(habit);
+      } else if (
         relative.includes('bed') ||
         period.includes('bed') ||
         period.includes('night') ||
@@ -162,8 +167,12 @@ export default function DashboardPage() {
       );
     }
 
-    // 4. Specialized Read Books Card (30-minute reading timer)
-    if (isMatchingCanonical('canonical_read_books') || (isPersonalPreset && method === 'reading_duration')) {
+    // 4. Specialized Read Books Card (reading duration timer)
+    if (
+      isMatchingCanonical('canonical_read_books') ||
+      (isPersonalPreset && method === 'reading_duration') ||
+      method === 'reading_duration'
+    ) {
       return (
         <ReadingCard
           key={habit.id}
@@ -260,7 +269,22 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* 1. Morning Routines */}
+            {/* 1. Flexible / Anytime */}
+            {groupedHabits.flexible.length > 0 && (
+              <section className="space-y-3">
+                <div className="flex items-center gap-2 px-1">
+                  <span className="text-xs font-semibold text-sub uppercase tracking-wider">
+                    Flexible / Anytime
+                  </span>
+                  <div className="h-px bg-slate-200 dark:bg-slate-800 flex-1" />
+                </div>
+                <div className="space-y-3">
+                  {groupedHabits.flexible.map(renderHabitCard)}
+                </div>
+              </section>
+            )}
+
+            {/* 2. Morning Routines */}
             {groupedHabits.morning.length > 0 && (
               <section className="space-y-3">
                 <div className="flex items-center gap-2 px-1">
@@ -275,7 +299,7 @@ export default function DashboardPage() {
               </section>
             )}
 
-            {/* 2. Afternoon Preferred */}
+            {/* 3. Afternoon Preferred */}
             {groupedHabits.afternoon.length > 0 && (
               <section className="space-y-3">
                 <div className="flex items-center gap-2 px-1">
@@ -290,7 +314,7 @@ export default function DashboardPage() {
               </section>
             )}
 
-            {/* 3. Evening */}
+            {/* 4. Evening */}
             {groupedHabits.evening.length > 0 && (
               <section className="space-y-3">
                 <div className="flex items-center gap-2 px-1">
@@ -305,7 +329,7 @@ export default function DashboardPage() {
               </section>
             )}
 
-            {/* 4. Before Bed */}
+            {/* 5. Before Bed */}
             {groupedHabits.beforeBed.length > 0 && (
               <section className="space-y-3">
                 <div className="flex items-center gap-2 px-1">
@@ -316,21 +340,6 @@ export default function DashboardPage() {
                 </div>
                 <div className="space-y-3">
                   {groupedHabits.beforeBed.map(renderHabitCard)}
-                </div>
-              </section>
-            )}
-
-            {/* 5. Flexible / Anytime */}
-            {groupedHabits.flexible.length > 0 && (
-              <section className="space-y-3">
-                <div className="flex items-center gap-2 px-1">
-                  <span className="text-xs font-semibold text-sub uppercase tracking-wider">
-                    Flexible / Anytime
-                  </span>
-                  <div className="h-px bg-slate-200 dark:bg-slate-800 flex-1" />
-                </div>
-                <div className="space-y-3">
-                  {groupedHabits.flexible.map(renderHabitCard)}
                 </div>
               </section>
             )}

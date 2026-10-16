@@ -20,14 +20,20 @@ describe('Phase 6: Reading Timer & Routine Timing-Mode Controls', () => {
       assert.ok(content.includes('export default memo(ReadingCard)'), 'Must export memo(ReadingCard)');
     });
 
-    it('should verify 30-minute target constant (TARGET_SECONDS = 30 * 60)', () => {
+    it('should verify ReadingCard derives duration from habit configuration without hardcoded constants', () => {
       const content = readWebFile('src/components/habits/ReadingCard.js');
-      assert.ok(content.includes('TARGET_SECONDS = 30 * 60'), 'Must define TARGET_SECONDS constant');
+      assert.ok(!content.includes('TARGET_SECONDS'), 'Must not define hardcoded TARGET_SECONDS constant');
+      assert.ok(!content.includes('DURATION_PRESETS'), 'Must not define in-card DURATION_PRESETS');
+      assert.ok(content.includes('getReadingTargetMinutes'), 'Must derive duration via getReadingTargetMinutes');
     });
 
-    it('should verify timer cleanup on unmount using useEffect return callback', () => {
-      const content = readWebFile('src/components/habits/ReadingCard.js');
-      assert.ok(content.includes('clearInterval(timerRef.current)'), 'Must clear interval on unmount');
+    it('should verify timer cleanup and interval management', () => {
+      const cardContent = readWebFile('src/components/habits/ReadingCard.js');
+      const hookContent = readWebFile('src/hooks/use-timer.js');
+      assert.ok(
+        cardContent.includes('useTimer') && hookContent.includes('clearInterval(timerRef.current)'),
+        'Must clear interval on unmount via timer subsystem'
+      );
     });
 
     it('should verify auto-completion trigger when timer reaches 0', () => {
@@ -54,9 +60,13 @@ describe('Phase 6: Reading Timer & Routine Timing-Mode Controls', () => {
       assert.ok(content.includes('w-11 h-11') || content.includes('min-h-[44px]'), 'Timer reset button must meet 44x44px touch target');
     });
 
-    it('should verify timer reset button disables when at initial 30:00 idle state', () => {
+    it('should verify timer reset button disables when at initial idle state', () => {
       const content = readWebFile('src/components/habits/ReadingCard.js');
-      assert.ok(content.includes('disabled={secondsRemaining === TARGET_SECONDS && !timerActive}'), 'Must disable reset button when already at target');
+      assert.ok(
+        content.includes('secondsRemaining === targetSeconds') ||
+        content.includes('secondsRemaining === TARGET_SECONDS'),
+        'Must disable reset button when already at target'
+      );
     });
 
     it('should verify zero prohibited colors in ReadingCard', () => {

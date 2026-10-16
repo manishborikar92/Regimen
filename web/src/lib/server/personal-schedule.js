@@ -134,8 +134,8 @@ export const MANISH_PERSONAL_ROUTINES = [
     order: 4,
     isSystemSeed: true,
     seedOrigin: 'personal_preset',
+    targetMinutes: 30,
     metadata: {
-      targetMinutes: 30,
       context: 'Before going to sleep',
     },
     instructions:

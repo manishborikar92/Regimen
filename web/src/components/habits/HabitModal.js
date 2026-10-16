@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { X, Trash2, Clock, CheckCircle2, ListChecks, Info, Sparkles, Sunrise, Moon } from 'lucide-react';
+import { X, Trash2, Clock, Info, Sparkles, Sunrise, Moon } from 'lucide-react';
 import { CATEGORIES } from '@/lib/constants/categories';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -19,11 +19,17 @@ const GENERIC_COMPLETION_STYLES = [
   { id: 'diary_entry', label: 'Reflection & Notes', description: 'Private journal note with guided prompts' },
 ];
 
+import {
+  READING_DURATION_PRESETS,
+  DEFAULT_READING_DURATION,
+  getReadingTargetMinutes,
+} from '@/utils/reading-helpers';
+
 const SPECIALIZED_COMPLETION_STYLES = {
   workbook_sessions: { label: 'Specialized: Two-Session Workbook Counter', description: 'Word Power Made Easy 2-session tracker' },
   exercise_plan: { label: 'Specialized: Structured Movement Plan', description: '12-week progressive movement schedule' },
   osho_listening: { label: 'Specialized: Discourse Listening Session', description: '30-discourse audio library catalog' },
-  reading_duration: { label: 'Specialized: Reading Duration Target', description: '30-minute reading timer' },
+  reading_duration: { label: 'Specialized: Reading Duration Target', description: 'Configurable reading timer session' },
   simple_with_notes: { label: 'Specialized: Speaking Practice with Notes', description: 'Conversational practice with autosaving notes' },
 };
 
@@ -39,6 +45,7 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
     instructions: '',
     frequency: [...DAYS],
     checklistItems: [],
+    targetMinutes: getReadingTargetMinutes(habit),
     order: habit?.order || 99,
     stableKey: null,
   });
@@ -72,6 +79,7 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
         instructions: habit.instructions || '',
         frequency: habit.frequency || [...DAYS],
         checklistItems: habit.checklistItems || [],
+        targetMinutes: getReadingTargetMinutes(habit),
         order: habit.order || 1,
         stableKey: habit.stableKey || null,
       });
@@ -106,9 +114,15 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
       displayTime = formData.time || '08:00 AM';
     }
 
+    const targetMinutes = parseInt(formData.targetMinutes, 10) || DEFAULT_READING_DURATION;
+    const cleanMetadata = { ...(habit?.metadata || {}) };
+    delete cleanMetadata.targetMinutes;
+
     const payload = {
       ...formData,
       time: displayTime,
+      targetMinutes,
+      metadata: cleanMetadata,
     };
 
     setSaving(true);
@@ -225,6 +239,31 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
                 {SPECIALIZED_COMPLETION_STYLES[formData.completionMethod]?.description}
               </p>
             </div>
+
+            {/* Target Duration Configuration for Specialized Reading Timer */}
+            {formData.completionMethod === 'reading_duration' && (
+              <div className="p-3 sm:p-3.5 bg-surface-subtle dark:bg-slate-800/40 rounded-xl border border-subtle dark:border-slate-700/80 space-y-2">
+                <label className="block text-xs font-semibold text-main">
+                  Target Reading Duration
+                </label>
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  {READING_DURATION_PRESETS.map((mins) => (
+                    <button
+                      key={mins}
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, targetMinutes: mins }))}
+                      className={`min-h-[38px] px-2.5 py-1 text-xs rounded-lg font-medium border transition-colors ${
+                        Number(formData.targetMinutes) === mins
+                          ? 'bg-teal-700 dark:bg-teal-600 text-white border-teal-700 dark:border-teal-600 font-semibold shadow-2xs'
+                          : 'bg-surface dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-subtle dark:border-slate-700 hover:bg-surface-subtle'
+                      }`}
+                    >
+                      {mins} min
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Timing Preference Model (Compact 2x2 Responsive Architecture) */}
             <div className="p-3 sm:p-3.5 bg-surface-subtle dark:bg-slate-800/40 rounded-xl border border-subtle dark:border-slate-700/80 space-y-2.5">
