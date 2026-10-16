@@ -69,7 +69,7 @@ root/
         ├── components/   # Modular React components
         │   ├── habits/   # Interactive routine cards (Movement, Workbook, Osho, etc.)
         │   └── ui/       # Presentation components (TopNav, BottomNav, ThemeToggle)
-        ├── contexts/     # Application React Context providers (Auth, Data, Theme, Toast)
+        ├── contexts/     # Application React Context providers (Auth, Data, Theme, Toast, Sound, Timer)
         ├── hooks/        # Reusable domain hooks (useHabits, useDailyLogs, useStreak)
         └── lib/          # Utilities, configuration, and data fixtures
             ├── constants/# Category configurations and brand definitions
@@ -207,3 +207,76 @@ Firestore Root
 - **Owner Scope:** Users can only read and write their own documents (`request.auth.uid == resource.data.userId`).
 - **Category Validation:** Validates `category` against the canonical category whitelist.
 - **Protected Paths:** Disallows client writes to server-reserved paths.
+
+---
+
+## 7. Interactive Sound Architecture & Procedural Synthesis
+
+Vritta features a native, zero-dependency interactive audio system powered directly by the Web Audio API (`web/src/utils/audio-chime.js`).
+
+### 7.1 Design Principles & Performance
+- **Zero Asset Overhead:** All audio cues are synthesized dynamically in code using Web Audio oscillators and exponential gain ramps. No MP3, WAV, or OGG audio files are downloaded over the network.
+- **Harmonic Musical Palette:** Cues utilize a unified Pentatonic scale (C5, D5, E5, G5, A5, C6) to produce warm, tranquil, meditative chimes that evoke focus without startle or auditory fatigue.
+- **Micro-Decay Envelopes:** Sound durations are tightly bounded: ticks (45ms), navigational clicks (25ms), and timer completions (1.8s exponential decay).
+
+### 7.2 Sound Interaction Map
+
+| Interaction | Trigger / Component | Acoustic Profile | Musical Pitch & Envelope |
+| :--- | :--- | :--- | :--- |
+| **Timer Start** | `ReadingCard`, `TimerModal` | Gentle rising chime | C5 (523Hz) → E5 (659Hz) → G5 (784Hz), 450ms |
+| **Timer Pause** | `ReadingCard`, `TimerModal` | Soft descending transition | G5 (784Hz) → E5 (659Hz), 200ms |
+| **Timer Resume** | `ReadingCard`, `TimerModal` | Bright upward step | E5 (659Hz) → A5 (880Hz), 200ms |
+| **Timer Reset** | `ReadingCard`, `TimerModal` | Restrained grounding cue | E5 (659Hz) → C5 (523Hz), 180ms |
+| **Timer Completion** | `TimerContext` | Resonant tri-tone bell | C5 (523Hz) + G5 (784Hz) + C6 (1046Hz) chord, 1.8s decay, mixed sine/triangle oscillators |
+| **Checklist Step Toggle** | `StepItem`, `OshoLibraryModal` | Crisp micro-tick | 880Hz / 659Hz, 45ms, gentle attack/decay |
+| **Habit Completion** | Habit Cards, Checkbox | Celebratory arpeggio | C5 → E5 → G5 → C6 harmonic sweep, 500ms |
+| **Tab Navigation** | `BottomNav` | Subdued wooden/bamboo click | Bandpass filtered noise/impulse, 25ms, < -18dB |
+| **Action Success** | `OshoLibraryModal`, `MovementCard` | Warm affirmation chord | F5 → A5 → C6 chord, 250ms |
+
+### 7.3 State, Provider Hierarchy & Autoplay Governance
+- **Provider Ordering (`web/src/app/layout.js`):**
+  `SoundProvider` is mounted at the root provider layer, above `TimerProvider` and `DataProvider`. This ensures timer callbacks, habit toggles, and modal dialogues can consume sound dispatches without circular dependencies.
+- **Autoplay Policy Handling:** The browser's native `AudioContext` is lazily instantiated and automatically resumed on the first user interaction (touch or click), avoiding browser console autoplay warnings.
+- **Persistence & User Control:**
+  - Volume (default 0.7) and mute state are persisted in `localStorage('vritta-sound-volume')` and `localStorage('vritta-sound-muted')`.
+  - Accessible `SoundControl` toggle in `TopNav` provides instantaneous mute/unmute with screen-reader friendly status.
+
+---
+
+## 8. Resilient Background Timer Subsystem
+
+The timer engine (`web/src/contexts/TimerContext.js` and `web/src/hooks/use-timer.js`) is architected for strict wall-clock accuracy, resilient background tab operation, and seamless recovery across page reloads.
+
+### 8.1 Wall-Clock Timestamp Synchronization
+Unlike naive timer implementations that decrement an interval counter every 1000ms, Vritta strictly derives remaining time from wall-clock timestamps:
+```javascript
+const diffMs = targetEndTime - Date.now();
+const secondsRemaining = Math.max(0, Math.ceil(diffMs / 1000));
+```
+- **Interval Drift Immunity:** Throttling or background tab freezes cannot cause time drift. When the browser resumes, the remaining time instantly recalculates to the exact wall-clock second.
+- **Elimination of `00:01` Stranding:** If `targetEndTime <= Date.now()`, the timer immediately yields `0` seconds and executes completion, preventing timers from freezing at `00:01`.
+
+### 8.2 Web Worker Background Dispatch
+Browser engines aggressively throttle `setInterval` in inactive or minimized background tabs (often to once per minute). Vritta circumvents this via an inline Blob Web Worker (`createTimerWorker` in `web/src/contexts/TimerContext.js`):
+- The Web Worker operates on a separate background thread unaffected by DOM throttling, emitting unthrottled 500ms pulses.
+- In addition to worker pulses, `TimerContext` binds native `focus`, `visibilitychange`, and `pageshow` event listeners to immediately reconcile state whenever the user switches back to the application tab.
+
+### 8.3 Concurrency & Reload Recovery Guarantees
+- **Atomic Completion Guard:** Completion callbacks and sound dispatches are protected by `completedSessionsRef` keyed by `${timerId}_${targetEndTime}` and `finishingTimersRef`. Even if the Web Worker pulse, main thread timeout, and `visibilitychange` fire simultaneously, the completion callback and audio chime execute exactly once.
+- **Silent Reload Recovery:** If a timer session expires while the browser tab was closed or navigating, the session is reconciled on reload. It records the completed duration to Cloud Firestore once `authLoading` resolves, but suppresses the audio chime (`isSilent = true`) to prevent alarming unexpected sound playback upon launch.
+- **Platform Boundaries:** Procedural Web Audio API sound playback requires the browser application process to be running. If the operating system puts the device into deep sleep or terminates the browser process, the timer session accurately self-heals and logs upon the next launch.
+
+---
+
+## 9. Dynamic Analytics Engine & Rest-Day Guarantees
+
+The analytics subsystem (`web/src/app/(protected)/analytics/page.js` and `web/src/hooks/useStreak.js`) translates raw daily logs into clear, actionable rhythm metrics.
+
+### 9.1 Multi-Granular Metrics
+- **Rolling 7-Day View:** Daily completion percentages, active habit tallies, and rest-day indicators.
+- **Rolling 30-Day View:** Monthly consistency score, category distribution chart, and total completed sessions.
+
+### 9.2 Rest-Day Preservation Principle
+A core philosophy of Vritta is guilt-free consistency. Habits scheduled with specific rest periods (e.g., the Sunday recovery day in the 12-Week Movement Plan) are dynamically excluded from the denominator in completion rate calculations:
+- Planned rest days maintain continuity without penalizing user streaks.
+- Rest days are visually distinguished with amber recovery icons rather than incomplete status badges.

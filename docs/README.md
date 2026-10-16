@@ -30,6 +30,9 @@ docs/
 - Two-state theme engine (Light/Dark, zero-flash pre-paint script, Level AAA touch targets).
 - Routine architecture and schedule isolation (foundation routines vs. quarantined personal routines).
 - Cloud Firestore collection schemas and owner-scoped security rules.
+- Interactive sound experience & procedural Web Audio synthesis (`SoundContext`, `audio-chime.js`).
+- Resilient background timer subsystem (wall-clock synchronization, Web Worker dispatch, reload recovery).
+- Dynamic analytics engine (rolling 7-day/30-day views, rest-day streak preservation).
 
 ### 2. [Local Development Guide](development.md)
 *How-To & Developer Reference*
@@ -37,7 +40,7 @@ docs/
 - Step-by-step local setup from a fresh clone.
 - Complete environment variables reference table (client and server scopes).
 - Package scripts reference (`dev`, `build`, `start`, `lint`, `test`, `schedule:fetch-personal`).
-- Automated testing architecture (98 unit and integration tests across 31 suites in `web/tests/`).
+- Automated testing architecture (350+ unit and integration tests across 115+ suites in `web/tests/`).
 - Pre-commit quality gates and troubleshooting common development issues.
 
 ### 3. [Firebase Setup & Operations Runbook](firebase-setup.md)
@@ -56,8 +59,8 @@ docs/
 - Pre-release local verification checklist.
 - Post-deployment verification checklist and instant rollback protocol.
 
-### 5. [Project Roadmap & Outstanding Actions](roadmap.md)
+### 5. [Project Roadmap & Production Readiness](roadmap.md)
 *Planning & Reference*
-- Verified milestone completion summary (Phases 1–7, 11, and 12 complete).
-- Outstanding Action 1: Phase 13 production release execution procedure.
-- Outstanding Action 2: Phase 8 local workspace directory rename procedure (`Regimen` -> `Vritta`).
+- Authoritative milestone completion summary (Phases 1–5, 7, and 8 complete; Phase 6 skipped/reverted).
+- Production release execution runbook (`dev` -> `main` PR, automated Vercel rollout, post-deployment verification).
+- Local workspace alignment and directory hygiene note.

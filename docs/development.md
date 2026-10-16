@@ -98,13 +98,19 @@ npm --prefix web run test
 ```
 
 ### Test Suite Structure
-The test suite consists of 98 unit and integration tests across 31 suites in `web/tests/`:
-- **`brand-assets.test.mjs`:** Asserts Guiding Sutra SVG markup, PWA manifest existence, icons, and theme colors.
+The automated test suite consists of 350+ unit and integration tests across 115+ test suites in `web/tests/`, executing in ~1.5 seconds via the native Node.js test runner (`node --test`).
+
+Key test domains include:
+- **`brand-assets.test.mjs` & `manifest-contract.test.mjs`:** Asserts Guiding Sutra SVG markup, PWA manifest existence, icons, and theme colors.
 - **`categories-contract.test.mjs`:** Validates category definitions, semantic badges, and dark-mode tokens.
-- **`date-helpers.test.mjs`:** Verifies local timezone handling and date calculations.
-- **`default-routine-loading.test.mjs`:** Tests foundation routine seeding and Firestore idempotency.
-- **`phase-4-login-redesign.test.mjs`:** Validates login layout, touch targets, and accessibility.
+- **`date-helpers.test.mjs` & `streak-calculation.test.mjs`:** Verifies local timezone handling, rest-day exclusions, and multi-period streak continuity.
 - **`theme-engine.test.mjs`:** Tests two-state theme toggle, pre-paint blocking script, and legacy `'system'` migration.
+- **`audio-chime.test.mjs` & `sound-context.test.mjs`:** Tests Web Audio API synthesis, frequency parameters, gain envelopes, volume scaling, and mute toggles.
+- **`timer-context.test.mjs` & `use-timer.test.mjs`:** Tests wall-clock deadline derivation, Web Worker ticks, focus/visibility wakeups, single-completion guards, and silent reload recovery.
+- **`habits-contracts.test.mjs` & `routine-seeding.test.mjs`:** Verifies foundation routine loading, personal schedule isolation, and Firestore model validation.
+
+> [!NOTE]
+> Exactly 4 tests in `firestore-integration.test.mjs` are intentionally skipped during local and CI test runs as they require an active live Firestore emulator or cloud credentials.
 
 ---
 
