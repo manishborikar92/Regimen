@@ -178,8 +178,10 @@ describe('SpeakingCard Static Source Code Compliance', () => {
   });
 
   it('should preserve WCAG 2.2 touch target standards (min 44x44px)', () => {
-    assert.ok(content.includes('min-w-[44px]'), 'Toggle button must meet min-w-[44px]');
-    assert.ok(content.includes('min-h-[44px]'), 'Toggle button must meet min-h-[44px]');
+    const has44pxToggle = content.includes('w-11 h-11') ||
+      (content.includes('w-11') && content.includes('h-11')) ||
+      (content.includes('min-w-[44px]') && content.includes('min-h-[44px]'));
+    assert.ok(has44pxToggle, 'Toggle button must meet 44x44px (w-11 h-11)');
   });
 
   it('should implement mobile-responsive textarea font sizing (text-base sm:text-xs)', () => {
