@@ -124,3 +124,117 @@ export function getFrequencyDisplay(frequency) {
 
   return frequency.join(', ');
 }
+
+/**
+ * Computes a standardized numerical sort weight for a habit based on its timing preference.
+ * Priority order (Flexible / Anytime first, followed by daily progression):
+ * 10: Flexible / Anytime
+ * 20: Morning
+ * 30: Afternoon
+ * 40: Evening
+ * 50: Before Bed / Night
+ *
+ * @param {Object} habit
+ * @returns {number}
+ */
+export function getTimingSortWeight(habit) {
+  if (!habit) return 10;
+
+  const timingType = habit.timingType || '';
+  const period = String(habit.preferredPeriod || habit.time || '').toLowerCase();
+  const relative = String(habit.relativeTiming || '').toLowerCase();
+
+  // 1. Flexible / Anytime (Highest priority: First position)
+  if (
+    timingType === 'anytime' ||
+    period === 'flexible' ||
+    (!period && !relative && timingType !== 'exact')
+  ) {
+    return 10;
+  }
+
+  // 2. Before Bed / Night (Relative or Night period)
+  if (
+    relative.includes('bed') ||
+    period.includes('bed') ||
+    period.includes('night') ||
+    relative.includes('night')
+  ) {
+    return 50;
+  }
+
+  // 3. Morning
+  if (
+    period.includes('morning') ||
+    relative.includes('waking') ||
+    relative.includes('breakfast')
+  ) {
+    return 20;
+  }
+
+  // 4. Afternoon
+  if (
+    period.includes('afternoon') ||
+    period.includes('midday') ||
+    relative.includes('lunch')
+  ) {
+    return 30;
+  }
+
+  // 5. Evening
+  if (
+    period.includes('evening') ||
+    relative.includes('evening') ||
+    relative.includes('wind-down') ||
+    relative.includes('dinner')
+  ) {
+    return 40;
+  }
+
+  // 6. Exact time parsing
+  if (timingType === 'exact' && habit.time) {
+    const timeStr = String(habit.time).toUpperCase().trim();
+    if (timeStr.includes('AM')) {
+      const match = timeStr.match(/^(\d{1,2})/);
+      const hour = match ? parseInt(match[1], 10) : 8;
+      if (hour === 12) return 50;
+      return 20;
+    }
+    if (timeStr.includes('PM')) {
+      const match = timeStr.match(/^(\d{1,2})/);
+      const hour = match ? parseInt(match[1], 10) : 12;
+      if (hour === 12 || hour < 5) return 30;
+      if (hour < 9) return 40;
+      return 50;
+    }
+  }
+
+  // 7. Default: Flexible / Anytime
+  return 10;
+}
+
+/**
+ * Predictably sort an array of habits based on natural daily timing,
+ * with stable secondary tie-breaker on existing order, then title.
+ *
+ * @param {Object} a
+ * @param {Object} b
+ * @returns {number}
+ */
+export function sortHabitsByTiming(a, b) {
+  const weightA = getTimingSortWeight(a);
+  const weightB = getTimingSortWeight(b);
+
+  if (weightA !== weightB) {
+    return weightA - weightB;
+  }
+
+  // Preserve existing order as a secondary tie-breaker if present and different
+  const orderA = typeof a.order === 'number' ? a.order : 99;
+  const orderB = typeof b.order === 'number' ? b.order : 99;
+  if (orderA !== orderB) {
+    return orderA - orderB;
+  }
+
+  return (a.title || '').localeCompare(b.title || '');
+}

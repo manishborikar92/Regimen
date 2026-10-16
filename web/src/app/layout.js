@@ -3,6 +3,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { DataProvider } from "@/contexts/DataContext";
+import { SoundProvider } from "@/contexts/SoundContext";
+import { TimerProvider } from "@/contexts/TimerContext";
 import { ToastProvider } from "@/contexts/ToastContext";
 import { BRAND } from "@/lib/constants/brand";
 
@@ -50,9 +52,13 @@ export default function RootLayout({ children }) {
         <ThemeProvider>
           <AuthProvider>
             <DataProvider>
-              <ToastProvider>
-                {children}
-              </ToastProvider>
+              <SoundProvider>
+                <TimerProvider>
+                  <ToastProvider>
+                    {children}
+                  </ToastProvider>
+                </TimerProvider>
+              </SoundProvider>
             </DataProvider>
           </AuthProvider>
         </ThemeProvider>

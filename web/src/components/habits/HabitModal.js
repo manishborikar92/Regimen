@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { X, Trash2, Clock, CheckCircle2, ListChecks, Info, Sparkles, Sunrise, Moon } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { X, Trash2, Clock, Info, Sparkles, Sunrise, Moon, ChevronUp, ChevronDown } from 'lucide-react';
 import { CATEGORIES } from '@/lib/constants/categories';
+import { normalizeChecklistItems } from '@/utils/checklist-helpers';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -13,15 +14,25 @@ const TIMING_TYPES = [
   { id: 'exact', label: 'Exact Time', description: 'Suggested target', icon: Clock },
 ];
 
-const COMPLETION_METHODS = [
-  { id: 'simple', label: 'Simple Checkmark' },
-  { id: 'workbook_sessions', label: 'Two-Session Workbook Counter' },
-  { id: 'exercise_plan', label: 'Structured Movement & Safety Routine' },
-  { id: 'osho_listening', label: 'Discourse Listening Session' },
-  { id: 'reading_duration', label: 'Reading Duration Target' },
-  { id: 'diary_entry', label: 'Private Journal / Reflection' },
-  { id: 'checklist', label: 'Custom Step Checklist' },
+const GENERIC_COMPLETION_STYLES = [
+  { id: 'simple', label: 'Standard Check-off', description: 'One tap to mark as completed' },
+  { id: 'checklist', label: 'Step-by-Step Checklist', description: 'List of steps or sub-tasks to guide your routine' },
+  { id: 'diary_entry', label: 'Reflection & Notes', description: 'Private journal note with guided prompts' },
 ];
+
+import {
+  READING_DURATION_PRESETS,
+  DEFAULT_READING_DURATION,
+  getReadingTargetMinutes,
+} from '@/utils/reading-helpers';
+
+const SPECIALIZED_COMPLETION_STYLES = {
+  workbook_sessions: { label: 'Specialized: Two-Session Workbook Counter', description: 'Word Power Made Easy 2-session tracker' },
+  exercise_plan: { label: 'Specialized: Structured Movement Plan', description: '12-week progressive movement schedule' },
+  osho_listening: { label: 'Specialized: Discourse Listening Session', description: '30-discourse audio library catalog' },
+  reading_duration: { label: 'Specialized: Reading Duration Target', description: 'Configurable reading timer session' },
+  simple_with_notes: { label: 'Specialized: Speaking Practice with Notes', description: 'Conversational practice with autosaving notes' },
+};
 
 export default function HabitModal({ habit, onSave, onClose, onDelete }) {
   const [formData, setFormData] = useState({
@@ -35,9 +46,22 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
     instructions: '',
     frequency: [...DAYS],
     checklistItems: [],
-    order: 1,
+    targetMinutes: getReadingTargetMinutes(habit),
+    order: habit?.order || 99,
     stableKey: null,
   });
+
+  const availableMethods = useMemo(() => {
+    const list = [...GENERIC_COMPLETION_STYLES];
+    const currentMethod = habit?.completionMethod;
+    if (currentMethod && SPECIALIZED_COMPLETION_STYLES[currentMethod]) {
+      list.unshift({
+        id: currentMethod,
+        ...SPECIALIZED_COMPLETION_STYLES[currentMethod],
+      });
+    }
+    return list;
+  }, [habit?.completionMethod]);
 
   const [newChecklistItem, setNewChecklistItem] = useState('');
   const [saving, setSaving] = useState(false);
@@ -55,7 +79,8 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
         time: habit.time || 'Flexible',
         instructions: habit.instructions || '',
         frequency: habit.frequency || [...DAYS],
-        checklistItems: habit.checklistItems || [],
+        checklistItems: normalizeChecklistItems(habit.checklistItems),
+        targetMinutes: getReadingTargetMinutes(habit),
         order: habit.order || 1,
         stableKey: habit.stableKey || null,
       });
@@ -71,9 +96,6 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
     }
     if (formData.frequency.length === 0) {
       newErrors.frequency = 'Select at least one active day';
-    }
-    if (formData.order < 1) {
-      newErrors.order = 'Order must be at least 1';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -93,9 +115,16 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
       displayTime = formData.time || '08:00 AM';
     }
 
+    const targetMinutes = parseInt(formData.targetMinutes, 10) || DEFAULT_READING_DURATION;
+    const cleanMetadata = { ...(habit?.metadata || {}) };
+    delete cleanMetadata.targetMinutes;
+
     const payload = {
       ...formData,
       time: displayTime,
+      targetMinutes,
+      checklistItems: normalizeChecklistItems(formData.checklistItems),
+      metadata: cleanMetadata,
     };
 
     setSaving(true);
@@ -117,11 +146,30 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
 
   const addChecklistItem = () => {
     if (!newChecklistItem.trim()) return;
+    const stableId = `step_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     setFormData(prev => ({
       ...prev,
-      checklistItems: [...prev.checklistItems, { label: newChecklistItem.trim() }],
+      checklistItems: [...prev.checklistItems, { id: stableId, label: newChecklistItem.trim() }],
     }));
     setNewChecklistItem('');
+  };
+
+  const updateChecklistItemLabel = (index, newLabel) => {
+    setFormData(prev => ({
+      ...prev,
+      checklistItems: prev.checklistItems.map((item, i) =>
+        i === index ? { ...item, label: newLabel } : item
+      ),
+    }));
+  };
+
+  const moveChecklistItem = (index, direction) => {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= formData.checklistItems.length) return;
+    const items = [...formData.checklistItems];
+    const [moved] = items.splice(index, 1);
+    items.splice(targetIndex, 0, moved);
+    setFormData(prev => ({ ...prev, checklistItems: items }));
   };
 
   const removeChecklistItem = (index) => {
@@ -191,21 +239,52 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
               </select>
             </div>
 
-            {/* Completion Method */}
+            {/* Completion Style */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Tracking / Completion Method
+                How to Complete
               </label>
               <select
                 value={formData.completionMethod}
                 onChange={(e) => setFormData(prev => ({ ...prev, completionMethod: e.target.value }))}
                 className="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl text-base sm:text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
               >
-                {COMPLETION_METHODS.map(m => (
+                {availableMethods.map(m => (
                   <option key={m.id} value={m.id}>{m.label}</option>
                 ))}
               </select>
+              <p className="text-2xs text-muted mt-1">
+                {formData.completionMethod === 'simple' && 'Quick checkmark to mark this routine done today.'}
+                {formData.completionMethod === 'checklist' && 'Break this routine down into clear sub-steps.'}
+                {formData.completionMethod === 'diary_entry' && 'Opens a private reflection note and reflection prompts.'}
+                {SPECIALIZED_COMPLETION_STYLES[formData.completionMethod]?.description}
+              </p>
             </div>
+
+            {/* Target Duration Configuration for Specialized Reading Timer */}
+            {formData.completionMethod === 'reading_duration' && (
+              <div className="p-3 sm:p-3.5 bg-surface-subtle dark:bg-slate-800/40 rounded-xl border border-subtle dark:border-slate-700/80 space-y-2">
+                <label className="block text-xs font-semibold text-main">
+                  Target Reading Duration
+                </label>
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  {READING_DURATION_PRESETS.map((mins) => (
+                    <button
+                      key={mins}
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, targetMinutes: mins }))}
+                      className={`min-h-[38px] px-2.5 py-1 text-xs rounded-lg font-medium border transition-colors ${
+                        Number(formData.targetMinutes) === mins
+                          ? 'bg-teal-700 dark:bg-teal-600 text-white border-teal-700 dark:border-teal-600 font-semibold shadow-2xs'
+                          : 'bg-surface dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-subtle dark:border-slate-700 hover:bg-surface-subtle'
+                      }`}
+                    >
+                      {mins} min
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Timing Preference Model (Compact 2x2 Responsive Architecture) */}
             <div className="p-3 sm:p-3.5 bg-surface-subtle dark:bg-slate-800/40 rounded-xl border border-subtle dark:border-slate-700/80 space-y-2.5">
@@ -379,16 +458,49 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
                 </label>
                 <div className="space-y-1.5">
                   {formData.checklistItems.map((item, index) => (
-                    <div key={index} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
-                      <span className="flex-1 text-xs text-slate-800 dark:text-slate-200">{item.label}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeChecklistItem(index)}
-                        className="text-rose-500 hover:text-rose-700 p-1 min-w-[32px] min-h-[32px] flex items-center justify-center"
-                        aria-label="Remove item"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                    <div
+                      key={item.id || index}
+                      className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/80 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700"
+                    >
+                      <span className="text-2xs font-bold text-slate-400 w-4 text-center select-none flex-shrink-0">
+                        {index + 1}.
+                      </span>
+                      <input
+                        type="text"
+                        value={item.label}
+                        onChange={(e) => updateChecklistItemLabel(index, e.target.value)}
+                        className="flex-1 text-xs bg-transparent text-slate-800 dark:text-slate-200 border-0 focus:outline-none focus:ring-1 focus:ring-teal-500 rounded px-1.5 py-1"
+                        placeholder="Step description..."
+                        aria-label={`Step ${index + 1} description`}
+                      />
+                      <div className="flex items-center gap-0.5 flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => moveChecklistItem(index, -1)}
+                          disabled={index === 0}
+                          className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed rounded"
+                          aria-label={`Move step ${index + 1} up`}
+                        >
+                          <ChevronUp className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveChecklistItem(index, 1)}
+                          disabled={index === formData.checklistItems.length - 1}
+                          className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed rounded"
+                          aria-label={`Move step ${index + 1} down`}
+                        >
+                          <ChevronDown className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeChecklistItem(index)}
+                          className="w-7 h-7 flex items-center justify-center text-rose-500 hover:text-rose-700 rounded"
+                          aria-label={`Remove step ${index + 1}`}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   ))}
 
@@ -417,18 +529,6 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
                 </div>
               </div>
             )}
-
-            {/* Display Order */}
-            <div className="flex items-center justify-between pt-1">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Display Order</label>
-              <input
-                type="number"
-                value={formData.order}
-                onChange={(e) => setFormData(prev => ({ ...prev, order: parseInt(e.target.value) || 1 }))}
-                min={1}
-                className="w-20 px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-base sm:text-xs text-center font-bold bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-              />
-            </div>
           </div>
 
           {/* Sticky Modal Action Bar */}

@@ -10,7 +10,7 @@ import {
     seedHabitsForUser,
 } from '@/lib/firebase/firestore';
 import { DEFAULT_ROUTINES } from '@/lib/seed-data';
-import { getDayOfWeek } from '@/utils/date-helpers';
+import { getDayOfWeek, sortHabitsByTiming } from '@/utils/date-helpers';
 
 /**
  * Hook for managing habits — CRUD operations, real-time sync, and idempotent seeding.
@@ -46,8 +46,8 @@ export function useHabits(user) {
                     ...data,
                 };
             });
-            // Sort primarily by order, then by title
-            habitsData.sort((a, b) => (a.order || 99) - (b.order || 99));
+            // Predictable, automatic ordering based on daily timing rhythm
+            habitsData.sort(sortHabitsByTiming);
             setHabits(habitsData);
             setLoading(false);
         }, (err) => {

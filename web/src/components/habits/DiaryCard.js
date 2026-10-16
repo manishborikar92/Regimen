@@ -104,10 +104,10 @@ function DiaryCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProgre
 
           {isEditorOpen && (
             <div className="mt-2 p-3 sm:p-3.5 bg-rose-50/40 dark:bg-rose-950/30 rounded-xl border border-rose-200/70 dark:border-rose-900/40 space-y-3">
-              {/* Optional Reflection Prompts */}
+              {/* Reflection Prompts */}
               <div>
                 <span className="text-2xs font-bold text-rose-900 dark:text-rose-200 uppercase tracking-wider block mb-1.5">
-                  Optional Reflection Prompts (tap to insert):
+                  Reflection Prompts (tap to insert):
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {PROMPTS.map((prompt, idx) => (

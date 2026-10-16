@@ -11,7 +11,7 @@ describe('Diary Privacy & Scoping Integrity', () => {
     assert.equal(diaryHabit.metadata?.isPrivateJournal, true);
   });
 
-  it('should include the 5 specified optional reflection prompts in diary metadata', () => {
+  it('should include the 5 specified reflection prompts in diary metadata', () => {
     const diaryHabit = CANONICAL_ROUTINES.find(r => r.stableKey === 'canonical_maintain_diary');
     const prompts = diaryHabit.metadata?.reflectivePrompts || [];
 

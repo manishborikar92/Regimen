@@ -67,6 +67,12 @@ export async function syncPersonalSchedule(userId) {
 
     if (existing) {
       // Reconcile system metadata while strictly preserving user customizations
+      const cleanMetadata = {
+        ...routine.metadata,
+        ...(existing.metadata || {}),
+      };
+      delete cleanMetadata.targetMinutes;
+
       const updatedData = {
         id: docId,
         stableKey: routine.stableKey,
@@ -88,22 +94,37 @@ export async function syncPersonalSchedule(userId) {
         checklistItems: Array.isArray(existing.checklistItems) && existing.checklistItems.length > 0
           ? existing.checklistItems
           : routine.checklistItems,
-        metadata: {
-          ...routine.metadata,
-          ...(existing.metadata || {}),
-        },
+        metadata: cleanMetadata,
       };
+
+      if (routine.completionMethod === 'reading_duration' || routine.stableKey === 'canonical_read_books') {
+        const existingMinutes = existing.targetMinutes !== undefined && existing.targetMinutes !== null
+          ? Number(existing.targetMinutes)
+          : (existing.metadata?.targetMinutes !== undefined ? Number(existing.metadata.targetMinutes) : null);
+
+        updatedData.targetMinutes = Number.isFinite(existingMinutes) && existingMinutes > 0
+          ? Math.round(existingMinutes)
+          : (routine.targetMinutes || 30);
+      }
 
       batch.set(docRef, updatedData, { merge: true });
     } else {
+      const cleanMetadata = { ...(routine.metadata || {}) };
+      delete cleanMetadata.targetMinutes;
+
       const newData = {
         ...routine,
         id: docId,
         userId,
         seedOrigin: 'personal_preset',
+        metadata: cleanMetadata,
         createdAt: now,
         updatedAt: now,
       };
+
+      if (routine.completionMethod === 'reading_duration' || routine.stableKey === 'canonical_read_books') {
+        newData.targetMinutes = routine.targetMinutes || 30;
+      }
 
       batch.set(docRef, newData, { merge: true });
     }

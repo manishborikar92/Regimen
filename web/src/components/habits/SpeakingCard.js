@@ -153,7 +153,7 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
           </div>
         </div>
 
-        {/* Optional Notes Toggle & Area */}
+        {/* Notes Toggle & Area */}
         <div className="mt-2.5 pt-2 border-t border-subtle">
           <button
             type="button"
@@ -161,7 +161,7 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
             className="py-2 flex items-center gap-1.5 text-xs font-semibold text-sky-700 dark:text-sky-400 hover:text-sky-900 dark:hover:text-sky-300 transition-colors"
           >
             <PenLine className="w-3.5 h-3.5" />
-            <span>{showNotes ? 'Hide conversation notes' : 'Add conversation topics / notes (optional)'}</span>
+            <span>{showNotes ? 'Hide conversation notes' : 'Add conversation topics / notes'}</span>
           </button>
 
           {showNotes && (

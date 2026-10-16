@@ -134,8 +134,8 @@ export const MANISH_PERSONAL_ROUTINES = [
     order: 4,
     isSystemSeed: true,
     seedOrigin: 'personal_preset',
+    targetMinutes: 30,
     metadata: {
-      targetMinutes: 30,
       context: 'Before going to sleep',
     },
     instructions:
@@ -190,7 +190,7 @@ export const MANISH_PERSONAL_ROUTINES = [
       ],
     },
     instructions:
-      'Write in your personal diary about what you learned and your personal thoughts. Private to your account. Optional reflection prompts are provided in the journal view.',
+      'Write in your personal diary about what you learned and your personal thoughts. Private to your account. Reflection prompts are provided in the journal view.',
     checklistItems: [],
   },
 ];

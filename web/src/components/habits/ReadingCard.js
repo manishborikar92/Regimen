@@ -1,59 +1,65 @@
 'use client';
 
-import { useState, useEffect, useRef, memo } from 'react';
+import { memo } from 'react';
 import { BookMarked, Check, Clock, Moon, Play, Pause, RotateCcw } from 'lucide-react';
 import { getCategoryConfig } from '@/lib/constants/categories';
+import { getTimingDisplay } from '@/utils/date-helpers';
+import { useTimer } from '@/hooks/use-timer';
+import { getReadingTargetMinutes } from '@/utils/reading-helpers';
 
-const TARGET_SECONDS = 30 * 60; // 30 minutes
-
+/**
+ * ReadingCard — Specialized reading & focus timer card.
+ *
+ * Implements:
+ * - Authoritative duration configured via HabitModal (15-60 min)
+ * - Background-resilient countdown using absolute end timestamps (immune to tab throttling)
+ * - Navigation & page reload persistence (survives route switches and refreshes)
+ * - Gentle Web Audio API harmonic completion chime
+ * - Non-intrusive HTML5 browser notifications on background completion
+ * - Granular duration progress recording to Firestore daily logs
+ * - WCAG 2.2 compliant touch targets and zero prohibited colors
+ */
 function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProgress }) {
-  const [timerActive, setTimerActive] = useState(false);
-  const [secondsRemaining, setSecondsRemaining] = useState(TARGET_SECONDS);
-  const timerRef = useRef(null);
-
   const config = getCategoryConfig(habit.category);
+  const timingText = getTimingDisplay(habit);
+  const isNightTiming = timingText.toLowerCase().includes('bed') || timingText.toLowerCase().includes('night');
 
-  // Clean timer on unmount
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, []);
+  const targetMinutes = getReadingTargetMinutes(habit);
+
+  const {
+    targetSeconds,
+    secondsRemaining,
+    timerActive,
+    isPaused,
+    progressPercent,
+    timeFormatted,
+    startTimer,
+    pauseTimer,
+    resetTimer,
+  } = useTimer({
+    habitId: habit.id,
+    initialTargetMinutes: targetMinutes,
+    isCompleted,
+    onComplete: ({ durationMinutes }) => {
+      if (onUpdateProgress) {
+        onUpdateProgress(habit.id, { durationMinutes }, true);
+      } else if (!isCompleted && onToggle) {
+        onToggle(habit.id);
+      }
+    },
+  });
 
   const handleStartTimer = () => {
     if (timerActive) {
-      clearInterval(timerRef.current);
-      setTimerActive(false);
+      pauseTimer();
     } else {
-      setTimerActive(true);
-      timerRef.current = setInterval(() => {
-        setSecondsRemaining((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current);
-            setTimerActive(false);
-            // Auto complete on timer finish
-            if (!isCompleted) {
-              onToggle(habit.id);
-            }
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+      startTimer();
     }
   };
 
   const handleResetTimer = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    setTimerActive(false);
-    setSecondsRemaining(TARGET_SECONDS);
+    resetTimer();
   };
-
-  const minutes = Math.floor(secondsRemaining / 60);
-  const seconds = secondsRemaining % 60;
-  const timeFormatted = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  const elapsedSeconds = TARGET_SECONDS - secondsRemaining;
-  const progressPercent = Math.min(100, Math.max(0, Math.round((elapsedSeconds / TARGET_SECONDS) * 100)));
 
   return (
     <div
@@ -72,8 +78,12 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
                 {habit.category}
               </span>
               <span className="flex items-center gap-1 text-2xs sm:text-xs text-teal-800 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/60 px-2 py-0.5 rounded-md font-medium">
-                <Moon className="w-3 h-3 text-teal-600 dark:text-teal-400" />
-                Before Bed
+                {isNightTiming ? (
+                  <Moon className="w-3 h-3 text-teal-600 dark:text-teal-400" />
+                ) : (
+                  <Clock className="w-3 h-3 text-teal-600 dark:text-teal-400" />
+                )}
+                {timingText}
               </span>
             </div>
 
@@ -83,7 +93,7 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
             </h3>
 
             <p className="text-xs text-sub mt-0.5 leading-relaxed">
-              30 minutes target • Read before sleep
+              {targetMinutes} minutes target • {habit.instructions || 'Read before sleep'}
             </p>
           </div>
 
@@ -104,14 +114,15 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
           </div>
         </div>
 
-        {/* 30-Minute Timer Panel (Structured Mobile-First Layout) */}
+        {/* Dynamic Timer Panel (Structured Mobile-First Layout) */}
         <div className="mt-3 p-3 sm:p-3.5 bg-surface-subtle dark:bg-slate-900/40 rounded-xl border border-subtle space-y-2.5">
           {/* Header Row: Target duration & State badge */}
           <div className="flex items-center justify-between text-2xs">
             <div className="flex items-center gap-1.5 font-semibold text-muted uppercase tracking-wider">
               <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-              <span>30-Min Target</span>
+              <span>{targetMinutes}-Min Target</span>
             </div>
+
             <div className="flex items-center gap-2">
               {progressPercent > 0 && (
                 <span className="font-mono text-2xs text-muted font-medium">
@@ -124,12 +135,12 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
                     ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
                     : timerActive
                     ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-                    : secondsRemaining < TARGET_SECONDS
+                    : isPaused || secondsRemaining < targetSeconds
                     ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800'
                     : 'bg-surface text-muted border-subtle'
                 }`}
               >
-                {isCompleted ? 'Completed' : timerActive ? 'Active' : secondsRemaining < TARGET_SECONDS ? 'Paused' : 'Ready'}
+                {isCompleted ? 'Completed' : timerActive ? 'Active' : (isPaused || secondsRemaining < targetSeconds) ? 'Paused' : 'Ready'}
               </span>
             </div>
           </div>
@@ -149,7 +160,7 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
                 {timeFormatted}
               </span>
               <span className="text-2xs text-muted font-medium truncate">
-                {timerActive ? 'remaining' : secondsRemaining < TARGET_SECONDS ? 'paused' : 'target'}
+                {timerActive ? 'remaining' : (isPaused || secondsRemaining < targetSeconds) ? 'paused' : 'target'}
               </span>
             </div>
 
@@ -160,8 +171,6 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
                 className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition-colors whitespace-nowrap shadow-2xs ${
                   timerActive
                     ? 'bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-200 hover:bg-amber-200 dark:hover:bg-amber-900 border border-amber-300/80 dark:border-amber-800/80'
-                    : secondsRemaining < TARGET_SECONDS
-                    ? 'bg-teal-700 dark:bg-teal-600 text-white hover:bg-teal-800 dark:hover:bg-teal-500'
                     : 'bg-teal-700 dark:bg-teal-600 text-white hover:bg-teal-800 dark:hover:bg-teal-500'
                 }`}
               >
@@ -169,7 +178,7 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
                   <>
                     <Pause className="w-4 h-4" /> <span>Pause</span>
                   </>
-                ) : secondsRemaining < TARGET_SECONDS ? (
+                ) : isPaused || secondsRemaining < targetSeconds ? (
                   <>
                     <Play className="w-4 h-4 fill-current" /> <span>Resume</span>
                   </>
@@ -183,7 +192,7 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
               <button
                 type="button"
                 onClick={handleResetTimer}
-                disabled={secondsRemaining === TARGET_SECONDS && !timerActive}
+                disabled={secondsRemaining === targetSeconds && !timerActive}
                 className="w-11 h-11 rounded-xl text-muted hover:text-main bg-surface border border-subtle hover:bg-surface-subtle flex items-center justify-center transition-colors disabled:opacity-35 disabled:hover:bg-surface disabled:hover:text-muted"
                 title="Reset Timer"
                 aria-label="Reset Timer"
