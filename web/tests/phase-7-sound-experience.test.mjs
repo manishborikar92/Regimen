@@ -336,7 +336,7 @@ describe('Phase 7: Interactive Sound Experience & Audio Polish', () => {
       assert.ok(navContent.includes('useSound'), 'BottomNav must import useSound');
       assert.ok(navContent.includes('playTabSwitchCue'), 'BottomNav must call playTabSwitchCue');
       assert.ok(
-        navContent.includes('pathname !== href'),
+        navContent.includes('!isRouteActive(pathname, href)') || navContent.includes('pathname !== href'),
         'BottomNav must guard navigation cue so only genuine destination switches play sound'
       );
     });
@@ -427,5 +427,309 @@ describe('Phase 7: Interactive Sound Experience & Audio Polish', () => {
       assert.ok(soundPos < themePos, 'SoundControl must be positioned next to ThemeToggle in header');
     });
   });
+
+  describe('8. Targeted Sound Additions: Osho Stepper, Active Series & Movement 12-Week Plan', () => {
+    it('should verify OshoLibraryModal implements talk progress decrement/increment cues and boundary silence', () => {
+      const modalContent = readWebFile('src/components/habits/OshoLibraryModal.js');
+
+      assert.ok(
+        modalContent.includes('playStepToggleCue'),
+        'OshoLibraryModal must import/destructure playStepToggleCue from useSound'
+      );
+      assert.ok(
+        modalContent.includes('handleDecrementTalk') &&
+        modalContent.includes('playStepToggleCue?.(false);'),
+        'handleDecrementTalk must dispatch playStepToggleCue(false)'
+      );
+      assert.ok(
+        modalContent.includes('handleIncrementTalk') &&
+        modalContent.includes('playStepToggleCue?.(true);'),
+        'handleIncrementTalk must dispatch playStepToggleCue(true)'
+      );
+      assert.ok(
+        modalContent.includes('disabled={progress.completedTalks <= 0}'),
+        'Decrement button must be disabled at boundary (completedTalks <= 0)'
+      );
+      assert.ok(
+        modalContent.includes('progress.completedTalks >= item.talkCount'),
+        'Increment button must be disabled when item.talkCount limit is reached'
+      );
+    });
+
+    it('should verify OshoLibraryModal Set as Active series plays playActionSuccessCue only after genuine successful change', () => {
+      const modalContent = readWebFile('src/components/habits/OshoLibraryModal.js');
+
+      assert.ok(
+        modalContent.includes('playActionSuccessCue'),
+        'OshoLibraryModal must import/destructure playActionSuccessCue from useSound'
+      );
+      assert.ok(
+        modalContent.includes('if (!seriesId || seriesId === currentSeriesId'),
+        'handleSelectSeries must guard against already-active or empty seriesId'
+      );
+      assert.ok(
+        modalContent.includes('activatingRef.current'),
+        'handleSelectSeries must guard against concurrent double-click invocations'
+      );
+      assert.ok(
+        modalContent.includes('await onSelectSeries(seriesId);') &&
+        modalContent.includes('playActionSuccessCue?.();'),
+        'handleSelectSeries must await onSelectSeries and dispatch playActionSuccessCue upon success'
+      );
+      assert.ok(
+        modalContent.indexOf('await onSelectSeries') < modalContent.indexOf('playActionSuccessCue?.();'),
+        'playActionSuccessCue must be placed after successful await onSelectSeries'
+      );
+      assert.ok(
+        !modalContent.includes('catch (err) {\n      playActionSuccessCue'),
+        'Catch block must not dispatch success cues'
+      );
+      assert.ok(
+        modalContent.includes('disabled={isCurrent || activatingSeriesId === item.id}'),
+        'Button must be disabled when series is already current or activating'
+      );
+    });
+
+    it('should verify MovementCard Start 12-Week Plan plays playActionSuccessCue only after genuine activation', () => {
+      const cardContent = readWebFile('src/components/habits/MovementCard.js');
+
+      assert.ok(
+        cardContent.includes('playActionSuccessCue'),
+        'MovementCard must import/destructure playActionSuccessCue from useSound'
+      );
+      assert.ok(
+        cardContent.includes('if (exercisePlanState?.activated || activatingPlanRef.current'),
+        'handleActivatePlan must guard against already-activated or concurrent activations'
+      );
+      assert.ok(
+        cardContent.includes('await onUpdateProfile({') &&
+        cardContent.includes('playActionSuccessCue?.();'),
+        'handleActivatePlan must await onUpdateProfile and dispatch playActionSuccessCue upon success'
+      );
+      assert.ok(
+        cardContent.indexOf('await onUpdateProfile') < cardContent.indexOf('playActionSuccessCue?.();'),
+        'playActionSuccessCue must be placed after successful await onUpdateProfile'
+      );
+      assert.ok(
+        !cardContent.includes('catch (err) {\n      playActionSuccessCue'),
+        'Catch block must not dispatch success cues'
+      );
+      assert.ok(
+        cardContent.includes('disabled={isActivatingPlan || exercisePlanState.activated}'),
+        'Start 12-Week Plan button must be disabled when already activated or in-flight'
+      );
+      assert.ok(
+        cardContent.includes('onClick={() => setShowSafetyModal(true)}'),
+        'Opening safety modal must remain independent and silent'
+      );
+    });
+
+    it('should simulate functional runtime behavior for Osho talk counter boundaries and no-ops', () => {
+      let updatedTalks = null;
+      let soundCueCalled = null;
+
+      const mockUpdate = (seriesId, count) => {
+        updatedTalks = count;
+      };
+      const mockPlayStepToggleCue = (isChecked) => {
+        soundCueCalled = isChecked;
+      };
+
+      // Helper simulating handleDecrementTalk logic
+      const simulateDecrement = (item, currentTalks) => {
+        const current = typeof currentTalks === 'number' ? currentTalks : 0;
+        if (current <= 0) return false;
+        const nextVal = Math.max(0, current - 1);
+        if (nextVal < current) {
+          mockUpdate(item.id, nextVal);
+          mockPlayStepToggleCue(false);
+          return true;
+        }
+        return false;
+      };
+
+      // Helper simulating handleIncrementTalk logic
+      const simulateIncrement = (item, currentTalks) => {
+        const current = typeof currentTalks === 'number' ? currentTalks : 0;
+        const maxTalks = typeof item.talkCount === 'number' ? item.talkCount : Infinity;
+        if (current >= maxTalks) return false;
+        const nextVal = current + 1;
+        if (nextVal > current) {
+          mockUpdate(item.id, nextVal);
+          mockPlayStepToggleCue(true);
+          return true;
+        }
+        return false;
+      };
+
+      // 1. Normal decrement
+      updatedTalks = null;
+      soundCueCalled = null;
+      const decResult = simulateDecrement({ id: 'osho_01', talkCount: 15 }, 4);
+      assert.equal(decResult, true);
+      assert.equal(updatedTalks, 3);
+      assert.equal(soundCueCalled, false);
+
+      // 2. Decrement at lower boundary (0) -> NO sound, NO update
+      updatedTalks = null;
+      soundCueCalled = null;
+      const decBoundResult = simulateDecrement({ id: 'osho_01', talkCount: 15 }, 0);
+      assert.equal(decBoundResult, false);
+      assert.equal(updatedTalks, null);
+      assert.equal(soundCueCalled, null);
+
+      // 3. Normal increment
+      updatedTalks = null;
+      soundCueCalled = null;
+      const incResult = simulateIncrement({ id: 'osho_01', talkCount: 15 }, 14);
+      assert.equal(incResult, true);
+      assert.equal(updatedTalks, 15);
+      assert.equal(soundCueCalled, true);
+
+      // 4. Increment at upper boundary (talkCount limit reached) -> NO sound, NO update
+      updatedTalks = null;
+      soundCueCalled = null;
+      const incBoundResult = simulateIncrement({ id: 'osho_01', talkCount: 15 }, 15);
+      assert.equal(incBoundResult, false);
+      assert.equal(updatedTalks, null);
+      assert.equal(soundCueCalled, null);
+
+      // 5. Increment on series with null talkCount (compilations) -> allows increment
+      updatedTalks = null;
+      soundCueCalled = null;
+      const incNullResult = simulateIncrement({ id: 'osho_comp', talkCount: null }, 20);
+      assert.equal(incNullResult, true);
+      assert.equal(updatedTalks, 21);
+      assert.equal(soundCueCalled, true);
+    });
+
+    it('should simulate functional runtime behavior for active series selection, error handling and duplicate prevention', async () => {
+      let cueCount = 0;
+      let activatingRef = { current: false };
+
+      const mockPlayActionSuccess = () => {
+        cueCount++;
+      };
+
+      const simulateSelectSeries = async (seriesId, currentSeriesId, onSelectSeries) => {
+        if (!seriesId || seriesId === currentSeriesId || activatingRef.current || !onSelectSeries) {
+          return false;
+        }
+        activatingRef.current = true;
+        try {
+          await onSelectSeries(seriesId);
+          mockPlayActionSuccess();
+          return true;
+        } catch (err) {
+          // error swallowed
+          return false;
+        } finally {
+          activatingRef.current = false;
+        }
+      };
+
+      // 1. Successful change
+      cueCount = 0;
+      const res1 = await simulateSelectSeries('osho_02', 'osho_01', async () => {});
+      assert.equal(res1, true);
+      assert.equal(cueCount, 1);
+
+      // 2. Already active series -> NO-OP, NO sound
+      cueCount = 0;
+      const res2 = await simulateSelectSeries('osho_01', 'osho_01', async () => {});
+      assert.equal(res2, false);
+      assert.equal(cueCount, 0);
+
+      // 3. Failed operation -> caught, NO sound
+      cueCount = 0;
+      const res3 = await simulateSelectSeries('osho_03', 'osho_01', async () => {
+        throw new Error('Network error');
+      });
+      assert.equal(res3, false);
+      assert.equal(cueCount, 0);
+
+      // 4. Duplicate rapid double call -> second call blocked while in flight
+      cueCount = 0;
+      let resolveFirst;
+      const slowPromise = new Promise(resolve => { resolveFirst = resolve; });
+      const firstCall = simulateSelectSeries('osho_04', 'osho_01', () => slowPromise);
+      const secondCall = simulateSelectSeries('osho_04', 'osho_01', () => slowPromise);
+
+      assert.equal(await secondCall, false); // blocked by activatingRef
+      resolveFirst();
+      assert.equal(await firstCall, true);
+      assert.equal(cueCount, 1); // exactly one sound dispatched
+    });
+
+    it('should simulate functional runtime behavior for 12-week plan activation and duplicate prevention', async () => {
+      let cueCount = 0;
+      let activatingPlanRef = { current: false };
+
+      const mockPlayActionSuccess = () => {
+        cueCount++;
+      };
+
+      const simulateActivatePlan = async (isAlreadyActive, onUpdateProfile) => {
+        if (isAlreadyActive || activatingPlanRef.current || !onUpdateProfile) return false;
+        activatingPlanRef.current = true;
+        try {
+          await onUpdateProfile();
+          mockPlayActionSuccess();
+          return true;
+        } catch (err) {
+          return false;
+        } finally {
+          activatingPlanRef.current = false;
+        }
+      };
+
+      // 1. Genuine activation
+      cueCount = 0;
+      const res1 = await simulateActivatePlan(false, async () => {});
+      assert.equal(res1, true);
+      assert.equal(cueCount, 1);
+
+      // 2. Already active plan -> NO sound
+      cueCount = 0;
+      const res2 = await simulateActivatePlan(true, async () => {});
+      assert.equal(res2, false);
+      assert.equal(cueCount, 0);
+
+      // 3. Failed activation -> caught, NO sound
+      cueCount = 0;
+      const res3 = await simulateActivatePlan(false, async () => {
+        throw new Error('Firestore error');
+      });
+      assert.equal(res3, false);
+      assert.equal(cueCount, 0);
+
+      // 4. Concurrent duplicate prevention
+      cueCount = 0;
+      let resolveFirst;
+      const slowPromise = new Promise(resolve => { resolveFirst = resolve; });
+      const firstCall = simulateActivatePlan(false, () => slowPromise);
+      const secondCall = simulateActivatePlan(false, () => slowPromise);
+
+      assert.equal(await secondCall, false);
+      resolveFirst();
+      assert.equal(await firstCall, true);
+      assert.equal(cueCount, 1);
+    });
+
+    it('should verify global mute setting halts audio playback for all three additions', () => {
+      const soundContextContent = readWebFile('src/contexts/SoundContext.js');
+
+      // Verify that SoundContext methods guard against !soundEnabled
+      assert.ok(
+        soundContextContent.includes('const playStepToggle = useCallback((isChecked = true) => {\n    if (!soundEnabled) return false;'),
+        'playStepToggle must return false when soundEnabled is false'
+      );
+      assert.ok(
+        soundContextContent.includes('const playActionSuccess = useCallback(() => {\n    if (!soundEnabled) return false;'),
+        'playActionSuccess must return false when soundEnabled is false'
+      );
+    });
+  });
 });
+
 

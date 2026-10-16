@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ExternalLink, Headphones, Search, CheckCircle2, BookmarkCheck, BookOpen, AlertCircle } from 'lucide-react';
 import { OSHO_GROUPS, OSHO_LIBRARY } from '@/lib/fixtures/osho-library';
 import { useSound } from '@/contexts';
@@ -13,14 +13,54 @@ export default function OshoLibraryModal({
   onSelectSeries,
   onUpdateTalkProgress,
 }) {
-  const { playTabSwitchCue } = useSound();
+  const { playTabSwitchCue, playActionSuccessCue, playStepToggleCue } = useSound();
   const [selectedGroup, setSelectedGroup] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [activatingSeriesId, setActivatingSeriesId] = useState(null);
+  const activatingRef = useRef(false);
 
   const handleGroupSelect = (groupId) => {
     if (groupId !== selectedGroup) {
       setSelectedGroup(groupId);
       playTabSwitchCue?.();
+    }
+  };
+
+  const handleSelectSeries = async (seriesId) => {
+    if (!seriesId || seriesId === currentSeriesId || activatingRef.current || !onSelectSeries) {
+      return;
+    }
+    activatingRef.current = true;
+    setActivatingSeriesId(seriesId);
+    try {
+      await onSelectSeries(seriesId);
+      playActionSuccessCue?.();
+    } catch (err) {
+      console.error('Failed to set active series:', err);
+    } finally {
+      activatingRef.current = false;
+      setActivatingSeriesId(null);
+    }
+  };
+
+  const handleDecrementTalk = (item, currentTalks) => {
+    const current = typeof currentTalks === 'number' ? currentTalks : 0;
+    if (current <= 0 || !onUpdateTalkProgress) return;
+    const nextVal = Math.max(0, current - 1);
+    if (nextVal < current) {
+      onUpdateTalkProgress(item.id, nextVal);
+      playStepToggleCue?.(false);
+    }
+  };
+
+  const handleIncrementTalk = (item, currentTalks) => {
+    const current = typeof currentTalks === 'number' ? currentTalks : 0;
+    const maxTalks = typeof item.talkCount === 'number' ? item.talkCount : Infinity;
+    if (current >= maxTalks || !onUpdateTalkProgress) return;
+    const nextVal = current + 1;
+    if (nextVal > current) {
+      onUpdateTalkProgress(item.id, nextVal);
+      playStepToggleCue?.(true);
     }
   };
 
@@ -186,14 +226,15 @@ export default function OshoLibraryModal({
                   <div className="flex items-center justify-between sm:flex-col sm:items-end gap-2 pt-2.5 sm:pt-0 border-t border-slate-100 dark:border-slate-800/80 sm:border-0 flex-shrink-0">
                     <button
                       type="button"
-                      onClick={() => onSelectSeries(item.id)}
+                      onClick={() => handleSelectSeries(item.id)}
+                      disabled={isCurrent || activatingSeriesId === item.id}
                       className={`min-h-[38px] px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                         isCurrent
-                          ? 'bg-amber-600 text-white shadow-2xs'
-                          : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600'
+                          ? 'bg-amber-600 text-white shadow-2xs cursor-default'
+                          : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50'
                       }`}
                     >
-                      {isCurrent ? 'Current Series' : 'Set as Active'}
+                      {isCurrent ? 'Current Series' : activatingSeriesId === item.id ? 'Setting...' : 'Set as Active'}
                     </button>
 
                     {/* Talk progress counter if active */}
@@ -202,8 +243,9 @@ export default function OshoLibraryModal({
                         <span className="text-2xs text-slate-500 dark:text-slate-400 px-1">Talk:</span>
                         <button
                           type="button"
-                          onClick={() => onUpdateTalkProgress(item.id, Math.max(0, progress.completedTalks - 1))}
-                          className="w-7 h-7 sm:w-6 sm:h-6 rounded flex items-center justify-center bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs"
+                          onClick={() => handleDecrementTalk(item, progress.completedTalks)}
+                          disabled={progress.completedTalks <= 0}
+                          className="w-7 h-7 sm:w-6 sm:h-6 rounded flex items-center justify-center bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
                           aria-label="Decrement talk"
                         >
                           -
@@ -214,8 +256,9 @@ export default function OshoLibraryModal({
                         </span>
                         <button
                           type="button"
-                          onClick={() => onUpdateTalkProgress(item.id, progress.completedTalks + 1)}
-                          className="w-7 h-7 sm:w-6 sm:h-6 rounded flex items-center justify-center bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs"
+                          onClick={() => handleIncrementTalk(item, progress.completedTalks)}
+                          disabled={typeof item.talkCount === 'number' && progress.completedTalks >= item.talkCount}
+                          className="w-7 h-7 sm:w-6 sm:h-6 rounded flex items-center justify-center bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
                           aria-label="Increment talk"
                         >
                           +
