@@ -47,10 +47,6 @@ function RoutineCard({ habit, onEdit, onDelete }) {
               Foundation
             </span>
           )}
-
-          <span className="text-2xs text-muted font-medium bg-surface-subtle/80 border border-subtle/60 px-1.5 py-0.5 rounded">
-            #{habit.order}
-          </span>
         </div>
 
         {/* Action buttons: Edit & Delete (WCAG min 44x44px touch targets) */}

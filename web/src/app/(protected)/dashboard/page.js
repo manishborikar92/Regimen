@@ -35,43 +35,91 @@ export default function DashboardPage() {
     updateProfile,
   } = useData();
 
-  // Group habits by time context: Flexible / Afternoon / Before Bed
+  // Standardized daily timing rhythm grouping: Morning / Afternoon / Evening / Before Bed / Flexible
   const groupedHabits = useMemo(() => {
-    const anytime = [];
+    const morning = [];
     const afternoon = [];
+    const evening = [];
     const beforeBed = [];
-    const other = [];
+    const flexible = [];
 
     todaysHabits.forEach(habit => {
       const timingType = habit.timingType || '';
-      const period = habit.preferredPeriod || habit.time || '';
-      const relative = habit.relativeTiming || '';
+      const period = String(habit.preferredPeriod || habit.time || '').toLowerCase();
+      const relative = String(habit.relativeTiming || '').toLowerCase();
 
-      if (relative === 'Before bed' || period === 'Before bed') {
+      // 1. Before Bed / Night
+      if (
+        relative.includes('bed') ||
+        period.includes('bed') ||
+        period.includes('night') ||
+        relative.includes('night')
+      ) {
         beforeBed.push(habit);
-      } else if (period.toLowerCase().includes('afternoon') || timingType === 'preferred_period') {
+      } else if (
+        period.includes('morning') ||
+        relative.includes('waking') ||
+        relative.includes('breakfast')
+      ) {
+        morning.push(habit);
+      } else if (
+        period.includes('afternoon') ||
+        period.includes('midday') ||
+        relative.includes('lunch')
+      ) {
         afternoon.push(habit);
-      } else if (timingType === 'anytime' || period === 'Flexible' || !period) {
-        anytime.push(habit);
+      } else if (
+        period.includes('evening') ||
+        relative.includes('evening') ||
+        relative.includes('wind-down') ||
+        relative.includes('dinner')
+      ) {
+        evening.push(habit);
+      } else if (timingType === 'exact' && habit.time) {
+        const timeStr = String(habit.time).toUpperCase().trim();
+        if (timeStr.includes('AM')) {
+          const match = timeStr.match(/^(\d{1,2})/);
+          const hour = match ? parseInt(match[1], 10) : 8;
+          if (hour === 12) {
+            beforeBed.push(habit);
+          } else {
+            morning.push(habit);
+          }
+        } else if (timeStr.includes('PM')) {
+          const match = timeStr.match(/^(\d{1,2})/);
+          const hour = match ? parseInt(match[1], 10) : 12;
+          if (hour === 12 || hour < 5) {
+            afternoon.push(habit);
+          } else if (hour < 9) {
+            evening.push(habit);
+          } else {
+            beforeBed.push(habit);
+          }
+        } else {
+          flexible.push(habit);
+        }
       } else {
-        other.push(habit);
+        flexible.push(habit);
       }
     });
 
-    return { anytime, afternoon, beforeBed, other };
+    return { morning, afternoon, evening, beforeBed, flexible };
   }, [todaysHabits]);
 
   // Helper to render the appropriate activity-specific card
+  // Strictly relies on explicit stableKey and seedOrigin identifiers — NEVER on title substring matching.
   const renderHabitCard = useCallback((habit) => {
     const isCompleted = todayLog.includes(habit.id);
     const progress = todayProgress[habit.id] || EMPTY_PROGRESS;
 
-    const key = habit.stableKey || habit.id;
+    const key = habit.stableKey || habit.id || '';
     const method = habit.completionMethod || '';
-    const title = (habit.title || '').toLowerCase();
+    const isPersonalPreset = habit.seedOrigin === 'personal_preset';
+    const isMatchingCanonical = (targetKey) =>
+      key === targetKey || habit.stableKey === targetKey || String(habit.id || '').endsWith(`_${targetKey}`);
 
-    // 1. Workbook Card
-    if (key === 'canonical_english_workbook' || method === 'workbook_sessions' || title.includes('workbook')) {
+    // 1. Specialized Workbook Card (Word Power Made Easy 2-session tracker)
+    if (isMatchingCanonical('canonical_english_workbook') || (isPersonalPreset && method === 'workbook_sessions')) {
       return (
         <WorkbookCard
           key={habit.id}
@@ -83,8 +131,8 @@ export default function DashboardPage() {
       );
     }
 
-    // 2. Exercise / Movement Card
-    if (key === 'canonical_exercise_plan' || method === 'exercise_plan' || title.includes('exercise') || title.includes('movement')) {
+    // 2. Specialized Exercise / Movement Card (12-week movement & workout plan)
+    if (isMatchingCanonical('canonical_exercise_plan') || (isPersonalPreset && method === 'exercise_plan')) {
       return (
         <MovementCard
           key={habit.id}
@@ -98,8 +146,8 @@ export default function DashboardPage() {
       );
     }
 
-    // 3. Listen to Osho Card
-    if (key === 'canonical_listen_osho' || method === 'osho_listening' || title.includes('osho')) {
+    // 3. Specialized Listen to Osho Card (30-discourse audio library catalog)
+    if (isMatchingCanonical('canonical_listen_osho') || (isPersonalPreset && method === 'osho_listening')) {
       return (
         <OshoCard
           key={habit.id}
@@ -114,8 +162,8 @@ export default function DashboardPage() {
       );
     }
 
-    // 4. Read Books Card
-    if (key === 'canonical_read_books' || method === 'reading_duration' || title.includes('read books')) {
+    // 4. Specialized Read Books Card (30-minute reading timer)
+    if (isMatchingCanonical('canonical_read_books') || (isPersonalPreset && method === 'reading_duration')) {
       return (
         <ReadingCard
           key={habit.id}
@@ -128,8 +176,8 @@ export default function DashboardPage() {
       );
     }
 
-    // 5. Practice English Speaking Card
-    if (key === 'canonical_english_speaking' || method === 'simple_with_notes' || title.includes('speaking')) {
+    // 5. Specialized Practice English Speaking Card (conversational practice with autosave notes)
+    if (isMatchingCanonical('canonical_english_speaking') || (isPersonalPreset && method === 'simple_with_notes')) {
       return (
         <SpeakingCard
           key={habit.id}
@@ -142,8 +190,12 @@ export default function DashboardPage() {
       );
     }
 
-    // 6. Maintain a Diary Card
-    if (key === 'canonical_maintain_diary' || method === 'diary_entry' || title.includes('diary')) {
+    // 6. Reflection & Diary Card (canonical diary, foundation reflection, or any diary_entry)
+    if (
+      isMatchingCanonical('canonical_maintain_diary') ||
+      isMatchingCanonical('routine_daily_reflection') ||
+      method === 'diary_entry'
+    ) {
       return (
         <DiaryCard
           key={habit.id}
@@ -156,7 +208,7 @@ export default function DashboardPage() {
       );
     }
 
-    // Fallback: Generic Card
+    // Fallback: Generic Habit Card for all custom habits (including those titled "Exercise", "Workbook", "Reading", etc.)
     return (
       <GenericHabitCard
         key={habit.id}
@@ -208,8 +260,68 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* 1. Flexible / Anytime Routines */}
-            {groupedHabits.anytime.length > 0 && (
+            {/* 1. Morning Routines */}
+            {groupedHabits.morning.length > 0 && (
+              <section className="space-y-3">
+                <div className="flex items-center gap-2 px-1">
+                  <span className="text-xs font-semibold text-amber-800 dark:text-amber-400 uppercase tracking-wider">
+                    Morning
+                  </span>
+                  <div className="h-px bg-amber-200 dark:bg-amber-900/50 flex-1" />
+                </div>
+                <div className="space-y-3">
+                  {groupedHabits.morning.map(renderHabitCard)}
+                </div>
+              </section>
+            )}
+
+            {/* 2. Afternoon Preferred */}
+            {groupedHabits.afternoon.length > 0 && (
+              <section className="space-y-3">
+                <div className="flex items-center gap-2 px-1">
+                  <span className="text-xs font-semibold text-teal-800 dark:text-teal-300 uppercase tracking-wider">
+                    Afternoon (Preferred)
+                  </span>
+                  <div className="h-px bg-teal-200 dark:bg-teal-900/50 flex-1" />
+                </div>
+                <div className="space-y-3">
+                  {groupedHabits.afternoon.map(renderHabitCard)}
+                </div>
+              </section>
+            )}
+
+            {/* 3. Evening */}
+            {groupedHabits.evening.length > 0 && (
+              <section className="space-y-3">
+                <div className="flex items-center gap-2 px-1">
+                  <span className="text-xs font-semibold text-teal-800 dark:text-teal-300 uppercase tracking-wider">
+                    Evening
+                  </span>
+                  <div className="h-px bg-teal-200 dark:bg-teal-900/50 flex-1" />
+                </div>
+                <div className="space-y-3">
+                  {groupedHabits.evening.map(renderHabitCard)}
+                </div>
+              </section>
+            )}
+
+            {/* 4. Before Bed */}
+            {groupedHabits.beforeBed.length > 0 && (
+              <section className="space-y-3">
+                <div className="flex items-center gap-2 px-1">
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                    Before Bed
+                  </span>
+                  <div className="h-px bg-slate-200 dark:bg-slate-800 flex-1" />
+                </div>
+                <div className="space-y-3">
+                  {groupedHabits.beforeBed.map(renderHabitCard)}
+                </div>
+              </section>
+            )}
+
+            {/* 5. Flexible / Anytime */}
+            {groupedHabits.flexible.length > 0 && (
               <section className="space-y-3">
                 <div className="flex items-center gap-2 px-1">
                   <span className="text-xs font-semibold text-sub uppercase tracking-wider">
@@ -218,52 +330,7 @@ export default function DashboardPage() {
                   <div className="h-px bg-slate-200 dark:bg-slate-800 flex-1" />
                 </div>
                 <div className="space-y-3">
-                  {groupedHabits.anytime.map(renderHabitCard)}
-                </div>
-              </section>
-            )}
-
-            {/* 2. Afternoon Preferred (Movement Plan) */}
-            {groupedHabits.afternoon.length > 0 && (
-              <section className="space-y-3">
-                <div className="flex items-center gap-2 px-1">
-                  <span className="text-xs font-semibold text-amber-800 dark:text-amber-400 uppercase tracking-wider">
-                    Afternoon (Preferred)
-                  </span>
-                  <div className="h-px bg-amber-200 dark:bg-amber-900/50 flex-1" />
-                </div>
-                <div className="space-y-3">
-                  {groupedHabits.afternoon.map(renderHabitCard)}
-                </div>
-              </section>
-            )}
-
-            {/* 3. Before Bed (Reading) */}
-            {groupedHabits.beforeBed.length > 0 && (
-              <section className="space-y-3">
-                <div className="flex items-center gap-2 px-1">
-                  <span className="text-xs font-semibold text-teal-800 dark:text-teal-300 uppercase tracking-wider">
-                    Before Bed (Relative)
-                  </span>
-                  <div className="h-px bg-teal-200 dark:bg-teal-900/50 flex-1" />
-                </div>
-                <div className="space-y-3">
-                  {groupedHabits.beforeBed.map(renderHabitCard)}
-                </div>
-              </section>
-            )}
-
-            {/* 4. Other Scheduled */}
-            {groupedHabits.other.length > 0 && (
-              <section className="space-y-3">
-                <div className="flex items-center gap-2 px-1">
-                  <span className="text-xs font-semibold text-sub uppercase tracking-wider">
-                    Additional Routines
-                  </span>
-                  <div className="h-px bg-slate-200 dark:bg-slate-800 flex-1" />
-                </div>
-                <div className="space-y-3">
-                  {groupedHabits.other.map(renderHabitCard)}
+                  {groupedHabits.flexible.map(renderHabitCard)}
                 </div>
               </section>
             )}

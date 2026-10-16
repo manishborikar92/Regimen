@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { X, Trash2, Clock, CheckCircle2, ListChecks, Info, Sparkles, Sunrise, Moon } from 'lucide-react';
 import { CATEGORIES } from '@/lib/constants/categories';
 
@@ -13,15 +13,19 @@ const TIMING_TYPES = [
   { id: 'exact', label: 'Exact Time', description: 'Suggested target', icon: Clock },
 ];
 
-const COMPLETION_METHODS = [
-  { id: 'simple', label: 'Simple Checkmark' },
-  { id: 'workbook_sessions', label: 'Two-Session Workbook Counter' },
-  { id: 'exercise_plan', label: 'Structured Movement & Safety Routine' },
-  { id: 'osho_listening', label: 'Discourse Listening Session' },
-  { id: 'reading_duration', label: 'Reading Duration Target' },
-  { id: 'diary_entry', label: 'Private Journal / Reflection' },
-  { id: 'checklist', label: 'Custom Step Checklist' },
+const GENERIC_COMPLETION_STYLES = [
+  { id: 'simple', label: 'Standard Check-off', description: 'One tap to mark as completed' },
+  { id: 'checklist', label: 'Step-by-Step Checklist', description: 'List of steps or sub-tasks to guide your routine' },
+  { id: 'diary_entry', label: 'Reflection & Notes', description: 'Private journal note with guided prompts' },
 ];
+
+const SPECIALIZED_COMPLETION_STYLES = {
+  workbook_sessions: { label: 'Specialized: Two-Session Workbook Counter', description: 'Word Power Made Easy 2-session tracker' },
+  exercise_plan: { label: 'Specialized: Structured Movement Plan', description: '12-week progressive movement schedule' },
+  osho_listening: { label: 'Specialized: Discourse Listening Session', description: '30-discourse audio library catalog' },
+  reading_duration: { label: 'Specialized: Reading Duration Target', description: '30-minute reading timer' },
+  simple_with_notes: { label: 'Specialized: Speaking Practice with Notes', description: 'Conversational practice with autosaving notes' },
+};
 
 export default function HabitModal({ habit, onSave, onClose, onDelete }) {
   const [formData, setFormData] = useState({
@@ -35,9 +39,21 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
     instructions: '',
     frequency: [...DAYS],
     checklistItems: [],
-    order: 1,
+    order: habit?.order || 99,
     stableKey: null,
   });
+
+  const availableMethods = useMemo(() => {
+    const list = [...GENERIC_COMPLETION_STYLES];
+    const currentMethod = habit?.completionMethod;
+    if (currentMethod && SPECIALIZED_COMPLETION_STYLES[currentMethod]) {
+      list.unshift({
+        id: currentMethod,
+        ...SPECIALIZED_COMPLETION_STYLES[currentMethod],
+      });
+    }
+    return list;
+  }, [habit?.completionMethod]);
 
   const [newChecklistItem, setNewChecklistItem] = useState('');
   const [saving, setSaving] = useState(false);
@@ -71,9 +87,6 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
     }
     if (formData.frequency.length === 0) {
       newErrors.frequency = 'Select at least one active day';
-    }
-    if (formData.order < 1) {
-      newErrors.order = 'Order must be at least 1';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -191,20 +204,26 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
               </select>
             </div>
 
-            {/* Completion Method */}
+            {/* Completion Style */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Tracking / Completion Method
+                How to Complete
               </label>
               <select
                 value={formData.completionMethod}
                 onChange={(e) => setFormData(prev => ({ ...prev, completionMethod: e.target.value }))}
                 className="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl text-base sm:text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
               >
-                {COMPLETION_METHODS.map(m => (
+                {availableMethods.map(m => (
                   <option key={m.id} value={m.id}>{m.label}</option>
                 ))}
               </select>
+              <p className="text-2xs text-muted mt-1">
+                {formData.completionMethod === 'simple' && 'Quick checkmark to mark this routine done today.'}
+                {formData.completionMethod === 'checklist' && 'Break this routine down into clear sub-steps.'}
+                {formData.completionMethod === 'diary_entry' && 'Opens a private reflection note and reflection prompts.'}
+                {SPECIALIZED_COMPLETION_STYLES[formData.completionMethod]?.description}
+              </p>
             </div>
 
             {/* Timing Preference Model (Compact 2x2 Responsive Architecture) */}
@@ -417,18 +436,6 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
                 </div>
               </div>
             )}
-
-            {/* Display Order */}
-            <div className="flex items-center justify-between pt-1">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Display Order</label>
-              <input
-                type="number"
-                value={formData.order}
-                onChange={(e) => setFormData(prev => ({ ...prev, order: parseInt(e.target.value) || 1 }))}
-                min={1}
-                className="w-20 px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-base sm:text-xs text-center font-bold bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-              />
-            </div>
           </div>
 
           {/* Sticky Modal Action Bar */}
