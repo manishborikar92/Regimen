@@ -245,13 +245,10 @@ export default function AnalyticsPage() {
       {viewMode === 'calendar' && (
         <div className="space-y-4">
           <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-subtle shadow-2xs">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs sm:text-sm font-bold text-main flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-                Last 30 Days Activity Map
-              </h3>
-              <span className="text-2xs text-muted">Tap a date to inspect activities</span>
-            </div>
+            <h3 className="mb-3 text-xs sm:text-sm font-bold text-main flex items-center gap-1.5">
+              <Calendar className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+              Last 30 Days Activity Map
+            </h3>
 
             {/* Day Headers (Mon-Sun) */}
             <div className="grid grid-cols-7 gap-1.5 text-center text-2xs font-bold text-muted py-1 border-b border-subtle mb-2">
