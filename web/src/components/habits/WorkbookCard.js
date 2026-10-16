@@ -3,6 +3,7 @@
 import { useState, memo } from 'react';
 import { BookOpen, Check, CheckCircle2, ChevronDown, Clock, Info } from 'lucide-react';
 import { getCategoryConfig } from '@/lib/constants/categories';
+import { useSound } from '@/contexts';
 
 /**
  * WorkbookCard: Dedicated 2-session English Workbook Tracker.
@@ -16,6 +17,7 @@ import { getCategoryConfig } from '@/lib/constants/categories';
  * - Partial completion state explicitly explains what remains.
  */
 function WorkbookCard({ habit, isCompleted, progress = {}, onUpdateProgress }) {
+  const { playStepToggleCue, playHabitCompleteCue } = useSound();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const config = getCategoryConfig(habit.category);
@@ -30,7 +32,17 @@ function WorkbookCard({ habit, isCompleted, progress = {}, onUpdateProgress }) {
 
   const handleSessionChange = (newCount) => {
     const clamped = Math.max(0, Math.min(2, newCount));
+    if (clamped === sessions) return;
+
     const nextFullyComplete = clamped >= 2 && reviewDone;
+    if (nextFullyComplete && !isFullyComplete) {
+      playHabitCompleteCue?.();
+    } else if (clamped > sessions) {
+      playStepToggleCue?.(true);
+    } else {
+      playStepToggleCue?.(false);
+    }
+
     onUpdateProgress(habit.id, {
       ...progress,
       sessionsCompleted: clamped,
@@ -42,6 +54,12 @@ function WorkbookCard({ habit, isCompleted, progress = {}, onUpdateProgress }) {
   const handleToggleReview = () => {
     const nextReview = !reviewDone;
     const nextFullyComplete = sessions >= 2 && nextReview;
+    if (nextFullyComplete && !isFullyComplete) {
+      playHabitCompleteCue?.();
+    } else {
+      playStepToggleCue?.(nextReview);
+    }
+
     onUpdateProgress(habit.id, {
       ...progress,
       sessionsCompleted: sessions,
@@ -52,6 +70,7 @@ function WorkbookCard({ habit, isCompleted, progress = {}, onUpdateProgress }) {
 
   const handleToggleUninterrupted = () => {
     const nextUninterrupted = !uninterruptedDone;
+    playStepToggleCue?.(nextUninterrupted);
     onUpdateProgress(habit.id, {
       ...progress,
       sessionsCompleted: sessions,

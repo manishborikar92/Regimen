@@ -4,6 +4,7 @@ import { useState, memo } from 'react';
 import { Check, ChevronDown, Clock, ListChecks } from 'lucide-react';
 import { getCategoryConfig } from '@/lib/constants/categories';
 import { getTimingDisplay } from '@/utils/date-helpers';
+import { useSound } from '@/contexts';
 import {
   getStepId,
   isStepCompleted,
@@ -20,6 +21,7 @@ function GenericHabitCard({
   progress = {},
   onUpdateProgress,
 }) {
+  const { playStepToggleCue, playHabitCompleteCue } = useSound();
   const config = getCategoryConfig(habit.category);
   const items = Array.isArray(habit.checklistItems) ? habit.checklistItems : [];
   const hasChecklist = items.length > 0;
@@ -41,12 +43,20 @@ function GenericHabitCard({
       return;
     }
 
+    const isCurrentlyChecked = isStepCompleted(items[index], index, completedSteps, isCompleted, items);
     const { nextCompletedSteps, isAllCompleted: nextAllDone } = toggleChecklistStep(
       items,
       completedSteps,
       index,
       isCompleted
     );
+
+    // If final step completes the habit, play only habit completion cue and suppress step tick.
+    if (nextAllDone) {
+      playHabitCompleteCue?.();
+    } else {
+      playStepToggleCue?.(!isCurrentlyChecked);
+    }
 
     onUpdateProgress(
       habit.id,
@@ -59,12 +69,18 @@ function GenericHabitCard({
   };
 
   const handleToggleWholeHabit = () => {
+    const nextCompleted = !isEffectivelyCompleted;
+    if (nextCompleted) {
+      playHabitCompleteCue?.();
+    } else {
+      playStepToggleCue?.(false);
+    }
+
     if (!hasChecklist || !onUpdateProgress) {
       onToggle(habit.id);
       return;
     }
 
-    const nextCompleted = !isEffectivelyCompleted;
     const { nextCompletedSteps } = toggleAllChecklistSteps(items, nextCompleted);
 
     onUpdateProgress(

@@ -2,13 +2,14 @@
 
 import { useState, useRef } from 'react';
 import { Plus, Compass } from 'lucide-react';
-import { useData, useToast } from '@/contexts';
+import { useData, useToast, useSound } from '@/contexts';
 import { ConfirmDialog, HabitsSkeleton } from '@/components/ui';
 import { HabitModal, RoutineCard } from '@/components/habits';
 
 export default function HabitsPage() {
   const { habits, loading, addHabit, updateHabit, deleteHabit, seedHabits } = useData();
   const { addToast } = useToast();
+  const { playActionSuccessCue, playActionDeleteCue } = useSound();
   const [showModal, setShowModal] = useState(false);
   const [editingHabit, setEditingHabit] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -26,6 +27,7 @@ export default function HabitsPage() {
       setShowModal(false);
       setEditingHabit(null);
       addToast(`Routine ${editingHabit ? 'updated' : 'created'} successfully`, 'success');
+      playActionSuccessCue?.();
     } catch (err) {
       console.error('Error saving routine:', err);
       addToast('Failed to save routine. Please try again.', 'error');
@@ -40,6 +42,7 @@ export default function HabitsPage() {
       setEditingHabit(null);
       setDeleteConfirm(null);
       addToast('Routine removed. Past logs remain preserved.', 'success');
+      playActionDeleteCue?.();
     } catch (err) {
       console.error('Error deleting routine:', err);
       addToast('Failed to delete routine. Please try again.', 'error');
@@ -57,6 +60,7 @@ export default function HabitsPage() {
     try {
       await seedHabits();
       addToast('Foundation routines loaded successfully!', 'success');
+      playActionSuccessCue?.();
     } catch (err) {
       console.error('Error loading foundation routines:', err);
       addToast(err.message || 'Failed to load recommended routines. Please try again.', 'error');

@@ -3,6 +3,7 @@
 import { useState, memo } from 'react';
 import { PenTool, Check, Clock, Lock, Sparkles, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { getCategoryConfig } from '@/lib/constants/categories';
+import { useSound } from '@/contexts';
 
 const PROMPTS = [
   'What happened or what thought came to mind?',
@@ -13,6 +14,7 @@ const PROMPTS = [
 ];
 
 function DiaryCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProgress }) {
+  const { playStepToggleCue, playHabitCompleteCue } = useSound();
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [entryText, setEntryText] = useState(progress.entryText || '');
   const [selectedPrompt, setSelectedPrompt] = useState(null);
@@ -21,6 +23,9 @@ function DiaryCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProgre
   const config = getCategoryConfig(habit.category);
 
   const handleSaveEntry = () => {
+    if (!isCompleted) {
+      playHabitCompleteCue?.();
+    }
     onUpdateProgress(habit.id, {
       ...progress,
       entryText,
@@ -71,7 +76,14 @@ function DiaryCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProgre
           <div className="flex flex-col items-end flex-shrink-0 pt-0.5">
             <button
               type="button"
-              onClick={() => onToggle(habit.id)}
+              onClick={() => {
+                if (!isCompleted) {
+                  playHabitCompleteCue?.();
+                } else {
+                  playStepToggleCue?.(false);
+                }
+                onToggle?.(habit.id);
+              }}
               className={`w-11 h-11 rounded-full border-2 flex items-center justify-center transition-all ${
                 isCompleted
                   ? 'bg-rose-600 border-rose-600 text-white shadow-xs'

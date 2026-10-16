@@ -17,6 +17,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useData } from '@/contexts/DataContext';
+import { useSound } from '@/contexts';
 import { AnalyticsSkeleton } from '@/components/ui';
 import { getDayOfWeek, formatDate } from '@/utils/date-helpers';
 import {
@@ -45,8 +46,16 @@ const CATEGORY_ICON_MAP = {
 
 export default function AnalyticsPage() {
   const { habits, dailyLogs, fetchDailyLogs, loading } = useData();
+  const { playTabSwitchCue } = useSound();
   const [selectedDate, setSelectedDate] = useState(null);
   const [viewMode, setViewMode] = useState('insights'); // 'insights' | 'calendar'
+
+  const handleViewModeChange = (nextMode) => {
+    if (nextMode !== viewMode) {
+      setViewMode(nextMode);
+      playTabSwitchCue?.();
+    }
+  };
 
   // Fetch historical logs on mount
   useEffect(() => {
@@ -93,7 +102,7 @@ export default function AnalyticsPage() {
       <div className="flex bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl">
         <button
           type="button"
-          onClick={() => setViewMode('insights')}
+          onClick={() => handleViewModeChange('insights')}
           className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
             viewMode === 'insights'
               ? 'bg-white dark:bg-slate-700 text-teal-800 dark:text-teal-300 shadow-2xs'
@@ -104,7 +113,7 @@ export default function AnalyticsPage() {
         </button>
         <button
           type="button"
-          onClick={() => setViewMode('calendar')}
+          onClick={() => handleViewModeChange('calendar')}
           className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
             viewMode === 'calendar'
               ? 'bg-white dark:bg-slate-700 text-teal-800 dark:text-teal-300 shadow-2xs'

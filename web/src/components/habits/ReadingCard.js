@@ -5,6 +5,7 @@ import { BookMarked, Check, Clock, Moon, Play, Pause, RotateCcw } from 'lucide-r
 import { getCategoryConfig } from '@/lib/constants/categories';
 import { getTimingDisplay } from '@/utils/date-helpers';
 import { useTimer } from '@/hooks/use-timer';
+import { useSound } from '@/contexts';
 import { getReadingTargetMinutes } from '@/utils/reading-helpers';
 
 /**
@@ -20,6 +21,7 @@ import { getReadingTargetMinutes } from '@/utils/reading-helpers';
  * - WCAG 2.2 compliant touch targets and zero prohibited colors
  */
 function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProgress }) {
+  const { playStepToggleCue, playHabitCompleteCue } = useSound();
   const config = getCategoryConfig(habit.category);
   const timingText = getTimingDisplay(habit);
   const isNightTiming = timingText.toLowerCase().includes('bed') || timingText.toLowerCase().includes('night');
@@ -101,7 +103,14 @@ function ReadingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProg
           <div className="flex flex-col items-end flex-shrink-0 pt-0.5">
             <button
               type="button"
-              onClick={() => onToggle(habit.id)}
+              onClick={() => {
+                if (!isCompleted) {
+                  playHabitCompleteCue?.();
+                } else {
+                  playStepToggleCue?.(false);
+                }
+                onToggle?.(habit.id);
+              }}
               className={`w-11 h-11 rounded-full border-2 flex items-center justify-center transition-all ${
                 isCompleted
                   ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'

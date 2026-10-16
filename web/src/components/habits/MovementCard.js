@@ -24,6 +24,7 @@ import {
   GENERAL_HEALTH_NOTES,
 } from '@/lib/fixtures/exercise-plan';
 import { getDayOfWeek } from '@/utils/date-helpers';
+import { useSound } from '@/contexts';
 
 function MovementCard({
   habit,
@@ -33,6 +34,7 @@ function MovementCard({
   userProfile = {},
   onUpdateProfile,
 }) {
+  const { playStepToggleCue, playHabitCompleteCue } = useSound();
   const [isExpanded, setIsExpanded] = useState(false);
   const [showSafetyModal, setShowSafetyModal] = useState(false);
   const [expandedExerciseId, setExpandedExerciseId] = useState(null);
@@ -73,6 +75,13 @@ function MovementCard({
 
     const nextAllChecked = currentItems.length > 0 && currentItems.every(item => updatedIds.includes(item.id));
 
+    // If final exercise completes the workout, play only habit completion cue and suppress step tick.
+    if (nextAllChecked && !isWorkoutComplete) {
+      playHabitCompleteCue?.();
+    } else {
+      playStepToggleCue?.(!isCurrentlyChecked);
+    }
+
     onUpdateProgress(habit.id, {
       ...progress,
       completedItemIds: updatedIds,
@@ -82,6 +91,12 @@ function MovementCard({
 
   const handleToggleWholeWorkout = () => {
     const nextState = !isWorkoutComplete;
+    if (nextState) {
+      playHabitCompleteCue?.();
+    } else {
+      playStepToggleCue?.(false);
+    }
+
     const updatedIds = nextState ? currentItems.map(item => item.id) : [];
 
     onUpdateProgress(habit.id, {
