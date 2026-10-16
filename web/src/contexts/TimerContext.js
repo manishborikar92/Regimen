@@ -71,7 +71,13 @@ export function TimerProvider({ children }) {
   const callbacksRef = useRef({});
   const finishingTimersRef = useRef(new Set());
   const { updateProgress, todayLog, toggleHabit } = useData() || {};
-  const { playStartCue, playCompletionCue } = useSound();
+  const {
+    playStartCue,
+    playPauseCue,
+    playResumeCue,
+    playResetCue,
+    playCompletionCue,
+  } = useSound();
 
   // Save active timers state to localStorage (omits finished timers to prevent repeated re-alerting)
   const saveToStorage = useCallback((updatedTimers) => {
@@ -226,6 +232,12 @@ export function TimerProvider({ children }) {
 
     setTimers((prev) => {
       const current = prev[habitId];
+
+      // If timer is already actively running, avoid duplicate triggers or audio cues
+      if (current?.isRunning) {
+        return prev;
+      }
+
       const targetMinutes = durationMinutes || current?.targetMinutes || 30;
       const targetSeconds = targetMinutes * 60;
 
@@ -239,9 +251,11 @@ export function TimerProvider({ children }) {
       const currentRemaining = isResuming ? current.secondsRemaining : targetSeconds;
       const targetEndTime = Date.now() + currentRemaining * 1000;
 
-      // Only genuinely new sessions play start cue
-      if (!isResuming && playStartCue) {
-        playStartCue();
+      // Play resume cue when resuming a paused session; play start cue on fresh start
+      if (isResuming) {
+        playResumeCue?.();
+      } else {
+        playStartCue?.();
       }
 
       const updated = {
@@ -260,13 +274,15 @@ export function TimerProvider({ children }) {
       saveToStorage(updated);
       return updated;
     });
-  }, [saveToStorage, playStartCue]);
+  }, [saveToStorage, playStartCue, playResumeCue]);
 
-  // Pause a running timer (strictly silent)
+  // Pause a running timer
   const pauseTimer = useCallback((habitId) => {
     setTimers((prev) => {
       const current = prev[habitId];
       if (!current || !current.isRunning) return prev;
+
+      playPauseCue?.();
 
       const remaining = current.targetEndTime
         ? Math.max(0, Math.ceil((current.targetEndTime - Date.now()) / 1000))
@@ -286,19 +302,31 @@ export function TimerProvider({ children }) {
       saveToStorage(updated);
       return updated;
     });
-  }, [saveToStorage]);
+  }, [saveToStorage, playPauseCue]);
 
-  // Reset a timer back to full target duration (strictly silent)
+  // Reset a timer back to full target duration (only plays if timer was actually active or paused mid-session)
   const resetTimer = useCallback((habitId, fallbackMinutes = 30) => {
     finishingTimersRef.current.delete(habitId);
 
     setTimers((prev) => {
+      const current = prev[habitId];
+      const canReset = current && (
+        current.isRunning ||
+        (current.isPaused && typeof current.secondsRemaining === 'number' && current.secondsRemaining < current.targetSeconds)
+      );
+
+      if (!canReset) {
+        return prev;
+      }
+
+      playResetCue?.();
+
       const next = { ...prev };
       delete next[habitId];
       saveToStorage(next);
       return next;
     });
-  }, [saveToStorage]);
+  }, [saveToStorage, playResetCue]);
 
   // Adjust duration while timer is idle
   const setTimerDuration = useCallback((habitId, minutes) => {

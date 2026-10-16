@@ -3,8 +3,10 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { MessageSquare, Check, Clock, Bot, PenLine } from 'lucide-react';
 import { getCategoryConfig } from '@/lib/constants/categories';
+import { useSound } from '@/contexts';
 
 function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdateProgress }) {
+  const { playStepToggleCue, playHabitCompleteCue } = useSound();
   const [showNotes, setShowNotes] = useState(Boolean(progress.notes));
   const [notes, setNotes] = useState(progress.notes || '');
   const [isEditing, setIsEditing] = useState(false);
@@ -79,6 +81,11 @@ function SpeakingCard({ habit, isCompleted, onToggle, progress = {}, onUpdatePro
   // Flush pending save if completion toggle is clicked
   const handleToggle = () => {
     flushSave();
+    if (!isCompleted) {
+      playHabitCompleteCue?.();
+    } else {
+      playStepToggleCue?.(false);
+    }
     onToggle(habit.id);
   };
 

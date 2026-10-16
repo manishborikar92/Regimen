@@ -3,7 +3,15 @@
 import { createContext, useContext, useCallback, useMemo, useSyncExternalStore } from 'react';
 import {
   playStartCue as synthStartCue,
+  playPauseCue as synthPauseCue,
+  playResumeCue as synthResumeCue,
+  playResetCue as synthResetCue,
   playCompletionChime as synthCompletionChime,
+  playStepToggleCue as synthStepToggleCue,
+  playHabitCompleteCue as synthHabitCompleteCue,
+  playTabSwitchCue as synthTabSwitchCue,
+  playActionSuccessCue as synthActionSuccessCue,
+  playActionDeleteCue as synthActionDeleteCue,
   isAudioSupported,
 } from '@/utils/audio-chime';
 
@@ -17,7 +25,15 @@ const SoundContext = createContext({
   setSoundEnabled: () => {},
   toggleSound: () => {},
   playStartCue: () => false,
+  playPauseCue: () => false,
+  playResumeCue: () => false,
+  playResetCue: () => false,
   playCompletionCue: () => false,
+  playStepToggleCue: () => false,
+  playHabitCompleteCue: () => false,
+  playTabSwitchCue: () => false,
+  playActionSuccessCue: () => false,
+  playActionDeleteCue: () => false,
 });
 
 const emptySubscribe = () => () => {};
@@ -115,9 +131,49 @@ export function SoundProvider({ children }) {
     return synthStartCue();
   }, [soundEnabled]);
 
+  const playPause = useCallback(() => {
+    if (!soundEnabled) return false;
+    return synthPauseCue();
+  }, [soundEnabled]);
+
+  const playResume = useCallback(() => {
+    if (!soundEnabled) return false;
+    return synthResumeCue();
+  }, [soundEnabled]);
+
+  const playReset = useCallback(() => {
+    if (!soundEnabled) return false;
+    return synthResetCue();
+  }, [soundEnabled]);
+
   const playCompletion = useCallback(() => {
     if (!soundEnabled) return false;
     return synthCompletionChime();
+  }, [soundEnabled]);
+
+  const playStepToggle = useCallback((isChecked = true) => {
+    if (!soundEnabled) return false;
+    return synthStepToggleCue(isChecked);
+  }, [soundEnabled]);
+
+  const playHabitComplete = useCallback(() => {
+    if (!soundEnabled) return false;
+    return synthHabitCompleteCue();
+  }, [soundEnabled]);
+
+  const playTabSwitch = useCallback(() => {
+    if (!soundEnabled) return false;
+    return synthTabSwitchCue();
+  }, [soundEnabled]);
+
+  const playActionSuccess = useCallback(() => {
+    if (!soundEnabled) return false;
+    return synthActionSuccessCue();
+  }, [soundEnabled]);
+
+  const playActionDelete = useCallback(() => {
+    if (!soundEnabled) return false;
+    return synthActionDeleteCue();
   }, [soundEnabled]);
 
   const value = useMemo(() => ({
@@ -127,7 +183,15 @@ export function SoundProvider({ children }) {
     setSoundEnabled,
     toggleSound,
     playStartCue: playStart,
+    playPauseCue: playPause,
+    playResumeCue: playResume,
+    playResetCue: playReset,
     playCompletionCue: playCompletion,
+    playStepToggleCue: playStepToggle,
+    playHabitCompleteCue: playHabitComplete,
+    playTabSwitchCue: playTabSwitch,
+    playActionSuccessCue: playActionSuccess,
+    playActionDeleteCue: playActionDelete,
   }), [
     soundEnabled,
     isMounted,
@@ -135,7 +199,15 @@ export function SoundProvider({ children }) {
     setSoundEnabled,
     toggleSound,
     playStart,
+    playPause,
+    playResume,
+    playReset,
     playCompletion,
+    playStepToggle,
+    playHabitComplete,
+    playTabSwitch,
+    playActionSuccess,
+    playActionDelete,
   ]);
 
   return (

@@ -2,7 +2,14 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTimerContext } from '@/contexts/TimerContext';
-import { unlockAudio, playStartCue, playCompletionChime } from '@/utils/audio-chime';
+import {
+  unlockAudio,
+  playStartCue,
+  playPauseCue,
+  playResumeCue,
+  playResetCue,
+  playCompletionChime,
+} from '@/utils/audio-chime';
 import { requestNotificationPermission, sendTimerNotification } from '@/utils/timer-notifications';
 
 /**
@@ -191,6 +198,11 @@ export function useTimer({
       return;
     }
 
+    // If timer is already running in standalone mode, avoid duplicate triggers
+    if (localTimerActive) {
+      return;
+    }
+
     unlockAudio();
     requestNotificationPermission().catch(() => {});
 
@@ -199,7 +211,9 @@ export function useTimer({
     const endTime = Date.now() + remaining * 1000;
     targetEndTimeRef.current = endTime;
 
-    if (!isResuming) {
+    if (isResuming) {
+      playResumeCue();
+    } else {
       playStartCue();
     }
 
@@ -219,7 +233,7 @@ export function useTimer({
         }));
       } catch {}
     }
-  }, [context, habitId, ctxState?.targetMinutes, initialTargetMinutes, localIsPaused, localSecondsRemaining, localTargetSeconds, storageKey, localTargetMinutes]);
+  }, [context, habitId, ctxState?.targetMinutes, initialTargetMinutes, localTimerActive, localIsPaused, localSecondsRemaining, localTargetSeconds, storageKey, localTargetMinutes]);
 
   const pauseTimer = useCallback(() => {
     if (context) {
@@ -227,7 +241,10 @@ export function useTimer({
       return;
     }
 
+    if (!localTimerActive) return;
+
     if (timerRef.current) clearInterval(timerRef.current);
+    playPauseCue();
     setLocalTimerActive(false);
     setLocalIsPaused(true);
 
@@ -249,7 +266,7 @@ export function useTimer({
         }));
       } catch {}
     }
-  }, [context, habitId, localSecondsRemaining, storageKey, localTargetMinutes, localTargetSeconds]);
+  }, [context, habitId, localTimerActive, localSecondsRemaining, storageKey, localTargetMinutes, localTargetSeconds]);
 
   const resetTimer = useCallback(() => {
     if (context) {
@@ -257,7 +274,11 @@ export function useTimer({
       return;
     }
 
+    const canReset = localTimerActive || (localIsPaused && localSecondsRemaining < localTargetSeconds);
+    if (!canReset) return;
+
     if (timerRef.current) clearInterval(timerRef.current);
+    playResetCue();
     setLocalTimerActive(false);
     setLocalIsPaused(false);
     targetEndTimeRef.current = null;
@@ -266,7 +287,7 @@ export function useTimer({
     if (storageKey) {
       try { localStorage.removeItem(storageKey); } catch {}
     }
-  }, [context, habitId, ctxState?.targetMinutes, initialTargetMinutes, localTargetSeconds, storageKey]);
+  }, [context, habitId, ctxState?.targetMinutes, initialTargetMinutes, localTimerActive, localIsPaused, localSecondsRemaining, localTargetSeconds, storageKey]);
 
   const setDuration = useCallback((mins) => {
     if (context) {

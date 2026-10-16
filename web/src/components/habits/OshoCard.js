@@ -4,6 +4,7 @@ import { useState, memo } from 'react';
 import { Headphones, Check, Clock, Sparkles, BookOpen } from 'lucide-react';
 import { getCategoryConfig } from '@/lib/constants/categories';
 import { OSHO_LIBRARY } from '@/lib/fixtures/osho-library';
+import { useSound } from '@/contexts';
 import OshoLibraryModal from './OshoLibraryModal';
 
 function OshoCard({
@@ -15,6 +16,7 @@ function OshoCard({
   userProfile = {},
   onUpdateProfile,
 }) {
+  const { playStepToggleCue, playHabitCompleteCue } = useSound();
   const [showLibraryModal, setShowLibraryModal] = useState(false);
 
   const config = getCategoryConfig(habit.category);
@@ -86,7 +88,14 @@ function OshoCard({
             <div className="flex flex-col items-end flex-shrink-0 pt-0.5">
               <button
                 type="button"
-                onClick={() => onToggle(habit.id)}
+                onClick={() => {
+                  if (!isCompleted) {
+                    playHabitCompleteCue?.();
+                  } else {
+                    playStepToggleCue?.(false);
+                  }
+                  onToggle?.(habit.id);
+                }}
                 className={`w-11 h-11 rounded-full border-2 flex items-center justify-center transition-all ${
                   isCompleted
                     ? 'bg-amber-600 border-amber-600 text-white shadow-xs'

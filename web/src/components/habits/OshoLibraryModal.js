@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ExternalLink, Headphones, Search, CheckCircle2, BookmarkCheck, BookOpen, AlertCircle } from 'lucide-react';
 import { OSHO_GROUPS, OSHO_LIBRARY } from '@/lib/fixtures/osho-library';
+import { useSound } from '@/contexts';
 
 export default function OshoLibraryModal({
   isOpen,
@@ -12,8 +13,16 @@ export default function OshoLibraryModal({
   onSelectSeries,
   onUpdateTalkProgress,
 }) {
+  const { playTabSwitchCue } = useSound();
   const [selectedGroup, setSelectedGroup] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  const handleGroupSelect = (groupId) => {
+    if (groupId !== selectedGroup) {
+      setSelectedGroup(groupId);
+      playTabSwitchCue?.();
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -74,7 +83,7 @@ export default function OshoLibraryModal({
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide text-xs">
             <button
               type="button"
-              onClick={() => setSelectedGroup('all')}
+              onClick={() => handleGroupSelect('all')}
               className={`px-3 py-1.5 rounded-full font-medium whitespace-nowrap transition-colors ${
                 selectedGroup === 'all'
                   ? 'bg-amber-600 text-white'
@@ -87,7 +96,7 @@ export default function OshoLibraryModal({
               <button
                 key={g.id}
                 type="button"
-                onClick={() => setSelectedGroup(g.id)}
+                onClick={() => handleGroupSelect(g.id)}
                 className={`px-3 py-1.5 rounded-full font-medium whitespace-nowrap transition-colors ${
                   selectedGroup === g.id
                     ? 'bg-amber-600 text-white'
