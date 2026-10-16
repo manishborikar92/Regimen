@@ -24,6 +24,8 @@ Built with Next.js 16, React 19, Tailwind CSS v4, and Firebase, it features a cl
   - **`SpeakingCard`:** Structured ChatGPT voice practice prompts.
   - **`DiaryCard`:** Private encrypted journal with 5 rotating reflection prompts.
 - **Guilt-Free Consistency Rhythm:** Consistency calculations that exclude scheduled rest days from denominators, eliminating artificial streak failures.
+- **Interactive Sound Architecture:** Procedural Web Audio API synthesis providing serene acoustic feedback for timer events, habit completions, checklist toggles, and tactile navigation, with global mute and volume controls.
+- **Resilient Background Timer:** Dedicated Web Worker execution combined with wall-clock timestamp synchronization, guaranteeing zero interval drift, immunity to background tab throttling, and silent reload recovery.
 - **Two-State Theme Engine:** Binary Light/Dark mode with a tactile icon-only toggle (`ThemeToggle`) meeting WCAG 2.2 Level AAA touch target standards (>= 44×44px) and zero-flash pre-paint execution.
 - **Authoritative Visual Identity:** The Guiding Sutra monoline mark, Deep Obsidian (`#090D16`), Luminous Teal (`#14B8A6`), and Warm Amber (`#D97706`).
 - **Offline-First Persistence:** Cloud Firestore persistent local cache enables seamless operation without active network connectivity.
@@ -74,11 +76,11 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 Comprehensive technical guides and operational runbooks are maintained under the [`docs/`](docs/) directory:
 
 - 📖 **[Documentation Index](docs/README.md):** Complete navigation map for all project documentation.
-- 🏛️ **[Architecture & System Design](docs/architecture.md):** Deep dive into system design, data flows, theme engine, and Firestore collection schemas.
+- 🏛️ **[Architecture & System Design](docs/architecture.md):** Deep dive into system design, data flows, theme engine, sound architecture, and Firestore schemas.
 - 💻 **[Local Development Guide](docs/development.md):** Workstation setup, package scripts, testing strategy, and troubleshooting.
 - 🔥 **[Firebase Setup & Operations Runbook](docs/firebase-setup.md):** Credential management, security rules, indexes, and service account key rotation.
 - 🚀 **[Deployment & Release Guide](docs/deployment.md):** Vercel edge deployment, Git release workflow (`dev` -> `main`), and verification checklists.
-- 🗺️ **[Project Roadmap & Outstanding Actions](docs/roadmap.md):** Status tracking for the pending Phase 13 production release and Phase 8 directory rename.
+- 🗺️ **[Project Roadmap & Production Readiness](docs/roadmap.md):** Milestone completion summary (Phases 1–8 complete) and production release runbook.
 
 ---
 
@@ -88,7 +90,7 @@ Run all project checks before committing:
 
 ```bash
 # From project root
-npm --prefix web run test    # 98 automated unit tests across 31 suites
+npm --prefix web run test    # 350+ automated unit & integration tests across 115+ suites
 npm --prefix web run lint    # Next.js flat ESLint verification
 npm --prefix web run build   # Production webpack build compilation
 git diff --check             # Whitespace and formatting verification

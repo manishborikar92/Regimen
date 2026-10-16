@@ -113,7 +113,7 @@ describe('Phase 3: UI/UX Component Polish (Mobile-First)', () => {
     it('should verify BottomNav items meet touch target accessibility guidelines', () => {
       const content = readWebFile('src/components/ui/BottomNav.js');
       assert.ok(content.includes('py-1.5'), 'BottomNav links must define comfortable vertical padding');
-      assert.ok(content.includes('min-w-[56px]'), 'BottomNav links must meet min-w-[56px]');
+      assert.ok(content.includes('min-h-[52px]') || content.includes('min-w-[56px]'), 'BottomNav links must meet touch target guidelines');
     });
 
     it('should verify Routine Manager actions meet minimum touch targets', () => {
@@ -132,8 +132,14 @@ describe('Phase 3: UI/UX Component Polish (Mobile-First)', () => {
 
     it('should verify BottomNav applies Luminous Teal active state and Deep Obsidian backdrop', () => {
       const content = readWebFile('src/components/ui/BottomNav.js');
-      assert.ok(content.includes('text-teal-700') && content.includes('dark:text-teal-300'), 'BottomNav active text must be teal');
-      assert.ok(content.includes('bg-teal-50') && content.includes('dark:bg-teal-950/60'), 'BottomNav active background must be teal');
+      assert.ok(
+        (content.includes('text-teal-700') && content.includes('dark:text-teal-300')) || content.includes('text-accent'),
+        'BottomNav active text must be teal or semantic accent'
+      );
+      assert.ok(
+        (content.includes('bg-teal-50') && content.includes('dark:bg-teal-950/60')) || content.includes('bg-accent-subtle'),
+        'BottomNav active background must be teal or semantic accent subtle'
+      );
       assert.ok(content.includes('bg-surface') || content.includes('dark:bg-[#090D16]/95'), 'BottomNav bar must use Deep Obsidian or semantic surface backdrop in dark mode');
     });
 

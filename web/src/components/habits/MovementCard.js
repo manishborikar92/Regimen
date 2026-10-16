@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, memo } from 'react';
+import { useState, useRef, memo } from 'react';
 import {
   Activity,
   Check,
@@ -34,10 +34,12 @@ function MovementCard({
   userProfile = {},
   onUpdateProfile,
 }) {
-  const { playStepToggleCue, playHabitCompleteCue } = useSound();
+  const { playStepToggleCue, playHabitCompleteCue, playActionSuccessCue } = useSound();
   const [isExpanded, setIsExpanded] = useState(false);
   const [showSafetyModal, setShowSafetyModal] = useState(false);
   const [expandedExerciseId, setExpandedExerciseId] = useState(null);
+  const [isActivatingPlan, setIsActivatingPlan] = useState(false);
+  const activatingPlanRef = useRef(false);
 
   const config = getCategoryConfig(habit.category);
   const dayOfWeek = getDayOfWeek();
@@ -106,10 +108,13 @@ function MovementCard({
     }, nextState);
   };
 
-  const handleActivatePlan = () => {
-    if (onUpdateProfile) {
+  const handleActivatePlan = async () => {
+    if (exercisePlanState?.activated || activatingPlanRef.current || !onUpdateProfile) return;
+    activatingPlanRef.current = true;
+    setIsActivatingPlan(true);
+    try {
       const todayStr = new Date().toISOString().split('T')[0];
-      onUpdateProfile({
+      await onUpdateProfile({
         exercisePlan: {
           activated: true,
           startDate: todayStr,
@@ -117,6 +122,12 @@ function MovementCard({
           checkupCompleted: false,
         },
       });
+      playActionSuccessCue?.();
+    } catch (err) {
+      console.error('Failed to activate 12-week plan:', err);
+    } finally {
+      activatingPlanRef.current = false;
+      setIsActivatingPlan(false);
     }
   };
 
@@ -362,9 +373,10 @@ function MovementCard({
               <button
                 type="button"
                 onClick={handleActivatePlan}
-                className="text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-semibold underline flex items-center py-2"
+                disabled={isActivatingPlan || exercisePlanState.activated}
+                className="text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-semibold underline flex items-center py-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Start 12-Week Plan
+                {isActivatingPlan ? 'Starting Plan...' : 'Start 12-Week Plan'}
               </button>
             )}
           </div>

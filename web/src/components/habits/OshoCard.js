@@ -30,7 +30,7 @@ function OshoCard({
 
   const handleSelectSeries = (seriesId) => {
     if (onUpdateProfile) {
-      onUpdateProfile({
+      return onUpdateProfile({
         activeOshoSeriesId: seriesId,
       });
     }
@@ -46,7 +46,7 @@ function OshoCard({
           lastUpdated: new Date().toISOString(),
         },
       };
-      onUpdateProfile({
+      return onUpdateProfile({
         oshoSeriesProgress: updatedSeriesProgress,
       });
     }

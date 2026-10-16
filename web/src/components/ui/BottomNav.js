@@ -2,52 +2,96 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { CalendarCheck2, Compass, LineChart } from 'lucide-react';
 import { useSound } from '@/contexts/SoundContext';
+import { NAV_ITEMS, isRouteActive } from '@/lib/constants/navigation';
+import { useKeyboardOpen } from '@/hooks/useKeyboardOpen';
+import { cn } from '@/lib/utils/cn';
 
-const navItems = [
-  { href: '/dashboard', label: 'Today', Icon: CalendarCheck2 },
-  { href: '/habits', label: 'Routine', Icon: Compass },
-  { href: '/analytics', label: 'Insights', Icon: LineChart },
-];
+function NavTab({ href, label, Icon, active, onClick }) {
+  return (
+    <li className="min-w-0 flex-1">
+      <Link
+        href={href}
+        onClick={onClick}
+        aria-current={active ? 'page' : undefined}
+        className="group flex min-h-14 min-w-[56px] py-1.5 w-full select-none flex-col items-center justify-center rounded-xl focus-visible:-outline-offset-2"
+      >
+        {/* Pill indicator behind the icon only (Material 3 / iOS style) */}
+        <span className="relative flex h-8 w-16 items-center justify-center">
+          <span
+            aria-hidden="true"
+            className={cn(
+              'absolute inset-0 rounded-full transition-all duration-200 ease-out motion-reduce:transition-none',
+              active
+                ? 'scale-100 bg-accent-subtle/60 opacity-100'
+                : 'scale-x-50 scale-y-75 bg-surface-subtle opacity-0 group-hover:scale-100 group-hover:opacity-100 group-active:scale-100 group-active:opacity-100'
+            )}
+          />
+          <Icon
+            aria-hidden="true"
+            className={cn(
+              'relative size-5.5 transition-[color,transform] motion-safe:group-active:scale-90',
+              active ? 'stroke-[2.3] text-accent' : 'stroke-[1.8] text-muted group-hover:text-main'
+            )}
+          />
+        </span>
+        <span
+          className={cn(
+            'mt-0.5 max-w-full truncate text-2xs font-semibold tracking-tight transition-colors',
+            active ? 'text-accent' : 'text-muted group-hover:text-main'
+          )}
+        >
+          {label}
+        </span>
+      </Link>
+    </li>
+  );
+}
 
 export default function BottomNav() {
   const pathname = usePathname();
   const { playTabSwitchCue } = useSound();
+  const keyboardOpen = useKeyboardOpen();
 
-  const handleNavClick = (href) => {
-    if (pathname !== href) {
+  const handleClick = (e, href, active) => {
+    // Re-tapping the current tab scrolls to top instead of navigating
+    if (pathname === href) {
+      e.preventDefault();
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      return;
+    }
+    if (!isRouteActive(pathname, href)) {
       playTabSwitchCue?.();
+      navigator.vibrate?.(8); // light haptic tick (Android; ignored on iOS)
     }
   };
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur-md border-t border-subtle/90 pb-safe z-50 transition-colors"
       aria-label="Main navigation"
+      aria-hidden={keyboardOpen || undefined}
+      className={cn(
+        'fixed inset-x-0 bottom-0 z-50 border-t border-subtle/90 bg-surface/95 pb-safe backdrop-blur-md',
+        'transition-transform duration-200 motion-reduce:transition-none',
+        keyboardOpen ? 'pointer-events-none translate-y-full' : 'translate-y-0'
+      )}
     >
-      <div className="max-w-md mx-auto flex justify-around px-2 py-1.5">
-        {navItems.map(({ href, label, Icon }) => {
-          const isActive = pathname === href;
+      <ul className="mx-auto flex max-w-2xl items-stretch gap-1 px-2 pt-1.5 pb-1">
+        {NAV_ITEMS.map(({ href, label, Icon }) => {
+          const active = isRouteActive(pathname, href);
           return (
-            <Link
+            <NavTab
               key={href}
               href={href}
-              onClick={() => handleNavClick(href)}
-              className={`flex flex-col items-center justify-center min-w-[56px] py-1.5 px-4 rounded-xl transition-all ${
-                isActive
-                  ? 'text-teal-700 dark:text-teal-300 font-bold bg-teal-50 dark:bg-teal-950/60'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/70 dark:hover:bg-slate-800/60 font-medium'
-              }`}
-              aria-current={isActive ? 'page' : undefined}
-            >
-              <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.3]' : 'stroke-[1.8]'}`} />
-              <span className="text-2xs mt-1 tracking-tight">{label}</span>
-            </Link>
+              label={label}
+              Icon={Icon}
+              active={active}
+              onClick={(e) => handleClick(e, href, active)}
+            />
           );
         })}
-      </div>
+      </ul>
     </nav>
   );
 }
-

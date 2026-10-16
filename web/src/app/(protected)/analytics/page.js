@@ -245,13 +245,10 @@ export default function AnalyticsPage() {
       {viewMode === 'calendar' && (
         <div className="space-y-4">
           <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-subtle shadow-2xs">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs sm:text-sm font-bold text-main flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-                Last 30 Days Activity Map
-              </h3>
-              <span className="text-2xs text-muted">Tap a date to inspect activities</span>
-            </div>
+            <h3 className="mb-3 text-xs sm:text-sm font-bold text-main flex items-center gap-1.5">
+              <Calendar className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+              Last 30 Days Activity Map
+            </h3>
 
             {/* Day Headers (Mon-Sun) */}
             <div className="grid grid-cols-7 gap-1.5 text-center text-2xs font-bold text-muted py-1 border-b border-subtle mb-2">
@@ -290,7 +287,9 @@ export default function AnalyticsPage() {
                     type="button"
                     onClick={() => setSelectedDate(isSelected ? null : dateStr)}
                     className={`aspect-square rounded-xl flex flex-col items-center justify-center text-xs font-bold transition-all ${cellStyle} ${
-                      isSelected ? 'ring-2 ring-teal-600 dark:ring-teal-400 ring-offset-2 ring-offset-surface scale-105' : 'hover:opacity-85'
+                      isSelected
+                        ? 'ring-1 ring-teal-600 dark:ring-teal-400 ring-offset-1 ring-offset-surface'
+                        : 'hover:opacity-85'
                     }`}
                     aria-label={`${dateStr}: ${metrics.rate ?? 0}% completed`}
                   >

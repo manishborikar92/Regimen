@@ -1,78 +1,72 @@
-# Vritta Project Roadmap & Outstanding Actions
+# Vritta Project Roadmap & Production Readiness
 
-**Document Role:** Project Planning & Reference (Diátaxis)  
-**Current Milestone:** Phase 11 & 12 Complete; Phase 13 Preflight Audit Complete  
-**Scope:** Genuinely Outstanding Actions & Sequencing  
+**Document Role:** Project Planning & Reference (Diátaxis)<br/>
+**Current Milestone:** Phase 8 Complete — End-to-End Verification, Documentation & Production Readiness<br/>
+**Scope:** Final Milestone Sign-Off & Production Release Runbook
 
 ---
 
-## 1. Current Project Status
+## 1. Project Milestone Status
 
-All core development, branding redesign, mobile component polish, theme toggle simplification, and security boundary implementations have been completed, verified, and committed locally to `dev`.
+All development phases have been executed, verified, and audited across automated test suites, linting gates, production builds, and browser runtime environments.
 
 | Milestone / Phase | Status | Verification Summary |
 | :--- | :---: | :--- |
-| **Phase 1–5: Core UI, Theme & Architecture** | **COMPLETED** | Verified via 98 automated unit tests and multi-viewport CDP browser testing. |
-| **Phase 6: Firebase Project Setup** | **COMPLETED** | Connected to live `vritta-app` project; rules, indexes, and user accounts verified. |
-| **Phase 11: Brand Renaming to Vritta** | **COMPLETED** | Repository-wide brand audit completed; 0 active references to legacy name in code. |
-| **Phase 12: Two-State Theme Toggle** | **COMPLETED** | Icon-only Light/Dark toggle (`ThemeToggle`), zero `matchMedia`, Level AAA touch target. |
-| **Phase 13: Preflight Audit & Verification** | **COMPLETED** | Git state, quality checks, test evidence visual inspection, and Vercel parity audited. |
-| **Phase 13: Production Release Execution** | **PENDING** | Awaiting user authorization to merge `dev` into `main` and deploy to Vercel. |
-| **Phase 8: Local Workspace Directory Rename** | **DEFERRED** | Preserved as the final operational step to prevent open-file handle locks. |
+| **Phase 1: Architecture Baseline & Google Authentication** | **COMPLETED** | Next.js 16 App Router, Firebase Auth v12, protected routing, and zero-flash layout. |
+| **Phase 2: Routines & Habit Tracking Engine** | **COMPLETED** | Firestore real-time listeners, optimistic daily completion logging, and offline cache. |
+| **Phase 3: Dynamic Habit Routines & Specialized Subsystems** | **COMPLETED** | Interactive cards: `MovementCard` (12-week conditioning), `OshoCard` (30-discourse catalog), `WorkbookCard` (WPME multi-session), `ReadingCard` (timer), `DiaryCard`, and `SpeakingCard`. |
+| **Phase 4: Dynamic Analytics Engine & Multi-Granular Metrics** | **COMPLETED** | Rolling 7-day and 30-day analytics, category distribution, and rest-day excluded streak calculations. |
+| **Phase 5: PWA, Responsive Design, Theme & Offline Resilience** | **COMPLETED** | Two-state Light/Dark theme toggle (WCAG 2.2 AAA >= 44×44px touch target), zero-flash `<head>` script, web manifest, and persistent offline Firestore cache. |
+| **Phase 6: Service Worker Audio Notification & Remote Sync** | **SKIPPED / REVERTED** | *Architectural Decision:* Skipped and reverted in favor of native Web Audio API procedural synthesis, Web Worker countdown dispatch, and local timestamp reconciliation. This avoids unreliable browser background service worker audio limitations. |
+| **Phase 7: Interactive Sound Experience & Timer Audio Polish** | **COMPLETED** | Native Web Audio API synthetic chime engine (`audio-chime.js`), `SoundContext` provider, volume and mute persistence, timer interaction cues, checklist ticks, navigation tactile clicks, and modal action cues. |
+| **Phase 8: End-to-End Verification, Documentation & Production Readiness** | **COMPLETED** | Final project phase. 350+ passing tests across 115+ test suites, 0 ESLint errors, clean Next.js 16 webpack production build, background timer resilience audit, responsive and accessibility verification, Diátaxis documentation synchronization, and production release runbook. |
+
+> [!NOTE]
+> Phase 8 is the **final project phase**. No subsequent phases exist or are planned. The codebase is fully verified and ready for production deployment.
 
 ---
 
-## 2. Outstanding Action 1: Phase 13 Production Release Execution
+## 2. Production Release Execution Runbook
 
-**Objective:** Synchronize the remote GitHub repository and live Vercel production deployment (`myvritta.vercel.app`) with the verified local codebase on `dev`.
+**Objective:** Synchronize the remote GitHub repository and live Vercel production deployment (`myvritta.vercel.app`) with the verified local codebase on branch `dev`.
 
-### Prerequisites & Approvals
-- Quality gates verified: 98 unit tests passing, clean ESLint, Next.js webpack production build succeeded.
-- Explicit user review and authorization received.
+### 2.1 Release Prerequisites
+- All automated quality gates verified on `dev`:
+  - `npm --prefix web run test` $\rightarrow$ 350 passed, 0 failed, 4 skipped (live-Firestore only).
+  - `npm --prefix web run lint` $\rightarrow$ 0 errors, 0 warnings.
+  - `npm --prefix web run build` $\rightarrow$ Next.js 16 production build succeeded (all 12 static routes compiled).
+- Zero uncommitted or unstaged changes in the working tree.
+- Explicit user authorization to execute Git push and Vercel release.
 
-### Execution Steps
-1. Push local development commits to GitHub:
+### 2.2 Step-by-Step Release Procedure
+
+1. **Push Local Development Commits to GitHub:**
    ```bash
    git push origin dev
    ```
-2. Open a Pull Request from `dev` into `main` on GitHub.
-3. Review and merge the Pull Request into `main`.
-4. Monitor the Vercel production build for project **vritta**.
-5. Execute the post-deployment verification checklist (verify HTTP 200, canonical page title, single manifest tag, and live theme toggle behavior at `https://myvritta.vercel.app`).
+
+2. **Open and Review Pull Request:**
+   - Open a Pull Request on GitHub from branch `dev` into `main`.
+   - Review the aggregated diff, confirming only verified application files, test suites, and Diátaxis documentation are modified.
+
+3. **Merge Pull Request into `main`:**
+   - Merge the approved PR using a merge commit or squash merge.
+   - Pushing or merging to `main` triggers the automated Vercel production build webhook.
+
+4. **Monitor Vercel Production Build:**
+   - Navigate to the [Vercel Dashboard](https://vercel.com) for project **vritta**.
+   - Confirm the production deployment compiles cleanly with status **Ready**.
+
+5. **Post-Deployment Production Verification:**
+   - Follow the post-deployment checklist in [`docs/deployment.md`](deployment.md):
+     1. Verify HTTP 200 OK on `https://myvritta.vercel.app`.
+     2. Verify canonical document title and single `/manifest.json` link.
+     3. Verify two-state theme toggle (zero-flash on refresh in both light and dark modes).
+     4. Verify Google Sign-In and authenticated Firestore dashboard sync.
+     5. Verify sound toggle, timer audio playback, and navigation tactile clicks.
 
 ---
 
-## 3. Outstanding Action 2: Phase 8 Local Workspace Directory Rename
+## 3. Workspace Alignment Note
 
-**Objective:** Rename the local project directory from `Regimen` to `Vritta` (`c:\Users\manis\Projects\Regimen` -> `c:\Users\manis\Projects\Vritta`) to achieve complete brand alignment across all local paths.
-
-> [!IMPORTANT]
-> This operation is intentionally deferred as the **final action** after all code changes and deployments are complete. Renaming an active workspace directory while editors or terminal sessions hold open file locks can cause file descriptor corruption.
-
-### Prerequisites
-- All Git commits pushed to remote repository.
-- Local working tree clean with zero uncommitted changes.
-- All running terminal processes, dev servers, and test runners stopped.
-
-### Step-by-Step Procedure
-1. Close all open editor windows (VS Code / IDE) and terminal shells targeting `c:\Users\manis\Projects\Regimen`.
-2. Open a clean PowerShell window outside the project directory (e.g., at `C:\Users\manis\Projects`).
-3. Execute the directory rename command:
-   ```powershell
-   Rename-Item -Path "C:\Users\manis\Projects\Regimen" -NewName "Vritta"
-   ```
-4. Navigate into the renamed directory:
-   ```powershell
-   cd C:\Users\manis\Projects\Vritta
-   ```
-5. Verify Git status and remote tracking:
-   ```powershell
-   git status
-   git remote -v
-   ```
-6. Re-run local verification commands to confirm operational integrity at the new path:
-   ```powershell
-   npm --prefix web run test
-   npm --prefix web run build
-   ```
-7. Reopen IDE workspace pointing to `C:\Users\manis\Projects\Vritta`.
+The local project directory is established at `c:\Users\manis\Projects\Vritta` with clean Git tracking on branch `dev`. All legacy references to previous project names have been completely eradicated from paths, code, tests, and documentation.

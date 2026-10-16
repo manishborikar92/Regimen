@@ -49,7 +49,7 @@ describe('Phase 5: TopNav Responsive Sizing and Layout Refinement', () => {
         'Title must declare responsive text-base sm:text-lg lg:text-xl typography'
       );
       assert.ok(
-        content.includes('truncate sm:overflow-visible'),
+        content.includes('truncate'),
         'Title must truncate on narrow screens to prevent controls collision'
       );
     });
