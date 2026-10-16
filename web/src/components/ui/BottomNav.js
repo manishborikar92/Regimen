@@ -2,64 +2,93 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { CalendarCheck2, Compass, LineChart } from 'lucide-react';
 import { useSound } from '@/contexts/SoundContext';
+import { NAV_ITEMS, isRouteActive } from '@/lib/constants/navigation';
+import { useKeyboardOpen } from '@/hooks/useKeyboardOpen';
+import { cn } from '@/lib/utils/cn';
 
-const navItems = [
-  { href: '/dashboard', label: 'Today', Icon: CalendarCheck2 },
-  { href: '/habits', label: 'Routine', Icon: Compass },
-  { href: '/analytics', label: 'Insights', Icon: LineChart },
-];
-
-// Match the section, not just the exact URL, so /habits/123 still highlights "Routine"
-const isRouteActive = (pathname, href) =>
-  pathname === href || pathname?.startsWith(`${href}/`);
+function NavTab({ href, label, Icon, active, onClick }) {
+  return (
+    <li className="min-w-0 flex-1">
+      <Link
+        href={href}
+        onClick={onClick}
+        aria-current={active ? 'page' : undefined}
+        className="group flex min-h-14 min-w-[56px] py-1.5 w-full select-none flex-col items-center justify-center rounded-xl focus-visible:-outline-offset-2"
+      >
+        {/* Pill indicator behind the icon only (Material 3 / iOS style) */}
+        <span className="relative flex h-8 w-16 items-center justify-center">
+          <span
+            aria-hidden="true"
+            className={cn(
+              'absolute inset-0 rounded-full transition-all duration-200 ease-out motion-reduce:transition-none',
+              active
+                ? 'scale-100 bg-accent-subtle/60 opacity-100'
+                : 'scale-x-50 scale-y-75 bg-surface-subtle opacity-0 group-hover:scale-100 group-hover:opacity-100 group-active:scale-100 group-active:opacity-100'
+            )}
+          />
+          <Icon
+            aria-hidden="true"
+            className={cn(
+              'relative size-5.5 transition-[color,transform] motion-safe:group-active:scale-90',
+              active ? 'stroke-[2.3] text-accent' : 'stroke-[1.8] text-muted group-hover:text-main'
+            )}
+          />
+        </span>
+        <span
+          className={cn(
+            'mt-0.5 max-w-full truncate text-2xs font-semibold tracking-tight transition-colors',
+            active ? 'text-accent' : 'text-muted group-hover:text-main'
+          )}
+        >
+          {label}
+        </span>
+      </Link>
+    </li>
+  );
+}
 
 export default function BottomNav() {
   const pathname = usePathname();
-  // Guard against a missing provider so the nav never crashes the page
-  const { playTabSwitchCue } = useSound() ?? {};
+  const { playTabSwitchCue } = useSound();
+  const keyboardOpen = useKeyboardOpen();
 
-  const handleNavClick = (href) => {
+  const handleClick = (e, href, active) => {
+    // Re-tapping the current tab scrolls to top instead of navigating
+    if (pathname === href) {
+      e.preventDefault();
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      return;
+    }
     if (!isRouteActive(pathname, href)) {
       playTabSwitchCue?.();
+      navigator.vibrate?.(8); // light haptic tick (Android; ignored on iOS)
     }
   };
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur-md border-t border-subtle/90 z-50 transition-colors"
-      // Real CSS instead of the custom `pb-safe` class (silently does nothing if undefined).
-      // Requires <meta viewport ... viewport-fit=cover> / Next `viewport.viewportFit = 'cover'`.
-      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       aria-label="Main navigation"
+      aria-hidden={keyboardOpen || undefined}
+      className={cn(
+        'fixed inset-x-0 bottom-0 z-50 border-t border-subtle/90 bg-surface/95 pb-safe backdrop-blur-md',
+        'transition-transform duration-200 motion-reduce:transition-none',
+        keyboardOpen ? 'pointer-events-none translate-y-full' : 'translate-y-0'
+      )}
     >
-      {/* max-w-2xl matches the TopNav container so both bars align on tablet/desktop */}
-      <ul className="max-w-2xl mx-auto flex items-stretch gap-1 px-2 py-1.5">
-        {navItems.map(({ href, label, Icon }) => {
-          const isActive = isRouteActive(pathname, href);
+      <ul className="mx-auto flex max-w-2xl items-stretch gap-1 px-2 pt-1.5 pb-1">
+        {NAV_ITEMS.map(({ href, label, Icon }) => {
+          const active = isRouteActive(pathname, href);
           return (
-            <li key={href} className="flex-1 min-w-0">
-              <Link
-                href={href}
-                onClick={() => handleNavClick(href)}
-                aria-current={isActive ? 'page' : undefined}
-                className={`flex flex-col items-center justify-center w-full min-h-[52px] py-1.5 px-2 rounded-xl transition-colors motion-safe:active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
-                  isActive
-                    ? 'text-accent bg-accent-subtle/40'
-                    : 'text-muted hover:text-main hover:bg-surface-subtle'
-                }`}
-              >
-                <Icon
-                  className={`w-5 h-5 ${isActive ? 'stroke-[2.3]' : 'stroke-[1.8]'}`}
-                  aria-hidden="true"
-                />
-                {/* constant weight: switching bold/medium changed the label width and made the bar jitter */}
-                <span className="text-2xs font-semibold mt-1 tracking-tight truncate max-w-full">
-                  {label}
-                </span>
-              </Link>
-            </li>
+            <NavTab
+              key={href}
+              href={href}
+              label={label}
+              Icon={Icon}
+              active={active}
+              onClick={(e) => handleClick(e, href, active)}
+            />
           );
         })}
       </ul>
