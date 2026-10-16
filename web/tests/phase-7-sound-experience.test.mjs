@@ -227,13 +227,22 @@ describe('Phase 7: Interactive Sound Experience & Audio Polish', () => {
         'handleTimerFinished must guard playCompletionCue with !isSilent'
       );
       assert.ok(
-        contextContent.includes('finishingTimersRef.current.has(id)'),
-        'tickTimers must use finishingTimersRef to prevent duplicate completion handling'
+        contextContent.includes('completedSessionsRef.current[sessionKey]'),
+        'tickTimers must use completedSessionsRef to prevent duplicate completion handling'
       );
       assert.ok(
         contextContent.includes('handleTimerFinished(id, t.targetMinutes, true /* isSilent'),
         'Reload recovery for expiredWhileAway must pass isSilent=true to handleTimerFinished'
       );
+    });
+
+    it('should verify background timer resilience: Web Worker ticker, target deadline timeouts, and pageshow listener', () => {
+      const contextContent = readWebFile('src/contexts/TimerContext.js');
+      assert.ok(contextContent.includes('createTimerWorker'), 'TimerContext must define Web Worker ticker');
+      assert.ok(contextContent.includes('deadlineTimeoutsRef'), 'TimerContext must schedule exact deadline timeouts');
+      assert.ok(contextContent.includes("window.addEventListener('pageshow'"), 'TimerContext must listen to pageshow for bfcache restore');
+      assert.ok(contextContent.includes('useAuth'), 'TimerContext must consume useAuth for reload recovery');
+      assert.ok(contextContent.includes('diffMs <= 0 ? 0 : Math.ceil(diffMs / 1000)'), 'getTimerState must compute realtime remaining to prevent 00:01 stranding');
     });
 
     it('should verify standalone use-timer.js fallback supports start, resume, pause, reset, and completion cues', () => {
@@ -322,10 +331,14 @@ describe('Phase 7: Interactive Sound Experience & Audio Polish', () => {
       );
     });
 
-    it('should verify BottomNav route navigation remains strictly silent', () => {
+    it('should verify BottomNav route navigation triggers playTabSwitchCue only on genuine destination switches', () => {
       const navContent = readWebFile('src/components/ui/BottomNav.js');
-      assert.ok(!navContent.includes('useSound'), 'BottomNav must NOT import useSound');
-      assert.ok(!navContent.includes('play'), 'BottomNav must NOT call any audio cues');
+      assert.ok(navContent.includes('useSound'), 'BottomNav must import useSound');
+      assert.ok(navContent.includes('playTabSwitchCue'), 'BottomNav must call playTabSwitchCue');
+      assert.ok(
+        navContent.includes('pathname !== href'),
+        'BottomNav must guard navigation cue so only genuine destination switches play sound'
+      );
     });
 
     it('should verify OshoLibraryModal group pill switcher triggers playTabSwitchCue only on genuine changes', () => {

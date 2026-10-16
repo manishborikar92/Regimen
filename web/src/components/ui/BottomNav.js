@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { CalendarCheck2, Compass, LineChart } from 'lucide-react';
+import { useSound } from '@/contexts/SoundContext';
 
 const navItems = [
   { href: '/dashboard', label: 'Today', Icon: CalendarCheck2 },
@@ -12,6 +13,13 @@ const navItems = [
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { playTabSwitchCue } = useSound();
+
+  const handleNavClick = (href) => {
+    if (pathname !== href) {
+      playTabSwitchCue?.();
+    }
+  };
 
   return (
     <nav
@@ -25,6 +33,7 @@ export default function BottomNav() {
             <Link
               key={href}
               href={href}
+              onClick={() => handleNavClick(href)}
               className={`flex flex-col items-center justify-center min-w-[56px] py-1.5 px-4 rounded-xl transition-all ${
                 isActive
                   ? 'text-teal-700 dark:text-teal-300 font-bold bg-teal-50 dark:bg-teal-950/60'
@@ -41,3 +50,4 @@ export default function BottomNav() {
     </nav>
   );
 }
+

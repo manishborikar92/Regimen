@@ -106,12 +106,16 @@ export function useTimer({
   // Context callback registration (UI notification only; TimerContext authoritatively owns updateProgress)
   useEffect(() => {
     if (!context) return;
+    // Purge legacy standalone storage entry to prevent stale split-brain cache
+    if (storageKey && typeof window !== 'undefined') {
+      try { localStorage.removeItem(storageKey); } catch {}
+    }
     return context.registerTimerCallback(habitId, {
       onFinish: () => {
         // TimerContext handles Firestore progress and notifications authoritatively.
       },
     });
-  }, [context, habitId]);
+  }, [context, habitId, storageKey]);
 
   // Sync initialTargetMinutes in standalone mode when idle without useEffect cascading renders
   const [prevInitialTarget, setPrevInitialTarget] = useState(initialTargetMinutes);

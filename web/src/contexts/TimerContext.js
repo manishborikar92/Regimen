@@ -3,11 +3,50 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { unlockAudio } from '@/utils/audio-chime';
 import { requestNotificationPermission, sendTimerNotification } from '@/utils/timer-notifications';
+import { useAuth } from '@/contexts/AuthContext';
 import { useData } from '@/contexts/DataContext';
 import { useSound } from '@/contexts/SoundContext';
 
 const STORAGE_KEY = 'vritta_active_timers';
 const TimerContext = createContext(null);
+
+/**
+ * Creates an inline Web Worker ticker to bypass background tab setInterval throttling (which browsers throttle to >= 1000ms or 60s).
+ */
+function createTimerWorker() {
+  if (typeof window === 'undefined' || typeof Worker === 'undefined') return null;
+  try {
+    const workerScript = `
+      let intervalId = null;
+      self.onmessage = function(e) {
+        if (e.data === 'start') {
+          if (!intervalId) {
+            intervalId = setInterval(function() {
+              self.postMessage('tick');
+            }, 500);
+          }
+        } else if (e.data === 'stop') {
+          if (intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
+          }
+        }
+      };
+    `;
+    const blob = new Blob([workerScript], { type: 'application/javascript' });
+    const url = URL.createObjectURL(blob);
+    const worker = new Worker(url);
+    worker.cleanup = () => {
+      try {
+        worker.terminate();
+        URL.revokeObjectURL(url);
+      } catch {}
+    };
+    return worker;
+  } catch {
+    return null;
+  }
+}
 
 function getInitialTimers() {
   if (typeof window === 'undefined') return {};
@@ -26,8 +65,8 @@ function getInitialTimers() {
       const targetSeconds = t.targetSeconds || t.targetMinutes * 60;
 
       if (t.isRunning && t.targetEndTime) {
-        const remaining = Math.max(0, Math.ceil((t.targetEndTime - now) / 1000));
-        if (remaining <= 0) {
+        const diffMs = t.targetEndTime - now;
+        if (diffMs <= 0) {
           // Timer expired while the browser was closed
           restored[id] = {
             ...t,
@@ -41,7 +80,7 @@ function getInitialTimers() {
           // Timer is still active
           restored[id] = {
             ...t,
-            secondsRemaining: remaining,
+            secondsRemaining: Math.ceil(diffMs / 1000),
             targetSeconds,
             isRunning: true,
             isPaused: false,
@@ -70,6 +109,11 @@ export function TimerProvider({ children }) {
   const [timers, setTimers] = useState(getInitialTimers);
   const callbacksRef = useRef({});
   const finishingTimersRef = useRef(new Set());
+  const deadlineTimeoutsRef = useRef({});
+  const completedSessionsRef = useRef({});
+  const workerRef = useRef(null);
+
+  const { user, loading: authLoading } = useAuth() || {};
   const { updateProgress, todayLog, toggleHabit } = useData() || {};
   const {
     playStartCue,
@@ -132,8 +176,10 @@ export function TimerProvider({ children }) {
     }
   }, [playCompletionCue, updateProgress, toggleHabit, todayLog]);
 
-  // Handle reload recovery once on mount if any running timer expired while the app was closed
+  // Handle reload recovery once auth is fully resolved if any running timer expired while the app was closed
   useEffect(() => {
+    if (authLoading) return;
+
     const initial = getInitialTimers();
     let hasExpired = false;
 
@@ -148,25 +194,27 @@ export function TimerProvider({ children }) {
       // Clean up localStorage immediately so reload recovery does not repeat
       saveToStorage(initial);
     }
-  }, [handleTimerFinished, saveToStorage]);
+  }, [authLoading, handleTimerFinished, saveToStorage]);
 
   // Reusable tick and sync execution function
   const tickTimers = useCallback(() => {
     const now = Date.now();
-    let hasChanges = false;
     const finishedTimers = [];
 
     setTimers((prev) => {
+      let hasChanges = false;
       const next = { ...prev };
 
       Object.entries(prev).forEach(([id, t]) => {
         if (!t.isRunning || !t.targetEndTime) return;
 
-        const remaining = Math.max(0, Math.ceil((t.targetEndTime - now) / 1000));
+        const diffMs = t.targetEndTime - now;
 
-        if (remaining <= 0) {
-          // Atomic guard against duplicate processing
-          if (!finishingTimersRef.current.has(id)) {
+        if (diffMs <= 0) {
+          // Idempotent session key guard against duplicate completion execution
+          const sessionKey = `${id}_${t.targetEndTime}`;
+          if (!completedSessionsRef.current[sessionKey] && !finishingTimersRef.current.has(id)) {
+            completedSessionsRef.current[sessionKey] = true;
             finishingTimersRef.current.add(id);
             hasChanges = true;
             next[id] = {
@@ -178,12 +226,15 @@ export function TimerProvider({ children }) {
             };
             finishedTimers.push({ habitId: id, targetMinutes: t.targetMinutes });
           }
-        } else if (remaining !== t.secondsRemaining) {
-          hasChanges = true;
-          next[id] = {
-            ...t,
-            secondsRemaining: remaining,
-          };
+        } else {
+          const remaining = Math.ceil(diffMs / 1000);
+          if (remaining !== t.secondsRemaining) {
+            hasChanges = true;
+            next[id] = {
+              ...t,
+              secondsRemaining: remaining,
+            };
+          }
         }
       });
 
@@ -194,39 +245,95 @@ export function TimerProvider({ children }) {
       return hasChanges ? next : prev;
     });
 
+    // Execute completions outside the setState updater to maintain pure functional state updates
     finishedTimers.forEach(({ habitId, targetMinutes }) => {
-      handleTimerFinished(habitId, targetMinutes);
+      if (deadlineTimeoutsRef.current[habitId]) {
+        clearTimeout(deadlineTimeoutsRef.current[habitId]);
+        delete deadlineTimeoutsRef.current[habitId];
+      }
+      handleTimerFinished(habitId, targetMinutes, false);
       finishingTimersRef.current.delete(habitId);
     });
   }, [handleTimerFinished, saveToStorage]);
 
-  // Unified background timer tick loop (every 500ms)
+  // Schedule exact target deadline timeouts for active timers to guarantee prompt execution under background throttling
+  useEffect(() => {
+    Object.entries(timers).forEach(([id, t]) => {
+      if (t.isRunning && t.targetEndTime) {
+        if (!deadlineTimeoutsRef.current[id]) {
+          const delay = Math.max(0, t.targetEndTime - Date.now());
+          deadlineTimeoutsRef.current[id] = setTimeout(() => {
+            delete deadlineTimeoutsRef.current[id];
+            tickTimers();
+          }, delay);
+        }
+      } else if (deadlineTimeoutsRef.current[id]) {
+        clearTimeout(deadlineTimeoutsRef.current[id]);
+        delete deadlineTimeoutsRef.current[id];
+      }
+    });
+  }, [timers, tickTimers]);
+
+  // Initialize Web Worker ticker for background tab heartbeat (immune to DOM timer budget clamping)
+  useEffect(() => {
+    workerRef.current = createTimerWorker();
+    if (workerRef.current) {
+      workerRef.current.onmessage = (e) => {
+        if (e.data === 'tick') {
+          tickTimers();
+        }
+      };
+    }
+    return () => {
+      if (workerRef.current?.cleanup) {
+        workerRef.current.cleanup();
+      }
+    };
+  }, [tickTimers]);
+
+  // Manage worker heartbeat & fallback DOM interval based on active timers
   useEffect(() => {
     const hasRunningTimers = Object.values(timers).some((t) => t.isRunning);
-    if (!hasRunningTimers) return;
+    if (!hasRunningTimers) {
+      if (workerRef.current) {
+        workerRef.current.postMessage('stop');
+      }
+      return;
+    }
 
+    if (workerRef.current) {
+      workerRef.current.postMessage('start');
+    }
+
+    // Fallback standard interval in case Web Worker is blocked or unsupported
     const intervalId = setInterval(tickTimers, 500);
     return () => clearInterval(intervalId);
   }, [timers, tickTimers]);
 
-  // Synchronize on document visibility change and tab focus with race-condition guard
+  // Synchronize on document visibility change, window focus, and bfcache pageshow
   useEffect(() => {
-    if (typeof document === 'undefined') return;
+    if (typeof window === 'undefined') return;
 
     const handleSync = () => tickTimers();
 
     document.addEventListener('visibilitychange', handleSync);
     window.addEventListener('focus', handleSync);
+    window.addEventListener('pageshow', handleSync);
 
     return () => {
       document.removeEventListener('visibilitychange', handleSync);
       window.removeEventListener('focus', handleSync);
+      window.removeEventListener('pageshow', handleSync);
     };
   }, [tickTimers]);
 
   // Start or resume a timer for a specific habit
   const startTimer = useCallback((habitId, durationMinutes = 30) => {
     finishingTimersRef.current.delete(habitId);
+    if (deadlineTimeoutsRef.current[habitId]) {
+      clearTimeout(deadlineTimeoutsRef.current[habitId]);
+      delete deadlineTimeoutsRef.current[habitId];
+    }
     unlockAudio();
     requestNotificationPermission().catch(() => {});
 
@@ -278,6 +385,12 @@ export function TimerProvider({ children }) {
 
   // Pause a running timer
   const pauseTimer = useCallback((habitId) => {
+    finishingTimersRef.current.delete(habitId);
+    if (deadlineTimeoutsRef.current[habitId]) {
+      clearTimeout(deadlineTimeoutsRef.current[habitId]);
+      delete deadlineTimeoutsRef.current[habitId];
+    }
+
     setTimers((prev) => {
       const current = prev[habitId];
       if (!current || !current.isRunning) return prev;
@@ -307,6 +420,10 @@ export function TimerProvider({ children }) {
   // Reset a timer back to full target duration (only plays if timer was actually active or paused mid-session)
   const resetTimer = useCallback((habitId, fallbackMinutes = 30) => {
     finishingTimersRef.current.delete(habitId);
+    if (deadlineTimeoutsRef.current[habitId]) {
+      clearTimeout(deadlineTimeoutsRef.current[habitId]);
+      delete deadlineTimeoutsRef.current[habitId];
+    }
 
     setTimers((prev) => {
       const current = prev[habitId];
@@ -363,7 +480,7 @@ export function TimerProvider({ children }) {
     };
   }, []);
 
-  // Helper to get state of a timer with default fallback
+  // Helper to get state of a timer with default fallback and real-time millisecond calculation
   const getTimerState = useCallback((habitId, defaultMinutes = 30) => {
     const current = timers[habitId];
     const isRunning = Boolean(current?.isRunning);
@@ -375,9 +492,14 @@ export function TimerProvider({ children }) {
       ? current.targetMinutes
       : defaultMinutes;
     const targetSeconds = targetMinutes * 60;
-    const secondsRemaining = isRunning || isPaused
-      ? (typeof current?.secondsRemaining === 'number' ? current.secondsRemaining : targetSeconds)
-      : targetSeconds;
+
+    let secondsRemaining = targetSeconds;
+    if (isRunning && current?.targetEndTime) {
+      const diffMs = current.targetEndTime - Date.now();
+      secondsRemaining = diffMs <= 0 ? 0 : Math.ceil(diffMs / 1000);
+    } else if (isPaused && typeof current?.secondsRemaining === 'number') {
+      secondsRemaining = current.secondsRemaining;
+    }
 
     return {
       habitId,
@@ -406,3 +528,4 @@ export function TimerProvider({ children }) {
 export function useTimerContext() {
   return useContext(TimerContext);
 }
+
