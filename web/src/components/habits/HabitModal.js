@@ -78,7 +78,10 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
         time: habit.time || 'Flexible',
         instructions: habit.instructions || '',
         frequency: habit.frequency || [...DAYS],
-        checklistItems: habit.checklistItems || [],
+        checklistItems: (habit.checklistItems || []).map((item, idx) => ({
+          ...item,
+          id: item.id || `step_${idx}_${String(item.label || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 16)}`,
+        })),
         targetMinutes: getReadingTargetMinutes(habit),
         order: habit.order || 1,
         stableKey: habit.stableKey || null,
@@ -144,9 +147,10 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
 
   const addChecklistItem = () => {
     if (!newChecklistItem.trim()) return;
+    const stableId = `step_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     setFormData(prev => ({
       ...prev,
-      checklistItems: [...prev.checklistItems, { label: newChecklistItem.trim() }],
+      checklistItems: [...prev.checklistItems, { id: stableId, label: newChecklistItem.trim() }],
     }));
     setNewChecklistItem('');
   };

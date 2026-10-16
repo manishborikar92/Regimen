@@ -223,7 +223,9 @@ export default function DashboardPage() {
         key={habit.id}
         habit={habit}
         isCompleted={isCompleted}
+        progress={progress}
         onToggle={toggleHabit}
+        onUpdateProgress={updateProgress}
       />
     );
   }, [todayLog, todayProgress, userProfile, updateProgress, toggleHabit, updateProfile]);

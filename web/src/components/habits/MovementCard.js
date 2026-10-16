@@ -76,6 +76,8 @@ function MovementCard({
     onUpdateProgress(habit.id, {
       ...progress,
       completedItemIds: updatedIds,
+      completedCount: updatedIds.length,
+      totalCount: currentItems.length,
       workoutCompleted: nextAllChecked,
     }, nextAllChecked);
   };
@@ -87,6 +89,8 @@ function MovementCard({
     onUpdateProgress(habit.id, {
       ...progress,
       completedItemIds: updatedIds,
+      completedCount: updatedIds.length,
+      totalCount: currentItems.length,
       workoutCompleted: nextState,
     }, nextState);
   };
