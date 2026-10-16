@@ -287,7 +287,9 @@ export default function AnalyticsPage() {
                     type="button"
                     onClick={() => setSelectedDate(isSelected ? null : dateStr)}
                     className={`aspect-square rounded-xl flex flex-col items-center justify-center text-xs font-bold transition-all ${cellStyle} ${
-                      isSelected ? 'ring-2 ring-teal-600 dark:ring-teal-400 ring-offset-2 ring-offset-surface scale-105' : 'hover:opacity-85'
+                      isSelected
+                        ? 'ring-1 ring-teal-600 dark:ring-teal-400 ring-offset-1 ring-offset-surface'
+                        : 'hover:opacity-85'
                     }`}
                     aria-label={`${dateStr}: ${metrics.rate ?? 0}% completed`}
                   >
