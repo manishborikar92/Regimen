@@ -37,15 +37,15 @@ describe('Phase 3: Habits Routine Manager Redesign & FAB Collision Fix', () => {
       );
     });
 
-    it('should verify habits/page.js imports and renders RoutineCard', () => {
+    it('should verify habits/page.js imports and renders HabitManagerCard or RoutineCard', () => {
       const content = readWebFile(habitsPagePath);
       assert.ok(
-        content.includes('RoutineCard'),
-        'habits/page.js must import and render RoutineCard'
+        content.includes('HabitManagerCard') || content.includes('RoutineCard'),
+        'habits/page.js must import and render HabitManagerCard or RoutineCard'
       );
       assert.ok(
-        content.includes('<RoutineCard'),
-        'habits/page.js must render <RoutineCard /> for habits list'
+        content.includes('<HabitManagerCard') || content.includes('<RoutineCard'),
+        'habits/page.js must render <HabitManagerCard /> or <RoutineCard /> for habits list'
       );
     });
   });

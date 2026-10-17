@@ -45,10 +45,10 @@ describe('Phase 3: Specialized Reading Duration Timer Subsystem', () => {
     });
 
     it('should verify dashboard dispatches reading_duration and excludes generic timer', () => {
-      const content = readWebFile('src/app/(protected)/dashboard/page.js');
+      const content = readWebFile('src/components/habits/DashboardHabitCard.js') + readWebFile('src/app/(protected)/dashboard/page.js');
       assert.ok(
-        content.includes("method === 'reading_duration'"),
-        'Dashboard must dispatch reading_duration to ReadingCard'
+        content.includes("habit.completionMethod === 'reading_duration'"),
+        'Dashboard must dispatch reading_duration to timer slot'
       );
       assert.ok(
         !content.includes("method === 'timer'"),

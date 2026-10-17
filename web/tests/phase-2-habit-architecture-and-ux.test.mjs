@@ -57,7 +57,7 @@ describe('Phase 2: Habit Architecture & UX Simplification', () => {
     });
 
     it('should verify card dispatch strictly uses canonical stableKey or personal preset origin', () => {
-      const content = readWebFile(dashboardPath);
+      const content = readWebFile('src/components/habits/DashboardHabitCard.js') + readWebFile(dashboardPath);
       assert.ok(
         content.includes("canonical_english_workbook"),
         'Must dispatch workbook card on canonical key'

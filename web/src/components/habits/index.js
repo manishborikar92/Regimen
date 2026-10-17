@@ -9,7 +9,10 @@ export { default as OshoCard } from './OshoCard';
 export { default as ReadingCard } from './ReadingCard';
 export { default as SpeakingCard } from './SpeakingCard';
 export { default as DiaryCard } from './DiaryCard';
+export { default as DashboardHabitCard } from './DashboardHabitCard';
+export { default as HabitManagerCard } from './HabitManagerCard';
 export { default as RoutineCard } from './RoutineCard';
+export * from './slots';
 
 /**
  * Modals & Dialogs

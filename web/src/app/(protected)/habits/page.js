@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { Plus, Compass } from 'lucide-react';
 import { useData, useToast, useSound } from '@/contexts';
 import { ConfirmDialog, HabitsSkeleton } from '@/components/ui';
-import { HabitModal, RoutineCard } from '@/components/habits';
+import { HabitModal, HabitManagerCard } from '@/components/habits';
 
 export default function HabitsPage() {
   const { habits, loading, addHabit, updateHabit, deleteHabit, seedHabits } = useData();
@@ -116,7 +116,7 @@ export default function HabitsPage() {
 
             <div className="space-y-3">
               {habits.map((habit) => (
-                <RoutineCard
+                <HabitManagerCard
                   key={habit.id}
                   habit={habit}
                   onEdit={(h) => {

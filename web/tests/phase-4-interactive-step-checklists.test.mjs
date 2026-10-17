@@ -401,13 +401,13 @@ describe('Phase 4: Interactive Step Checklists & Workout Routine Consolidation',
   });
 
   describe('4. DashboardPage Card Dispatch & Wiring', () => {
-    it('should verify DashboardPage passes progress and onUpdateProgress to GenericHabitCard', () => {
+    it('should verify DashboardPage passes progress and onUpdateProgress to habit card', () => {
       const content = readWebFile('src/app/(protected)/dashboard/page.js');
       assert.ok(
-        content.includes('<GenericHabitCard') &&
+        (content.includes('<DashboardHabitCard') || content.includes('<GenericHabitCard')) &&
         content.includes('progress={progress}') &&
         content.includes('onUpdateProgress={updateProgress}'),
-        'DashboardPage must pass progress and onUpdateProgress to GenericHabitCard'
+        'DashboardPage must pass progress and onUpdateProgress to habit card'
       );
     });
   });
