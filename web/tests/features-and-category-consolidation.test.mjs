@@ -129,15 +129,15 @@ describe('Features Architecture & Life-Area Category Consolidation', () => {
       assert.deepEqual(CATEGORIES, CANONICAL_CATEGORIES, 'CATEGORIES must strictly equal CANONICAL_CATEGORIES');
       
       const expectedCategories = [
-        'English Learning',
-        'Movement & Strength',
-        'Listening & Awareness',
-        'Reading',
-        'Communication',
-        'Reflection',
-        'Nutrition',
-        'Recovery',
-        'Schedule',
+        'Health & Fitness',
+        'Learning & Growth',
+        'Mindfulness & Spirit',
+        'Reflection & Journaling',
+        'Work & Career',
+        'Creativity & Hobbies',
+        'Relationships & Family',
+        'Rest & Recovery',
+        'Other',
       ];
       assert.deepEqual(CANONICAL_CATEGORIES, expectedCategories);
     });
@@ -162,14 +162,14 @@ describe('Features Architecture & Life-Area Category Consolidation', () => {
     });
 
     it('should keep distinct cognitive, expressive, and restorative modalities separate', () => {
-      // English Learning vs Reading vs Communication
-      assert.ok(CANONICAL_CATEGORIES.includes('English Learning'));
-      assert.ok(CANONICAL_CATEGORIES.includes('Reading'));
-      assert.ok(CANONICAL_CATEGORIES.includes('Communication'));
+      // Health & Fitness vs Learning & Growth
+      assert.ok(CANONICAL_CATEGORIES.includes('Health & Fitness'));
+      assert.ok(CANONICAL_CATEGORIES.includes('Learning & Growth'));
+      assert.ok(CANONICAL_CATEGORIES.includes('Work & Career'));
 
-      // Listening & Awareness vs Reflection
-      assert.ok(CANONICAL_CATEGORIES.includes('Listening & Awareness'));
-      assert.ok(CANONICAL_CATEGORIES.includes('Reflection'));
+      // Mindfulness & Spirit vs Reflection & Journaling
+      assert.ok(CANONICAL_CATEGORIES.includes('Mindfulness & Spirit'));
+      assert.ok(CANONICAL_CATEGORIES.includes('Reflection & Journaling'));
     });
 
     it('should satisfy Cloud Firestore security rules category whitelist with strictly 9 canonical categories', () => {
@@ -192,7 +192,7 @@ describe('Features Architecture & Life-Area Category Consolidation', () => {
         id: 'habit_canonical_1',
         userId: 'user_123',
         title: 'Morning Conditioning',
-        category: 'Movement & Strength',
+        category: 'Health & Fitness',
         schedule: { frequency: ['Mon', 'Wed', 'Fri'] },
         features: {},
         lifecycle: {
@@ -270,7 +270,7 @@ describe('Features Architecture & Life-Area Category Consolidation', () => {
         id: 'theodinproject0622_master_routine',
         userId: 'theodinproject0622',
         title: 'Master Composable Routine',
-        category: 'Listening & Awareness',
+        category: 'Mindfulness & Spirit',
         description: 'Comprehensive multi-feature test routine',
         order: 1,
         schedule: {
@@ -308,7 +308,7 @@ describe('Features Architecture & Life-Area Category Consolidation', () => {
             ],
           },
           daySchedule: {
-            enabled: true,
+            enabled: false,
             planTitle: '12-Week Awareness Cycle',
             allowSundayRest: true,
             dayVariations: {
@@ -335,7 +335,7 @@ describe('Features Architecture & Life-Area Category Consolidation', () => {
       };
 
       const serialized = serializeHabitForFirestore(originalHabit);
-      assert.equal(serialized.category, 'Listening & Awareness');
+      assert.equal(serialized.category, 'Mindfulness & Spirit');
       assert.equal(serialized.features.counter.enabled, true);
       assert.equal(serialized.features.timer.targetDurationMinutes, 25);
       assert.equal(serialized.features.notes.isPrivateDiary, true);
@@ -343,7 +343,7 @@ describe('Features Architecture & Life-Area Category Consolidation', () => {
 
       const rehydrated = normalizeHabitFromFirestore(serialized, 'doc_test_roundtrip');
       assert.equal(rehydrated.title, originalHabit.title);
-      assert.equal(rehydrated.category, 'Listening & Awareness');
+      assert.equal(rehydrated.category, 'Mindfulness & Spirit');
       assert.equal(rehydrated.features.counter.targetCount, 3);
       assert.equal(rehydrated.features.timer.targetDurationMinutes, 25);
       assert.equal(rehydrated.features.timer.soundOnComplete, true);

@@ -104,7 +104,7 @@ describe('Phase 1: Domain Foundation & Architecture Modernization', () => {
       userId: 'usr123',
       title: 'Morning Reading Sprint',
       description: 'Focused reading before screens',
-      category: 'Reading',
+      category: 'Learning & Growth',
       schedule: {
         frequency: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
         timingType: 'preferred_period',

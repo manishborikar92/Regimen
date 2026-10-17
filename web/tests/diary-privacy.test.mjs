@@ -6,7 +6,7 @@ describe('Diary Privacy & Scoping Integrity', () => {
   it('should verify diary routine is flagged as a private journal', () => {
     const diaryHabit = CANONICAL_ROUTINES.find(r => r.stableKey === 'canonical_maintain_diary');
     assert.ok(diaryHabit, 'Diary routine must exist');
-    assert.equal(diaryHabit.category, 'Reflection');
+    assert.equal(diaryHabit.category, 'Reflection & Journaling');
     assert.equal(diaryHabit.completionMethod, 'diary_entry');
     assert.equal(diaryHabit.metadata?.isPrivateJournal, true);
   });

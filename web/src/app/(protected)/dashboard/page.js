@@ -25,6 +25,7 @@ export default function DashboardPage() {
     error,
     toggleHabit,
     updateProgress,
+    setHabitOutcome,
     updateProfile,
   } = useData();
 
@@ -110,7 +111,8 @@ export default function DashboardPage() {
   const renderHabitCard = useCallback((habit) => {
     const isCompleted = todayLog.includes(habit.id);
     const progress = todayProgress[habit.id] || EMPTY_PROGRESS;
-    const outcome = todayProgress?.outcomes?.[habit.id] || null;
+    const rawOutcome = todayProgress?.outcomes?.[habit.id] || null;
+    const outcome = typeof rawOutcome === 'object' && rawOutcome ? rawOutcome.status : rawOutcome;
 
     return (
       <DashboardHabitCard
@@ -121,17 +123,12 @@ export default function DashboardPage() {
         outcome={outcome}
         onToggle={toggleHabit}
         onUpdateProgress={updateProgress}
-        onSetOutcome={(habitId, nextOutcome) => {
-          updateProgress(habitId, {
-            ...(todayProgress[habitId] || {}),
-            outcome: nextOutcome,
-          }, nextOutcome === 'completed');
-        }}
+        onSetOutcome={setHabitOutcome}
         userProfile={userProfile}
         onUpdateProfile={updateProfile}
       />
     );
-  }, [todayLog, todayProgress, userProfile, updateProgress, toggleHabit, updateProfile]);
+  }, [todayLog, todayProgress, userProfile, updateProgress, setHabitOutcome, toggleHabit, updateProfile]);
 
   if (loading) {
     return <DashboardSkeleton />;

@@ -17,9 +17,13 @@ import {
   Layers,
   Calendar,
   Sliders,
+  Plus,
+  ExternalLink,
+  BookOpen,
 } from 'lucide-react';
 import { CATEGORIES } from '@/lib/constants/categories';
 import { WEEKDAYS, APPROVED_FEATURE_SLOTS, validateComposableHabit } from '@/lib/constants/habit-models';
+import { OSHO_LIBRARY } from '@/lib/fixtures/osho-library';
 import { normalizeChecklistItems } from '@/utils/checklist-helpers';
 import {
   DEFAULT_READING_DURATION,
@@ -56,7 +60,8 @@ export const SPECIALIZED_COMPLETION_STYLES = {
 export default function HabitModal({ habit, onSave, onClose, onDelete }) {
   const [formData, setFormData] = useState({
     title: habit?.title || '',
-    category: habit?.category || 'English Learning',
+    category: habit?.category || 'Health & Fitness',
+    customCategory: habit?.customCategory || '',
     completionMethod: habit?.completionMethod || 'simple',
     timingType: 'anytime',
     preferredPeriod: 'Afternoon',
@@ -84,6 +89,9 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
   const [activeTab, setActiveTab] = useState('details'); // 'details' | 'features' | 'schedule'
   const [newChecklistItem, setNewChecklistItem] = useState('');
   const [newPromptChip, setNewPromptChip] = useState('');
+  const [newCatalogItemTitle, setNewCatalogItemTitle] = useState('');
+  const [newCatalogItemUrl, setNewCatalogItemUrl] = useState('');
+  const [newCatalogItemDesc, setNewCatalogItemDesc] = useState('');
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -155,7 +163,8 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
 
       setFormData({
         title: habit.title || '',
-        category: habit.category || 'English Learning',
+        category: habit.category || 'Health & Fitness',
+        customCategory: habit.customCategory || '',
         completionMethod: habit.completionMethod || (habit.checklistItems?.length > 0 ? 'checklist' : 'simple'),
         timingType: schedule.timingType || habit.timingType || (habit.time === 'Afternoon' ? 'preferred_period' : habit.time === 'Before bed' ? 'relative' : 'anytime'),
         preferredPeriod: schedule.preferredPeriod || habit.preferredPeriod || 'Afternoon',
@@ -184,6 +193,14 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
     }
     if (formData.frequency.length === 0) {
       newErrors.frequency = 'Select at least one active day';
+    }
+    if (formData.category === 'Other') {
+      const customLabel = (formData.customCategory || '').trim();
+      if (!customLabel) {
+        newErrors.customCategory = 'Please enter a name for your custom category';
+      } else if (customLabel.length > 40) {
+        newErrors.customCategory = 'Custom category label must be 40 characters or less';
+      }
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -272,7 +289,7 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
       preferredPeriod: formData.timingType === 'preferred_period' ? formData.preferredPeriod : null,
       relativeTiming: formData.timingType === 'relative' ? formData.relativeTiming : null,
       exactTime: formData.timingType === 'exact' ? formData.time : null,
-      restDays: [...formData.restDays],
+      restDays: DAYS.filter(d => !formData.frequency.includes(d)),
       order: formData.order || 1,
     };
 
@@ -294,6 +311,8 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
     const payload = {
       ...formData,
       title: formData.title.trim(),
+      category: formData.category,
+      customCategory: formData.category === 'Other' ? (formData.customCategory || '').trim() : null,
       instructions: formData.instructions.trim(),
       description: formData.instructions.trim(),
       time: displayTime,
@@ -324,23 +343,118 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
     }));
   };
 
-  const toggleRestDay = (day) => {
-    setFormData(prev => ({
-      ...prev,
-      restDays: prev.restDays.includes(day)
-        ? prev.restDays.filter(d => d !== day)
-        : [...prev.restDays, day],
-    }));
+  const toggleFeatureSlot = (slotKey) => {
+    setFormData(prev => {
+      const nextEnabled = !prev.features[slotKey]?.enabled;
+      const updatedFeatures = {
+        ...prev.features,
+        [slotKey]: {
+          ...prev.features[slotKey],
+          enabled: nextEnabled,
+        },
+      };
+
+      // Mutex rule: catalog and daySchedule cannot both be enabled simultaneously
+      if (slotKey === 'catalog' && nextEnabled) {
+        updatedFeatures.daySchedule = {
+          ...updatedFeatures.daySchedule,
+          enabled: false,
+        };
+      } else if (slotKey === 'daySchedule' && nextEnabled) {
+        updatedFeatures.catalog = {
+          ...updatedFeatures.catalog,
+          enabled: false,
+        };
+      }
+
+      return {
+        ...prev,
+        features: updatedFeatures,
+      };
+    });
   };
 
-  const toggleFeatureSlot = (slotKey) => {
+  const addCatalogItem = () => {
+    if (!newCatalogItemTitle.trim()) return;
+    const newItem = {
+      id: `item_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      title: newCatalogItemTitle.trim(),
+      url: newCatalogItemUrl.trim() || undefined,
+      description: newCatalogItemDesc.trim() || undefined,
+    };
+    const currentItems = Array.isArray(formData.features.catalog.items) ? formData.features.catalog.items : [];
+    const updatedItems = [...currentItems, newItem];
     setFormData(prev => ({
       ...prev,
       features: {
         ...prev.features,
-        [slotKey]: {
-          ...prev.features[slotKey],
-          enabled: !prev.features[slotKey].enabled,
+        catalog: {
+          ...prev.features.catalog,
+          items: updatedItems,
+          totalItems: updatedItems.length,
+        },
+      },
+    }));
+    setNewCatalogItemTitle('');
+    setNewCatalogItemUrl('');
+    setNewCatalogItemDesc('');
+  };
+
+  const removeCatalogItem = (index) => {
+    const currentItems = Array.isArray(formData.features.catalog.items) ? formData.features.catalog.items : [];
+    const updatedItems = currentItems.filter((_, i) => i !== index);
+    setFormData(prev => ({
+      ...prev,
+      features: {
+        ...prev.features,
+        catalog: {
+          ...prev.features.catalog,
+          items: updatedItems,
+          totalItems: updatedItems.length,
+        },
+      },
+    }));
+  };
+
+  const moveCatalogItem = (index, direction) => {
+    const currentItems = Array.isArray(formData.features.catalog.items) ? [...formData.features.catalog.items] : [];
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= currentItems.length) return;
+    const [moved] = currentItems.splice(index, 1);
+    currentItems.splice(targetIndex, 0, moved);
+    setFormData(prev => ({
+      ...prev,
+      features: {
+        ...prev.features,
+        catalog: {
+          ...prev.features.catalog,
+          items: currentItems,
+        },
+      },
+    }));
+  };
+
+  const loadOshoPreset = () => {
+    const oshoItems = OSHO_LIBRARY.map((s) => ({
+      id: s.id,
+      title: `${s.order}. ${s.title}`,
+      description: `${s.theme} (${s.language})`,
+      url: s.driveUrl || undefined,
+    }));
+    setFormData(prev => ({
+      ...prev,
+      features: {
+        ...prev.features,
+        catalog: {
+          enabled: true,
+          catalogId: 'osho_discourses',
+          catalogTitle: 'Osho Discourse Audio Library',
+          totalItems: 30,
+          items: oshoItems,
+        },
+        daySchedule: {
+          ...prev.features.daySchedule,
+          enabled: false,
         },
       },
     }));
@@ -550,6 +664,29 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
                     </select>
                   </div>
 
+                  {/* Conditional Custom Category Input for 'Other' */}
+                  {formData.category === 'Other' && (
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Custom Category Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.customCategory}
+                        onChange={(e) => setFormData(prev => ({ ...prev, customCategory: e.target.value }))}
+                        className="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl text-base sm:text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent placeholder-slate-400"
+                        placeholder="e.g., Financial Health, Gardening, Skill Building"
+                        maxLength={40}
+                      />
+                      {errors.customCategory && (
+                        <p className="text-rose-500 text-xs mt-1">{errors.customCategory}</p>
+                      )}
+                      <p className="text-2xs text-muted mt-1">
+                        Distinguishes your custom life-area while adhering to the canonical domain model.
+                      </p>
+                    </div>
+                  )}
+
                   {/* Instructions & Notes */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
@@ -697,16 +834,19 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
 
                   {/* Active Days / Recurrence */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                      Active Weekdays
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                        Active Weekdays
+                      </label>
+                      <span className="text-2xs text-muted">Single source of schedule truth</span>
+                    </div>
                     <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
                       {DAYS.map(day => (
                         <button
                           key={day}
                           type="button"
                           onClick={() => toggleDay(day)}
-                          className={`w-full h-10 min-h-[40px] flex items-center justify-center rounded-lg text-xs font-bold transition-all ${
+                          className={`w-full h-11 min-h-[44px] flex items-center justify-center rounded-xl text-xs font-bold transition-all ${
                             formData.frequency.includes(day)
                               ? 'bg-teal-700 dark:bg-teal-600 text-white shadow-2xs'
                               : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -717,31 +857,13 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
                       ))}
                     </div>
                     {errors.frequency && <p className="text-rose-500 text-xs mt-1">{errors.frequency}</p>}
-                  </div>
 
-                  {/* Planned Rest Days */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="block text-xs font-semibold text-main">
-                        Planned Rest Days
-                      </label>
-                      <span className="text-2xs text-muted">Never breaks streaks</span>
-                    </div>
-                    <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
-                      {DAYS.map(day => (
-                        <button
-                          key={day}
-                          type="button"
-                          onClick={() => toggleRestDay(day)}
-                          className={`w-full h-8 min-h-[32px] flex items-center justify-center rounded-lg text-2xs font-bold transition-all ${
-                            formData.restDays.includes(day)
-                              ? 'bg-amber-600 text-white shadow-2xs'
-                              : 'bg-surface border border-subtle text-muted hover:text-main'
-                          }`}
-                        >
-                          {day}
-                        </button>
-                      ))}
+                    {/* Integrated Planned Rest Days Notice (Single source of truth) */}
+                    <div className="mt-2.5 flex items-start gap-2 p-2.5 bg-surface-subtle dark:bg-slate-800/40 rounded-xl border border-subtle dark:border-slate-700/60 text-2xs text-sub leading-relaxed">
+                      <Info className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 flex-shrink-0 mt-0.5" />
+                      <span>
+                        <strong className="text-main font-semibold">Planned Rest Days:</strong> Weekdays not selected above are automatically treated as planned rest days and will never break streaks.
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -1143,25 +1265,145 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
                     </div>
 
                     {formData.features.catalog.enabled && (
-                      <div className="mt-3 pt-3 border-t border-sky-200/60 dark:border-sky-900/40 space-y-2">
-                        <div>
-                          <label className="block text-2xs font-semibold text-main mb-1">Catalog Title</label>
-                          <input
-                            type="text"
-                            value={formData.features.catalog.catalogTitle}
-                            onChange={(e) => setFormData(prev => ({
-                              ...prev,
-                              features: {
-                                ...prev.features,
-                                catalog: { ...prev.features.catalog, catalogTitle: e.target.value },
-                              },
-                            }))}
-                            placeholder="e.g., Contemplative Discourses"
-                            className="w-full px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-surface text-main"
-                          />
+                      <div className="mt-3 pt-3 border-t border-sky-200/60 dark:border-sky-900/40 space-y-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex-1">
+                            <label className="block text-2xs font-semibold text-main mb-1">Catalog Title</label>
+                            <input
+                              type="text"
+                              value={formData.features.catalog.catalogTitle}
+                              onChange={(e) => setFormData(prev => ({
+                                ...prev,
+                                features: {
+                                  ...prev.features,
+                                  catalog: { ...prev.features.catalog, catalogTitle: e.target.value },
+                                },
+                              }))}
+                              placeholder="e.g., Contemplative Discourses"
+                              className="w-full px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-surface text-main"
+                            />
+                          </div>
+                          <div className="pt-4">
+                            <button
+                              type="button"
+                              onClick={loadOshoPreset}
+                              className="px-2.5 py-1.5 bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 hover:bg-amber-200 border border-amber-300 dark:border-amber-700/60 rounded-lg text-2xs font-semibold flex items-center gap-1 transition-colors"
+                              title="Load 30 Osho Discourses preset"
+                            >
+                              <BookOpen className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                              <span>Load Osho (30)</span>
+                            </button>
+                          </div>
                         </div>
+
+                        {/* Catalog Items Management */}
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-2xs font-semibold text-main">
+                            <span>Catalog Items ({formData.features.catalog.items?.length || 0})</span>
+                            <span className="text-muted">Interactive curriculum items</span>
+                          </div>
+
+                          {/* Existing items list */}
+                          <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                            {(formData.features.catalog.items || []).map((item, idx) => (
+                              <div
+                                key={item.id || idx}
+                                className="p-2 rounded-lg bg-surface border border-subtle space-y-1 text-xs"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="text-2xs font-bold text-slate-400 w-4 text-center select-none flex-shrink-0">
+                                    {idx + 1}.
+                                  </span>
+                                  <input
+                                    type="text"
+                                    value={item.title || item.label || ''}
+                                    onChange={(e) => {
+                                      const updated = [...(formData.features.catalog.items || [])];
+                                      updated[idx] = { ...updated[idx], title: e.target.value };
+                                      setFormData(prev => ({
+                                        ...prev,
+                                        features: {
+                                          ...prev.features,
+                                          catalog: { ...prev.features.catalog, items: updated },
+                                        },
+                                      }));
+                                    }}
+                                    placeholder="Item title..."
+                                    className="flex-1 text-xs bg-transparent text-main border-0 focus:outline-none focus:ring-1 focus:ring-teal-500 rounded px-1.5 py-0.5"
+                                  />
+                                  <div className="flex items-center gap-0.5 flex-shrink-0">
+                                    <button
+                                      type="button"
+                                      onClick={() => moveCatalogItem(idx, -1)}
+                                      disabled={idx === 0}
+                                      className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-main disabled:opacity-30 rounded"
+                                      aria-label={`Move item ${idx + 1} up`}
+                                    >
+                                      <ChevronUp className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => moveCatalogItem(idx, 1)}
+                                      disabled={idx === (formData.features.catalog.items?.length || 0) - 1}
+                                      className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-main disabled:opacity-30 rounded"
+                                      aria-label={`Move item ${idx + 1} down`}
+                                    >
+                                      <ChevronDown className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => removeCatalogItem(idx)}
+                                      className="w-6 h-6 flex items-center justify-center text-rose-500 hover:text-rose-700 rounded"
+                                      aria-label={`Remove item ${idx + 1}`}
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </div>
+                                {item.url && (
+                                  <div className="pl-6 text-2xs text-muted truncate">
+                                    Link: {item.url}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Add new catalog item */}
+                          <div className="p-2.5 rounded-lg bg-surface-subtle border border-dashed border-subtle space-y-2">
+                            <span className="block text-2xs font-semibold text-main">Add New Catalog Item</span>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              <input
+                                type="text"
+                                value={newCatalogItemTitle}
+                                onChange={(e) => setNewCatalogItemTitle(e.target.value)}
+                                placeholder="Item title or discourse name *"
+                                className="px-2.5 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-surface text-main"
+                              />
+                              <input
+                                type="text"
+                                value={newCatalogItemUrl}
+                                onChange={(e) => setNewCatalogItemUrl(e.target.value)}
+                                placeholder="Audio / video link (optional)"
+                                className="px-2.5 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-surface text-main"
+                              />
+                            </div>
+                            <div className="flex justify-end">
+                              <button
+                                type="button"
+                                onClick={addCatalogItem}
+                                disabled={!newCatalogItemTitle.trim()}
+                                className="px-3 py-1.5 bg-teal-700 dark:bg-teal-600 text-white rounded-lg text-xs font-semibold hover:bg-teal-800 disabled:opacity-50 flex items-center gap-1"
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                                <span>Add Item</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
                         <p className="text-2xs text-muted">
-                          Catalog items can be loaded directly from the template catalog.
+                          <strong>Note:</strong> Multi-Item Catalog is mutually exclusive with Progressive Day Schedule.
                         </p>
                       </div>
                     )}
@@ -1215,7 +1457,7 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
                           />
                         </div>
                         <p className="text-2xs text-muted">
-                          Structured weekday-specific routines with integrated Sunday rest day support.
+                          Structured weekday-specific routines with integrated Sunday rest day support. Mutually exclusive with Multi-Item Catalog.
                         </p>
                       </div>
                     )}

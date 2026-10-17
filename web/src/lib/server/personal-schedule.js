@@ -42,7 +42,7 @@ export const MANISH_PERSONAL_ROUTINES = [
   {
     stableKey: 'canonical_english_workbook',
     title: 'Practice English Workbook',
-    category: 'English Learning',
+    category: 'Learning & Growth',
     completionMethod: 'workbook_sessions',
     timingType: 'anytime',
     preferredPeriod: null,
@@ -73,7 +73,7 @@ export const MANISH_PERSONAL_ROUTINES = [
   {
     stableKey: 'canonical_exercise_plan',
     title: 'Exercise / Movement Plan',
-    category: 'Movement & Strength',
+    category: 'Health & Fitness',
     completionMethod: 'exercise_plan',
     timingType: 'preferred_period',
     preferredPeriod: 'Afternoon',
@@ -100,7 +100,7 @@ export const MANISH_PERSONAL_ROUTINES = [
   {
     stableKey: 'canonical_listen_osho',
     title: 'Listen to Osho',
-    category: 'Listening & Awareness',
+    category: 'Mindfulness & Spirit',
     completionMethod: 'osho_listening',
     timingType: 'anytime',
     preferredPeriod: null,
@@ -124,7 +124,7 @@ export const MANISH_PERSONAL_ROUTINES = [
   {
     stableKey: 'canonical_read_books',
     title: 'Read Books',
-    category: 'Reading',
+    category: 'Learning & Growth',
     completionMethod: 'reading_duration',
     timingType: 'relative',
     preferredPeriod: null,
@@ -147,7 +147,7 @@ export const MANISH_PERSONAL_ROUTINES = [
   {
     stableKey: 'canonical_english_speaking',
     title: 'Practice English Speaking',
-    category: 'Communication',
+    category: 'Learning & Growth',
     completionMethod: 'simple_with_notes',
     timingType: 'anytime',
     preferredPeriod: null,
@@ -169,7 +169,7 @@ export const MANISH_PERSONAL_ROUTINES = [
   {
     stableKey: 'canonical_maintain_diary',
     title: 'Maintain a Diary',
-    category: 'Reflection',
+    category: 'Reflection & Journaling',
     completionMethod: 'diary_entry',
     timingType: 'anytime',
     preferredPeriod: null,

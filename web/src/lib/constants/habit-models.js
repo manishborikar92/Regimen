@@ -10,9 +10,9 @@
  * - Strict validation and habit-specific historical date provenance
  */
 
-import { CATEGORIES, CANONICAL_CATEGORIES, isValidCategory } from './categories.js';
+import { CATEGORIES, CANONICAL_CATEGORIES, isValidCategory, isValidCustomCategory } from './categories.js';
 
-export { CATEGORIES, CANONICAL_CATEGORIES, isValidCategory };
+export { CATEGORIES, CANONICAL_CATEGORIES, isValidCategory, isValidCustomCategory };
 
 // ============================================================================
 // Enums & Domain Constants
@@ -464,9 +464,13 @@ export function validateComposableHabit(habit) {
 
   if (!habit.category || !isValidCategory(habit.category)) {
     errors.push(`Habit category '${habit.category}' is invalid. Allowed: ${CATEGORIES.join(', ')}`);
+  } else if (habit.category === 'Other') {
+    if (!habit.customCategory || !isValidCustomCategory(habit.customCategory)) {
+      errors.push("When category is 'Other', customCategory must be a non-empty string between 1 and 40 characters.");
+    }
   }
 
-  // Schedule validation
+  // Schedule validation: active weekdays (frequency) is the single source of truth
   if (!habit.schedule || typeof habit.schedule !== 'object') {
     errors.push('Habit schedule is required.');
   } else {
@@ -506,6 +510,11 @@ export function validateComposableHabit(habit) {
       if (!APPROVED_FEATURE_SLOTS.includes(slotKey)) {
         errors.push(`Unsupported feature slot '${slotKey}'. Approved slots: ${APPROVED_FEATURE_SLOTS.join(', ')}`);
       }
+    }
+
+    // Mutex / compatibility: Catalog and DaySchedule cannot both be enabled simultaneously
+    if (f.catalog && f.catalog.enabled && f.daySchedule && f.daySchedule.enabled) {
+      errors.push('Catalog and DaySchedule features cannot be enabled simultaneously on the same routine.');
     }
 
     // 1. Counter Slot
@@ -654,4 +663,93 @@ export function validateDailyLogDoc(logDoc) {
     valid: errors.length === 0,
     errors,
   };
+}
+
+/**
+ * Evaluates whether an individual configured feature slot is satisfied by progress data.
+ *
+ * Distinct state boundary: Feature progress vs Item state vs Parent habit outcome.
+ *
+ * @param {string} featureKey - One of APPROVED_FEATURE_SLOTS ('counter', 'timer', 'checklist', 'notes', 'catalog', 'daySchedule')
+ * @param {Object} featureConfig - Feature configuration object
+ * @param {Object} progress - Daily log progress for this habit
+ * @returns {boolean} Whether this specific feature is satisfied
+ */
+export function isFeatureSatisfied(featureKey, featureConfig = {}, progress = {}) {
+  if (!featureConfig || !featureConfig.enabled) return true;
+
+  switch (featureKey) {
+    case 'counter': {
+      const current = progress.sessionsCompleted ?? progress.count ?? 0;
+      const target = featureConfig.targetCount || 1;
+      return current >= target;
+    }
+    case 'timer': {
+      if (progress.timerCompleted) return true;
+      const duration = progress.durationMinutes || 0;
+      const target = featureConfig.targetDurationMinutes || 1;
+      return duration >= target;
+    }
+    case 'checklist': {
+      const items = Array.isArray(featureConfig.items) ? featureConfig.items : [];
+      const requiredItems = items.filter(item => item.isRequiredForCompletion !== false);
+      if (requiredItems.length === 0) return true;
+      const completedSteps = Array.isArray(progress.completedSteps) ? progress.completedSteps : [];
+      return requiredItems.every(reqItem => completedSteps.includes(reqItem.id || reqItem.label));
+    }
+    case 'catalog': {
+      return Boolean(
+        progress.catalogItemCompleted ||
+        progress.talkCompleted ||
+        (progress.seriesProgress && Object.values(progress.seriesProgress).some(sp => sp?.completedTalks > 0))
+      );
+    }
+    case 'daySchedule': {
+      return Boolean(
+        progress.workoutCompleted ||
+        (Array.isArray(progress.completedItemIds) && progress.completedItemIds.length > 0)
+      );
+    }
+    case 'notes': {
+      // Notes is an expressive / reflection annotation; does not gate completion
+      return true;
+    }
+    default:
+      return true;
+  }
+}
+
+/**
+ * Evaluates whether ALL required active features of a habit are satisfied.
+ *
+ * Multi-Feature Invariant:
+ * Completing one child item or one feature NEVER completes a multi-feature habit prematurely.
+ * If multiple features are enabled (e.g. Counter + Checklist), ALL enabled features with completion
+ * requirements must be satisfied for this function to return true.
+ *
+ * @param {Object} habit - Habit document with features
+ * @param {Object} progress - Progress state
+ * @returns {boolean}
+ */
+export function evaluateHabitCompletion(habit, progress = {}) {
+  if (!habit || !habit.features) return false;
+
+  const f = habit.features;
+  const activeFeatures = [];
+
+  if (f.counter?.enabled) activeFeatures.push({ key: 'counter', config: f.counter });
+  if (f.timer?.enabled) activeFeatures.push({ key: 'timer', config: f.timer });
+  if (f.checklist?.enabled && Array.isArray(f.checklist.items) && f.checklist.items.length > 0) {
+    activeFeatures.push({ key: 'checklist', config: f.checklist });
+  }
+  if (f.catalog?.enabled) activeFeatures.push({ key: 'catalog', config: f.catalog });
+  if (f.daySchedule?.enabled) activeFeatures.push({ key: 'daySchedule', config: f.daySchedule });
+
+  // If no action-based feature slots are enabled, habit completion is explicit-only
+  if (activeFeatures.length === 0) {
+    return false;
+  }
+
+  // ALL active features must be satisfied
+  return activeFeatures.every(({ key, config }) => isFeatureSatisfied(key, config, progress));
 }

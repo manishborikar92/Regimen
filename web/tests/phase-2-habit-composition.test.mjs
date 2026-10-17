@@ -201,12 +201,12 @@ describe('Phase 2: Composable Habit Configuration Engine & UI Polish', () => {
       assert.deepEqual(APPROVED_FEATURE_SLOTS, expectedSlots, 'APPROVED_FEATURE_SLOTS must contain exactly the 6 slots');
     });
 
-    it('should validate a habit configuring all 6 feature slots simultaneously', () => {
-      const fullHabit = {
+    it('should validate multi-feature habits respecting the catalog and daySchedule mutex', () => {
+      const fullHabitWithCatalog = {
         id: 'habit_multi_feature_1',
         userId: 'usr_full_feature',
         title: 'Complete Morning System',
-        category: 'Reflection',
+        category: 'Reflection & Journaling',
         schedule: {
           frequency: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
           timingType: 'preferred_period',
@@ -237,11 +237,9 @@ describe('Phase 2: Composable Habit Configuration Engine & UI Polish', () => {
             items: [],
           },
           daySchedule: {
-            enabled: true,
-            planTitle: '12-Week Mobility',
-            dayVariations: {
-              Mon: { focusTitle: 'Core', exercises: [] },
-            },
+            enabled: false,
+            planTitle: '',
+            dayVariations: {},
           },
         },
         lifecycle: {
@@ -249,14 +247,30 @@ describe('Phase 2: Composable Habit Configuration Engine & UI Polish', () => {
         },
       };
 
-      const result = validateComposableHabit(fullHabit);
+      const result = validateComposableHabit(fullHabitWithCatalog);
       assert.equal(result.valid, true, `Expected valid habit, errors: ${result.errors.join('; ')}`);
+
+      // Mutex test: catalog and daySchedule cannot be enabled together
+      const conflictingHabit = {
+        ...fullHabitWithCatalog,
+        features: {
+          ...fullHabitWithCatalog.features,
+          daySchedule: {
+            enabled: true,
+            planTitle: '12-Week Mobility',
+            dayVariations: {},
+          },
+        },
+      };
+      const conflictResult = validateComposableHabit(conflictingHabit);
+      assert.equal(conflictResult.valid, false, 'Expected mutex failure when both catalog and daySchedule are enabled');
+      assert.ok(conflictResult.errors.some(e => e.includes('Catalog and DaySchedule features cannot be enabled simultaneously')));
     });
 
     it('should catch invalid parameters in each individual feature slot', () => {
       // Counter: negative target
       assert.ok(validateComposableHabit({
-        id: 'h1', userId: 'u1', title: 'T', category: 'Reflection',
+        id: 'h1', userId: 'u1', title: 'T', category: 'Reflection & Journaling',
         schedule: { frequency: ['Mon'] },
         features: { counter: { enabled: true, targetCount: -1, unit: 'reps' } },
         lifecycle: { trackingHorizon: { startDate: '2026-10-17', status: 'verified_creation' } },
@@ -264,7 +278,7 @@ describe('Phase 2: Composable Habit Configuration Engine & UI Polish', () => {
 
       // Counter: empty unit
       assert.ok(validateComposableHabit({
-        id: 'h1', userId: 'u1', title: 'T', category: 'Reflection',
+        id: 'h1', userId: 'u1', title: 'T', category: 'Reflection & Journaling',
         schedule: { frequency: ['Mon'] },
         features: { counter: { enabled: true, targetCount: 5, unit: '  ' } },
         lifecycle: { trackingHorizon: { startDate: '2026-10-17', status: 'verified_creation' } },
@@ -272,7 +286,7 @@ describe('Phase 2: Composable Habit Configuration Engine & UI Polish', () => {
 
       // Timer: zero duration
       assert.ok(validateComposableHabit({
-        id: 'h1', userId: 'u1', title: 'T', category: 'Reflection',
+        id: 'h1', userId: 'u1', title: 'T', category: 'Reflection & Journaling',
         schedule: { frequency: ['Mon'] },
         features: { timer: { enabled: true, targetDurationMinutes: 0 } },
         lifecycle: { trackingHorizon: { startDate: '2026-10-17', status: 'verified_creation' } },
@@ -280,7 +294,7 @@ describe('Phase 2: Composable Habit Configuration Engine & UI Polish', () => {
 
       // Checklist: non-array items
       assert.ok(validateComposableHabit({
-        id: 'h1', userId: 'u1', title: 'T', category: 'Reflection',
+        id: 'h1', userId: 'u1', title: 'T', category: 'Reflection & Journaling',
         schedule: { frequency: ['Mon'] },
         features: { checklist: { enabled: true, items: 'not an array' } },
         lifecycle: { trackingHorizon: { startDate: '2026-10-17', status: 'verified_creation' } },
@@ -288,7 +302,7 @@ describe('Phase 2: Composable Habit Configuration Engine & UI Polish', () => {
 
       // Catalog: missing catalogTitle
       assert.ok(validateComposableHabit({
-        id: 'h1', userId: 'u1', title: 'T', category: 'Reflection',
+        id: 'h1', userId: 'u1', title: 'T', category: 'Reflection & Journaling',
         schedule: { frequency: ['Mon'] },
         features: { catalog: { enabled: true, catalogId: 'cat1', catalogTitle: '', items: [] } },
         lifecycle: { trackingHorizon: { startDate: '2026-10-17', status: 'verified_creation' } },
@@ -453,7 +467,7 @@ describe('Phase 2: Composable Habit Configuration Engine & UI Polish', () => {
         id: 'usr_persist_test_habit_1',
         userId: 'usr_persist_test',
         title: 'English Workbook Practice',
-        category: 'English Learning',
+        category: 'Learning & Growth',
         schedule: {
           frequency: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
           restDays: ['Sun'],
@@ -502,7 +516,7 @@ describe('Phase 2: Composable Habit Configuration Engine & UI Polish', () => {
         id: 'usr_hist_test_habit_1',
         userId: 'usr_hist_test',
         title: 'Morning Yoga',
-        category: 'Movement & Strength',
+        category: 'Health & Fitness',
         schedule: {
           frequency: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
           restDays: ['Sun'],

@@ -35,6 +35,7 @@ export function DataProvider({ children }) {
     todayStats,
     toggleHabit,
     updateProgress,
+    setHabitOutcome,
     fetchDailyLogs,
   } = useDailyLogs(user, todaysHabits);
 
@@ -82,6 +83,7 @@ export function DataProvider({ children }) {
     // Actions
     toggleHabit,
     updateProgress,
+    setHabitOutcome,
     updateProfile,
     addHabit,
     updateHabit,
@@ -101,6 +103,7 @@ export function DataProvider({ children }) {
     streak,
     toggleHabit,
     updateProgress,
+    setHabitOutcome,
     updateProfile,
     addHabit,
     updateHabit,

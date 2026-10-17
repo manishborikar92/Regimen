@@ -6,6 +6,7 @@ import {
     getDailyLogRef,
     toggleHabitCompletion,
     updateDailyHabitProgress,
+    setDailyHabitOutcome,
     fetchHistoricalLogs,
 } from '@/lib/firebase/firestore';
 import { getTodayString, getDayOfWeek } from '@/utils/date-helpers';
@@ -44,13 +45,18 @@ export function useDailyLogs(user, todaysHabits = []) {
                 const data = docSnap.data();
                 const completedIds = data.completedHabitIds || [];
                 const habitProgress = data.habitProgress || {};
+                const habitOutcomes = data.habitOutcomes || {};
                 setTodayLog(completedIds);
-                setTodayProgress(habitProgress);
+                setTodayProgress({
+                    ...habitProgress,
+                    outcomes: habitOutcomes,
+                });
                 setDailyLogs(prev => ({
                     ...prev,
                     [today]: {
                         completedHabitIds: completedIds,
                         habitProgress,
+                        habitOutcomes,
                     },
                 }));
             } else {
@@ -120,6 +126,32 @@ export function useDailyLogs(user, todaysHabits = []) {
         }
     }, [user, today]);
 
+    // Record an explicit outcome (completed, skipped, missed, or null to clear)
+    const setHabitOutcome = useCallback(async (habitId, outcomeStatus, reason = null) => {
+        if (!user) return;
+
+        // Optimistic update
+        setTodayProgress(prev => ({
+            ...prev,
+            outcomes: {
+                ...(prev.outcomes || {}),
+                ...(outcomeStatus ? { [habitId]: { status: outcomeStatus, reason, recordedAt: new Date().toISOString() } } : {}),
+            },
+        }));
+
+        if (outcomeStatus === 'completed') {
+            setTodayLog(prev => prev.includes(habitId) ? prev : [...prev, habitId]);
+        } else {
+            setTodayLog(prev => prev.filter(id => id !== habitId));
+        }
+
+        try {
+            await setDailyHabitOutcome(user.uid, today, habitId, outcomeStatus, reason);
+        } catch (err) {
+            console.error('Error setting habit outcome:', err);
+        }
+    }, [user, today]);
+
     // Fetch historical daily logs (for analytics)
     const fetchDailyLogs = useCallback(async () => {
         if (!user) return {};
@@ -158,6 +190,7 @@ export function useDailyLogs(user, todaysHabits = []) {
         todayStats,
         toggleHabit,
         updateProgress,
+        setHabitOutcome,
         fetchDailyLogs,
     };
 }

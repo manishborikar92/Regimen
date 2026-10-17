@@ -9,6 +9,7 @@ import {
     deleteDoc,
     arrayUnion,
     arrayRemove,
+    deleteField,
     query,
     where,
     orderBy,
@@ -100,16 +101,71 @@ export async function deleteHabitDoc(habitId) {
 export async function toggleHabitCompletion(userId, dateStr, habitId, isCurrentlyCompleted) {
     const dailyLogRef = getDailyLogRef(userId, dateStr);
 
-    // Update document with arrayUnion / arrayRemove.
-    // { merge: true } creates the document if missing without overwriting habitProgress.
     return setDoc(dailyLogRef, {
         userId,
         date: dateStr,
         completedHabitIds: isCurrentlyCompleted
             ? arrayRemove(habitId)
             : arrayUnion(habitId),
+        habitOutcomes: {
+            [habitId]: isCurrentlyCompleted
+                ? deleteField()
+                : {
+                    status: 'completed',
+                    recordedAt: new Date().toISOString(),
+                },
+        },
         updatedAt: serverTimestamp(),
     }, { merge: true });
+}
+
+/**
+ * Record an explicit outcome status for a habit on a given day.
+ * Synchronizes with habitOutcomes and completedHabitIds.
+ * 
+ * @param {string} userId
+ * @param {string} dateStr
+ * @param {string} habitId
+ * @param {'completed'|'skipped'|'missed'|null} outcomeStatus
+ * @param {string} [reason]
+ */
+export async function setDailyHabitOutcome(userId, dateStr, habitId, outcomeStatus, reason = null) {
+    const dailyLogRef = getDailyLogRef(userId, dateStr);
+
+    const updatePayload = {
+        userId,
+        date: dateStr,
+        updatedAt: serverTimestamp(),
+    };
+
+    if (outcomeStatus === 'completed') {
+        updatePayload.completedHabitIds = arrayUnion(habitId);
+        updatePayload[`habitOutcomes.${habitId}`] = {
+            status: 'completed',
+            recordedAt: new Date().toISOString(),
+            ...(reason ? { reason } : {}),
+        };
+    } else if (outcomeStatus === 'skipped') {
+        updatePayload.completedHabitIds = arrayRemove(habitId);
+        updatePayload[`habitOutcomes.${habitId}`] = {
+            status: 'skipped',
+            recordedAt: new Date().toISOString(),
+            ...(reason ? { reason } : {}),
+        };
+    } else if (outcomeStatus === 'missed') {
+        updatePayload.completedHabitIds = arrayRemove(habitId);
+        updatePayload[`habitOutcomes.${habitId}`] = {
+            status: 'missed',
+            recordedAt: new Date().toISOString(),
+            ...(reason ? { reason } : {}),
+        };
+    } else {
+        // Clear outcome
+        updatePayload.completedHabitIds = arrayRemove(habitId);
+        updatePayload[`habitOutcomes.${habitId}`] = deleteField();
+    }
+
+    return setDoc(dailyLogRef, updatePayload, { merge: true });
 }
 
 /**

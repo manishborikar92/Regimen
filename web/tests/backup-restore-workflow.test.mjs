@@ -242,7 +242,7 @@ describe('Safe Personal-Plan Backup & Restoration Workflow', () => {
       const validHabit = {
         userId: 'usr_1',
         title: 'Morning Meditation',
-        category: 'Reflection',
+        category: 'Reflection & Journaling',
         frequency: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
         time: '07:00 AM',
       };

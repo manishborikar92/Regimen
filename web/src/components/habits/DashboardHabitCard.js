@@ -13,6 +13,7 @@ import {
   BookOpen,
 } from 'lucide-react';
 import { getCategoryConfig } from '@/lib/constants/categories';
+import { evaluateHabitCompletion } from '@/lib/constants/habit-models';
 import { getTimingDisplay } from '@/utils/date-helpers';
 import { useSound } from '@/contexts';
 import {
@@ -54,7 +55,7 @@ function DashboardHabitCard({
 
   if (!habit) return null;
 
-  const config = getCategoryConfig(habit.category);
+  const config = getCategoryConfig(habit.category, habit.customCategory);
   const timingText = getTimingDisplay(habit);
   const isNightTiming = timingText.toLowerCase().includes('bed') || timingText.toLowerCase().includes('night');
 
@@ -133,45 +134,63 @@ function DashboardHabitCard({
     onSetOutcome?.(habit.id, newOutcome);
   };
 
-  // Slot update handlers
-  const handleCounterChange = (newCount, targetReached) => {
-    onUpdateProgress?.(habit.id, {
+  // Slot update handlers with strict completion boundaries
+  const handleCounterChange = (newCount) => {
+    const nextProgress = {
       ...progress,
       sessionsCompleted: newCount,
       count: newCount,
-    }, targetReached);
+    };
+    const allFeaturesSatisfied = evaluateHabitCompletion(habit, nextProgress);
+    onUpdateProgress?.(habit.id, nextProgress, allFeaturesSatisfied);
   };
 
   const handleTimerComplete = ({ durationMinutes }) => {
-    onUpdateProgress?.(habit.id, {
+    const nextProgress = {
       ...progress,
       durationMinutes,
       timerCompleted: true,
-    }, true);
+    };
+    const allFeaturesSatisfied = evaluateHabitCompletion(habit, nextProgress);
+    onUpdateProgress?.(habit.id, nextProgress, allFeaturesSatisfied);
   };
 
   const handleChecklistChange = (nextSteps, allDone) => {
-    onUpdateProgress?.(habit.id, {
+    const nextProgress = {
       ...progress,
       completedSteps: nextSteps,
       reviewDone: allDone,
-    }, allDone);
+    };
+    const allFeaturesSatisfied = evaluateHabitCompletion(habit, nextProgress);
+    onUpdateProgress?.(habit.id, nextProgress, allFeaturesSatisfied);
+  };
+
+  const handleDayScheduleChange = (updatedItemIds, allDone) => {
+    const nextProgress = {
+      ...progress,
+      completedItemIds: updatedItemIds,
+      workoutCompleted: allDone,
+    };
+    const allFeaturesSatisfied = evaluateHabitCompletion(habit, nextProgress);
+    onUpdateProgress?.(habit.id, nextProgress, allFeaturesSatisfied);
+  };
+
+  const handleCatalogChange = (catalogUpdates) => {
+    const nextProgress = {
+      ...progress,
+      ...catalogUpdates,
+    };
+    const allFeaturesSatisfied = evaluateHabitCompletion(habit, nextProgress);
+    onUpdateProgress?.(habit.id, nextProgress, allFeaturesSatisfied);
   };
 
   const handleNotesSave = (notesText) => {
+    // Notes is an expressive journal feature; it NEVER alters habit completion state
     onUpdateProgress?.(habit.id, {
       ...progress,
       notes: notesText,
       diaryEntry: notesText,
-    }, isCompleted);
-  };
-
-  const handleDayScheduleChange = (updatedItemIds, allDone) => {
-    onUpdateProgress?.(habit.id, {
-      ...progress,
-      completedItemIds: updatedItemIds,
-      workoutCompleted: allDone,
-    }, allDone);
+    });
   };
 
   return (
@@ -195,7 +214,7 @@ function DashboardHabitCard({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap mb-1.5">
               <span className={`text-2xs sm:text-xs px-2.5 py-0.5 rounded-full font-semibold border ${config.badgeClasses}`}>
-                {habit.category}
+                {config.label || habit.category}
               </span>
 
               {timingText && (
@@ -375,11 +394,13 @@ function DashboardHabitCard({
             />
           )}
 
-          {/* 5. Catalog Slot (Osho Audio Library) */}
+          {/* 5. Catalog Slot (Osho Audio Library or Curriculum) */}
           {hasCatalog && (
             <SlotCatalog
               feature={features.catalog || { catalogId: 'osho_discourses', catalogTitle: 'Osho Discourse Audio Library' }}
               habit={habit}
+              progress={progress}
+              onChange={handleCatalogChange}
               userProfile={userProfile}
               onUpdateProfile={onUpdateProfile}
               disabled={isSkipped || isMissed}

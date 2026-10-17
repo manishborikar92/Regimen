@@ -28,15 +28,15 @@ describe('Authoritative Canonical Category Taxonomy & Rule Conformance', () => {
     assert.equal(CATEGORIES.length, 9, 'Must have exactly 9 canonical supported categories');
     
     const expected = [
-      'English Learning',
-      'Movement & Strength',
-      'Listening & Awareness',
-      'Reading',
-      'Communication',
-      'Reflection',
-      'Nutrition',
-      'Recovery',
-      'Schedule',
+      'Health & Fitness',
+      'Learning & Growth',
+      'Mindfulness & Spirit',
+      'Reflection & Journaling',
+      'Work & Career',
+      'Creativity & Hobbies',
+      'Relationships & Family',
+      'Rest & Recovery',
+      'Other',
     ];
     assert.deepEqual(CATEGORIES, expected);
   });

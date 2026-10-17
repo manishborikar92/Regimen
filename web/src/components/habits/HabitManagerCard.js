@@ -33,7 +33,7 @@ function HabitManagerCard({ habit, onEdit, onDelete }) {
 
   if (!habit) return null;
 
-  const config = getCategoryConfig(habit.category);
+  const config = getCategoryConfig(habit.category, habit.customCategory);
   const timingText = getTimingDisplay(habit);
   const frequencyText = getFrequencyDisplay(habit.frequency);
 
@@ -111,7 +111,7 @@ function HabitManagerCard({ habit, onEdit, onDelete }) {
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 min-w-0">
           <span className={`text-2xs sm:text-xs px-2.5 py-0.5 rounded-full font-semibold border ${config.badgeClasses}`}>
-            {habit.category}
+            {config.label || habit.category}
           </span>
 
           {isPersonal && (

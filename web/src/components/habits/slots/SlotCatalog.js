@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, memo } from 'react';
-import { Headphones, BookOpen, Layers, ExternalLink } from 'lucide-react';
+import { Headphones, BookOpen, Layers, ExternalLink, Check } from 'lucide-react';
 import { OSHO_LIBRARY } from '@/lib/fixtures/osho-library';
 import OshoLibraryModal from '../OshoLibraryModal';
 
@@ -21,6 +21,8 @@ import OshoLibraryModal from '../OshoLibraryModal';
 function SlotCatalog({
   feature = {},
   habit = {},
+  progress = {},
+  onChange,
   userProfile = {},
   onUpdateProfile,
   disabled = false,
@@ -59,25 +61,96 @@ function SlotCatalog({
   };
 
   if (!isOshoCatalog) {
-    // Generic Catalog fallback
+    // Generic Catalog interactive view
     const items = Array.isArray(feature.items) ? feature.items : [];
+    const completedIds = Array.isArray(progress.completedCatalogItemIds) ? progress.completedCatalogItemIds : [];
+    const completedCount = items.filter(item => completedIds.includes(item.id || item.title)).length;
+
+    const handleToggleItem = (itemId, e) => {
+      e.stopPropagation();
+      if (disabled) return;
+      const isDone = completedIds.includes(itemId);
+      const updated = isDone
+        ? completedIds.filter(id => id !== itemId)
+        : [...completedIds, itemId];
+      const allDone = items.length > 0 && items.every(item => updated.includes(item.id || item.title));
+      onChange?.({
+        ...progress,
+        completedCatalogItemIds: updated,
+        catalogItemCompleted: allDone,
+      });
+    };
+
     return (
-      <div className="rounded-xl p-3 sm:p-3.5 bg-surface-subtle/80 dark:bg-stone-900/60 border border-subtle space-y-2">
+      <div className="rounded-xl p-3 sm:p-3.5 bg-surface-subtle/80 dark:bg-stone-900/60 border border-subtle space-y-2.5">
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-1.5 font-semibold text-main text-2xs uppercase tracking-tight">
             <Layers className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
             <span>{feature.catalogTitle || 'Curriculum Catalog'}</span>
           </div>
-          <span className="text-2xs text-sub">{items.length} items configured</span>
+          <span className="text-2xs text-sub font-medium">
+            {completedCount} of {items.length} completed
+          </span>
         </div>
-        {items.length > 0 && (
-          <div className="space-y-1">
-            {items.slice(0, 3).map((item, idx) => (
-              <div key={idx} className="p-2 rounded-lg bg-surface border border-subtle text-xs text-main flex items-center justify-between">
-                <span>{item.title || item.label || `Item ${idx + 1}`}</span>
-                {item.url && <ExternalLink className="w-3 h-3 text-muted" />}
-              </div>
-            ))}
+
+        {items.length === 0 ? (
+          <p className="text-2xs text-muted italic">No items configured in catalog.</p>
+        ) : (
+          <div className="space-y-1.5 max-h-56 overflow-y-auto">
+            {items.map((item, idx) => {
+              const itemId = item.id || item.title || `item_${idx}`;
+              const isChecked = completedIds.includes(itemId);
+              return (
+                <div
+                  key={itemId}
+                  className={`p-2 rounded-xl border flex items-center justify-between gap-2.5 transition-all ${
+                    isChecked
+                      ? 'bg-teal-50/50 dark:bg-teal-950/30 border-teal-200/60 dark:border-teal-800/60'
+                      : 'bg-surface border-subtle hover:bg-surface-subtle'
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={(e) => handleToggleItem(itemId, e)}
+                    disabled={disabled}
+                    className="flex-1 flex items-center gap-2.5 text-left min-h-[44px] py-1 focus-visible:outline-none"
+                  >
+                    <div
+                      className={`w-5 h-5 min-w-[20px] rounded-md border flex items-center justify-center transition-colors ${
+                        isChecked
+                          ? 'bg-teal-600 dark:bg-teal-500 border-teal-600 dark:border-teal-500 text-white'
+                          : 'border-slate-300 dark:border-slate-600 bg-surface'
+                      }`}
+                    >
+                      {isChecked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className={`text-xs block leading-tight font-medium ${isChecked ? 'line-through text-muted' : 'text-main'}`}>
+                        {item.title || item.label || `Item ${idx + 1}`}
+                      </span>
+                      {item.description && (
+                        <span className="text-2xs text-muted block truncate mt-0.5">
+                          {item.description}
+                        </span>
+                      )}
+                    </div>
+                  </button>
+
+                  {item.url && (
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-teal-600 hover:text-teal-700 dark:text-teal-400 rounded-lg hover:bg-surface transition-colors"
+                      title="Open external resource"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
