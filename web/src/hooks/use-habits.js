@@ -62,7 +62,7 @@ export function useHabits(user) {
     // Today's habits filtered by active day of week (or everyday if frequency not set)
     const todaysHabits = useMemo(() => {
         return habits.filter(habit => {
-            if (!habit.frequency || habit.frequency.length === 0) return true;
+            if (!habit.frequency || habit.frequency === 'daily' || !Array.isArray(habit.frequency) || habit.frequency.length === 0) return true;
             return habit.frequency.includes(dayOfWeek);
         });
     }, [habits, dayOfWeek]);

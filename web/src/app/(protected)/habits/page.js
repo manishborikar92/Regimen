@@ -107,18 +107,26 @@ export default function HabitsPage() {
             </div>
           </div>
         ) : (
-          <div className="space-y-3">
-            {habits.map((habit) => (
-              <RoutineCard
-                key={habit.id}
-                habit={habit}
-                onEdit={(h) => {
-                  setEditingHabit(h);
-                  setShowModal(true);
-                }}
-                onDelete={(id) => setDeleteConfirm(id)}
-              />
-            ))}
+          <div className="space-y-4">
+            {/* Page Header */}
+            <div className="px-1">
+              <h1 className="text-base sm:text-lg font-bold text-main">Routines & Observance</h1>
+              <p className="text-2xs text-muted">Manage your daily rhythms and feature slots</p>
+            </div>
+
+            <div className="space-y-3">
+              {habits.map((habit) => (
+                <RoutineCard
+                  key={habit.id}
+                  habit={habit}
+                  onEdit={(h) => {
+                    setEditingHabit(h);
+                    setShowModal(true);
+                  }}
+                  onDelete={(id) => setDeleteConfirm(id)}
+                />
+              ))}
+            </div>
           </div>
         )}
       </main>

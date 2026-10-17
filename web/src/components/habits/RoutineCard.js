@@ -94,7 +94,7 @@ function RoutineCard({ habit, onEdit, onDelete }) {
 
         <span
           className="inline-flex items-center gap-1.5 text-2xs sm:text-xs text-sub bg-surface-subtle border border-subtle px-2 py-0.5 rounded-md font-medium"
-          title={habit.frequency ? `Active on: ${habit.frequency.join(', ')}` : 'Active every day'}
+          title={Array.isArray(habit.frequency) ? `Active on: ${habit.frequency.join(', ')}` : habit.frequency ? `Active: ${habit.frequency}` : 'Active every day'}
         >
           <Repeat className="w-3 h-3 text-slate-400" />
           <span>{frequencyText}</span>

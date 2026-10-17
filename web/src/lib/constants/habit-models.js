@@ -43,6 +43,24 @@ export const PROVENANCE_STATUSES = [
   'unverifiable',        // Tier 4: Lacks createdAt and zero habit logs (horizon is null)
 ];
 
+/**
+ * Canonical alias for provenance status tiers matching plan specification.
+ */
+export const PROVENANCE_TIERS = PROVENANCE_STATUSES;
+
+/**
+ * The six canonical feature slots approved for composable habits.
+ * Sub-habits or other unauthorized features are strictly prohibited.
+ */
+export const APPROVED_FEATURE_SLOTS = [
+  'counter',
+  'timer',
+  'checklist',
+  'notes',
+  'catalog',
+  'daySchedule',
+];
+
 export const SEED_ORIGINS = [
   'custom',
   'template',
@@ -475,27 +493,89 @@ export function validateComposableHabit(habit) {
     }
   }
 
-  // Features validation
-  if (habit.features && typeof habit.features === 'object') {
+  // Features validation — strictly enforces the 6 canonical feature slots
+  if (!habit.features || typeof habit.features !== 'object') {
+    errors.push('Habit features object is required.');
+  } else {
     const f = habit.features;
+
+    // Reject unsupported / unauthorized feature slots (e.g., sub-habits)
+    for (const slotKey of Object.keys(f)) {
+      if (!APPROVED_FEATURE_SLOTS.includes(slotKey)) {
+        errors.push(`Unsupported feature slot '${slotKey}'. Approved slots: ${APPROVED_FEATURE_SLOTS.join(', ')}`);
+      }
+    }
+
+    // 1. Counter Slot
     if (f.counter && f.counter.enabled) {
       if (typeof f.counter.targetCount !== 'number' || f.counter.targetCount <= 0) {
         errors.push('Counter targetCount must be a positive number.');
       }
-      if (!f.counter.unit || typeof f.counter.unit !== 'string') {
+      if (!f.counter.unit || typeof f.counter.unit !== 'string' || !f.counter.unit.trim()) {
         errors.push('Counter unit must be a non-empty string.');
+      }
+      if (f.counter.step !== undefined && (typeof f.counter.step !== 'number' || f.counter.step <= 0)) {
+        errors.push('Counter step must be a positive number.');
+      }
+      if (f.counter.minCount !== undefined && typeof f.counter.minCount !== 'number') {
+        errors.push('Counter minCount must be a valid number.');
       }
     }
 
+    // 2. Timer Slot
     if (f.timer && f.timer.enabled) {
       if (typeof f.timer.targetDurationMinutes !== 'number' || f.timer.targetDurationMinutes <= 0) {
         errors.push('Timer targetDurationMinutes must be a positive number.');
       }
+      if (f.timer.mode && !['countdown', 'stopwatch'].includes(f.timer.mode)) {
+        errors.push(`Invalid timer mode '${f.timer.mode}'. Allowed: 'countdown', 'stopwatch'.`);
+      }
     }
 
+    // 3. Checklist Slot
     if (f.checklist && f.checklist.enabled) {
       if (!Array.isArray(f.checklist.items)) {
         errors.push('Checklist items must be an array.');
+      } else {
+        for (let i = 0; i < f.checklist.items.length; i++) {
+          const item = f.checklist.items[i];
+          if (!item || typeof item !== 'object' || typeof item.label !== 'string' || !item.label.trim()) {
+            errors.push(`Checklist item at index ${i} must have a valid non-empty label.`);
+          }
+        }
+      }
+    }
+
+    // 4. Notes & Reflection Slot
+    if (f.notes && f.notes.enabled) {
+      if (f.notes.isPrivateDiary !== undefined && typeof f.notes.isPrivateDiary !== 'boolean') {
+        errors.push('Notes isPrivateDiary must be a boolean.');
+      }
+      if (f.notes.reflectionPrompts !== undefined && (!Array.isArray(f.notes.reflectionPrompts) || f.notes.reflectionPrompts.some(p => typeof p !== 'string'))) {
+        errors.push('Notes reflectionPrompts must be an array of strings.');
+      }
+      if (f.notes.placeholder !== undefined && typeof f.notes.placeholder !== 'string') {
+        errors.push('Notes placeholder must be a string.');
+      }
+    }
+
+    // 5. Multi-Item Catalog Slot
+    if (f.catalog && f.catalog.enabled) {
+      if (!f.catalog.catalogId || typeof f.catalog.catalogId !== 'string' || !f.catalog.catalogId.trim()) {
+        errors.push('Catalog catalogId is required when catalog feature is enabled.');
+      }
+      if (!f.catalog.catalogTitle || typeof f.catalog.catalogTitle !== 'string' || !f.catalog.catalogTitle.trim()) {
+        errors.push('Catalog catalogTitle is required when catalog feature is enabled.');
+      }
+      if (!Array.isArray(f.catalog.items)) {
+        errors.push('Catalog items must be an array.');
+      }
+    }
+
+    // 6. Progressive Day Schedule Slot
+    if (f.daySchedule && f.daySchedule.enabled) {
+      if (!f.daySchedule.dayVariations || typeof f.daySchedule.dayVariations !== 'object') {
+        errors.push('DaySchedule dayVariations must be an object keyed by weekday.');
       }
     }
   }
