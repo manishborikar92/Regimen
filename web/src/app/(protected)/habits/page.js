@@ -79,7 +79,7 @@ export default function HabitsPage() {
 
   return (
     <>
-      <main className="max-w-2xl mx-auto px-4 py-5 sm:py-6 space-y-5 pb-32 sm:pb-36">
+      <main className="max-w-2xl mx-auto px-3 sm:px-4 py-4 sm:py-5 space-y-4 pb-32 sm:pb-36">
         {habits.length === 0 ? (
           <div className="text-center py-12 px-4 bg-surface rounded-2xl border border-subtle dark:border-stone-800 shadow-2xs space-y-4">
             <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 rounded-2xl flex items-center justify-center mx-auto text-teal-700 dark:text-teal-400 shadow-2xs">
@@ -118,17 +118,21 @@ export default function HabitsPage() {
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-3.5">
             {/* Page Header */}
-            <div className="flex items-center justify-between px-1">
-              <div>
-                <h1 className="text-base sm:text-lg font-bold text-main">Routines & Observance</h1>
-                <p className="text-2xs text-muted">Manage your daily rhythms and feature slots</p>
+            <div className="flex items-center justify-between gap-3 px-1">
+              <div className="space-y-0.5 min-w-0">
+                <h1 className="text-base sm:text-lg font-bold text-main leading-snug">
+                  Routines &amp; Observance
+                </h1>
+                <p className="text-2xs sm:text-xs text-muted leading-tight">
+                  Manage your daily rhythms and feature slots
+                </p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowTemplateBrowser(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-subtle bg-surface text-xs font-semibold text-main hover:bg-surface-subtle transition-colors shadow-2xs min-h-[44px]"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:py-2 rounded-xl border border-subtle bg-surface text-xs font-semibold text-main hover:bg-surface-subtle transition-colors shadow-2xs h-9 min-h-[36px] sm:h-10 sm:min-h-[40px] shrink-0"
                 title="Browse schedule blueprints and templates"
               >
                 <BookOpen className="w-4 h-4 text-teal-700 dark:text-teal-400" />
