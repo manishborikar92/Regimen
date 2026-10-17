@@ -384,8 +384,12 @@ export function applyScheduleUpdate(habit, newSchedule, effectiveDate) {
  * @returns {Object} TrackingHorizon { startDate: string|null, status: string, inferredEvidence?: string }
  */
 export function deriveTrackingHorizon(habitData, habitSpecificLogs = [], timezone = 'UTC') {
+  if (habitData?.lifecycle?.trackingHorizon?.startDate) {
+    return habitData.lifecycle.trackingHorizon;
+  }
+
   const habitId = habitData?.id;
-  const createdAt = habitData?.createdAt;
+  const createdAt = habitData?.createdAt || habitData?.lifecycle?.createdAt;
   const localCreationDate = convertTimestampToTrackingDate(createdAt, timezone);
 
   // Filter logs strictly referencing THIS specific habit

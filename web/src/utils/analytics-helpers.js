@@ -14,6 +14,7 @@
 
 import { getCategoryConfig } from '../lib/constants/categories.js';
 import { getDateString, getDaysAgo, getDayOfWeek } from './date-helpers.js';
+import { resolveObservanceDate, evaluateHabitCompletion } from '../lib/constants/habit-models.js';
 
 /**
  * Checks whether a habit is scheduled to run on a specific day of the week.
@@ -166,10 +167,16 @@ export function calculateDayMetrics(habits = [], completedHabitIds = [], dayOfWe
  * @param {number} maxDays - Window size (default: 30)
  * @returns {number} Current streak count
  */
-export function calculateStreak(habits = [], dailyLogs = {}, maxDays = 30) {
+export function calculateStreak(habits = [], dailyLogs = {}, maxDays = 30, timezone = 'UTC') {
   if (!habits || habits.length === 0) return 0;
 
   let currentStreak = 0;
+  let currentObservance = null;
+  try {
+    currentObservance = resolveObservanceDate(new Date(), timezone);
+  } catch {
+    currentObservance = getDateString(new Date());
+  }
 
   for (let i = 0; i < maxDays; i++) {
     const checkDate = getDaysAgo(i);
@@ -186,15 +193,27 @@ export function calculateStreak(habits = [], dailyLogs = {}, maxDays = 30) {
     const completedList = Array.isArray(logEntry)
       ? logEntry
       : (logEntry?.completedHabitIds || []);
+    const outcomes = (!Array.isArray(logEntry) && logEntry?.habitOutcomes) || {};
+    const habitProgress = (!Array.isArray(logEntry) && logEntry?.habitProgress) || {};
 
-    const completedCount = requiredHabits.filter(h => completedList.includes(h.id)).length;
+    const completedCount = requiredHabits.filter(h => {
+      if (outcomes[h.id]?.status === 'completed') return true;
+      if (completedList.includes(h.id)) return true;
+      if (habitProgress[h.id]) {
+        try {
+          if (evaluateHabitCompletion(h, habitProgress[h.id])) return true;
+        } catch {}
+      }
+      return false;
+    }).length;
+
     const completionRate = completedCount / requiredHabits.length;
 
     // Vritta's supportive 50% threshold
     if (completionRate >= 0.5) {
       currentStreak++;
-    } else if (i === 0) {
-      // Grace period for ongoing current day
+    } else if (i === 0 || dateStr >= currentObservance) {
+      // Grace period for ongoing current day or active grace window
       continue;
     } else {
       break;

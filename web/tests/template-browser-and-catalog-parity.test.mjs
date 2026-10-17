@@ -325,3 +325,40 @@ describe('Multi-Item Catalog Creation & Lifecycle Parity', () => {
     assert.equal(nextProgress.completedCatalogItemIds, undefined);
   });
 });
+
+describe('Routine Persistence Safe Error Reporting & Diagnostics', async () => {
+  const { getSafeSaveErrorMessage, logDiagnosticError } = await import('../src/lib/utils/error-helpers.js');
+
+  it('should return safe user-friendly message for internal Firestore undefined errors without leaking internals', () => {
+    const rawError = new Error('Function addDoc() called with invalid data. Unsupported field value: undefined (found in field features.catalog.items[0].description in document habits/123)');
+    const safeMsg = getSafeSaveErrorMessage(rawError);
+    assert.equal(safeMsg, 'Unable to save routine. Please check your inputs and try again.');
+    assert.ok(!safeMsg.includes('undefined'), 'Must not expose internal undefined keyword to user');
+    assert.ok(!safeMsg.includes('features.catalog'), 'Must not expose schema or field paths to user');
+    assert.ok(!safeMsg.includes('habits/123'), 'Must not expose document path to user');
+  });
+
+  it('should map permission-denied errors to clear authentication guidance', () => {
+    const permError = { code: 'permission-denied', message: 'Missing or insufficient permissions.' };
+    const safeMsg = getSafeSaveErrorMessage(permError);
+    assert.equal(safeMsg, 'Permission denied: Please ensure you are signed in and try again.');
+  });
+
+  it('should map network/offline errors to connectivity guidance', () => {
+    const netError = { code: 'unavailable', message: 'Could not reach Cloud Firestore backend.' };
+    const safeMsg = getSafeSaveErrorMessage(netError);
+    assert.equal(safeMsg, 'Network error: Unable to reach the server. Please check your connection and try again.');
+  });
+
+  it('should map validation errors to form review guidance', () => {
+    const valError = { name: 'ValidationError', message: 'Title is required' };
+    const safeMsg = getSafeSaveErrorMessage(valError);
+    assert.equal(safeMsg, 'Validation error: Please review the required routine fields and try again.');
+  });
+
+  it('should safely handle empty or null error inputs', () => {
+    assert.equal(getSafeSaveErrorMessage(null), 'Unable to save routine. Please try again.');
+    assert.equal(getSafeSaveErrorMessage(undefined), 'Unable to save routine. Please try again.');
+  });
+});
+

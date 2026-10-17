@@ -175,28 +175,46 @@ export async function setDailyHabitOutcome(userId, dateStr, habitId, outcomeStat
 
     if (outcomeStatus === 'completed') {
         updatePayload.completedHabitIds = arrayUnion(habitId);
-        updatePayload[`habitOutcomes.${habitId}`] = {
-            status: 'completed',
-            recordedAt: new Date().toISOString(),
-            ...(reason ? { reason } : {}),
+        updatePayload.habitOutcomes = {
+            [habitId]: {
+                status: 'completed',
+                recordedAt: new Date().toISOString(),
+                ...(reason ? { reason } : {}),
+            },
         };
     } else if (outcomeStatus === 'skipped') {
         updatePayload.completedHabitIds = arrayRemove(habitId);
-        updatePayload[`habitOutcomes.${habitId}`] = {
-            status: 'skipped',
-            recordedAt: new Date().toISOString(),
-            ...(reason ? { reason } : {}),
+        updatePayload.habitOutcomes = {
+            [habitId]: {
+                status: 'skipped',
+                recordedAt: new Date().toISOString(),
+                ...(reason ? { reason } : {}),
+            },
         };
     } else if (outcomeStatus === 'missed') {
         updatePayload.completedHabitIds = arrayRemove(habitId);
-        updatePayload[`habitOutcomes.${habitId}`] = {
-            status: 'missed',
-            recordedAt: new Date().toISOString(),
-            ...(reason ? { reason } : {}),
+        updatePayload.habitOutcomes = {
+            [habitId]: {
+                status: 'missed',
+                recordedAt: new Date().toISOString(),
+                ...(reason ? { reason } : {}),
+            },
+        };
+    } else if (outcomeStatus === 'rest') {
+        updatePayload.completedHabitIds = arrayRemove(habitId);
+        updatePayload.habitOutcomes = {
+            [habitId]: {
+                status: 'rest',
+                recordedAt: new Date().toISOString(),
+                ...(reason ? { reason } : {}),
+            },
         };
     } else {
         // Clear outcome
         updatePayload.completedHabitIds = arrayRemove(habitId);
+        updatePayload.habitOutcomes = {
+            [habitId]: deleteField(),
+        };
         updatePayload[`habitOutcomes.${habitId}`] = deleteField();
     }
 
@@ -232,12 +250,18 @@ export async function updateDailyHabitProgress(userId, dateStr, habitId, progres
     if (typeof isFullyCompleted === 'boolean') {
         if (isFullyCompleted) {
             updatePayload.completedHabitIds = arrayUnion(habitId);
-            updatePayload[`habitOutcomes.${habitId}`] = {
-                status: 'completed',
-                recordedAt: new Date().toISOString(),
+            updatePayload.habitOutcomes = {
+                [habitId]: {
+                    status: 'completed',
+                    recordedAt: new Date().toISOString(),
+                },
             };
         } else {
             updatePayload.completedHabitIds = arrayRemove(habitId);
+            updatePayload.habitOutcomes = {
+                [habitId]: deleteField(),
+            };
+            updatePayload[`habitOutcomes.${habitId}`] = deleteField();
         }
     }
 
@@ -314,6 +338,7 @@ export async function fetchHistoricalLogs(userId) {
             logsMap[data.date] = {
                 completedHabitIds: data.completedHabitIds || [],
                 habitProgress: data.habitProgress || {},
+                habitOutcomes: data.habitOutcomes || {},
             };
         }
     });

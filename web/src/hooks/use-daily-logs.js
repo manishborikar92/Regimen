@@ -45,7 +45,15 @@ export function useDailyLogs(user, todaysHabits = []) {
                 const data = docSnap.data();
                 const completedIds = data.completedHabitIds || [];
                 const habitProgress = data.habitProgress || {};
-                const habitOutcomes = data.habitOutcomes || {};
+                const habitOutcomes = { ...(data.habitOutcomes || {}) };
+                for (const [key, val] of Object.entries(data)) {
+                    if (key.startsWith('habitOutcomes.')) {
+                        const id = key.slice('habitOutcomes.'.length);
+                        if (val && typeof val === 'object' && !habitOutcomes[id]) {
+                            habitOutcomes[id] = val;
+                        }
+                    }
+                }
                 setTodayLog(completedIds);
                 setTodayProgress({
                     ...habitProgress,
@@ -131,13 +139,41 @@ export function useDailyLogs(user, todaysHabits = []) {
         if (!user) return;
 
         // Optimistic update
-        setTodayProgress(prev => ({
-            ...prev,
-            outcomes: {
-                ...(prev.outcomes || {}),
-                ...(outcomeStatus ? { [habitId]: { status: outcomeStatus, reason, recordedAt: new Date().toISOString() } } : {}),
-            },
-        }));
+        setTodayProgress(prev => {
+            const nextOutcomes = { ...(prev.outcomes || {}) };
+            if (outcomeStatus) {
+                nextOutcomes[habitId] = { status: outcomeStatus, reason, recordedAt: new Date().toISOString() };
+            } else {
+                delete nextOutcomes[habitId];
+            }
+            return {
+                ...prev,
+                outcomes: nextOutcomes,
+            };
+        });
+
+        // Also update local dailyLogs map for today so analytics & streaks reflect instantly
+        setDailyLogs(prev => {
+            const currentDayLog = prev[today] || { completedHabitIds: [], habitProgress: {}, habitOutcomes: {} };
+            const nextOutcomes = { ...(currentDayLog.habitOutcomes || {}) };
+            if (outcomeStatus) {
+                nextOutcomes[habitId] = { status: outcomeStatus, reason, recordedAt: new Date().toISOString() };
+            } else {
+                delete nextOutcomes[habitId];
+            }
+            const nextCompleted = outcomeStatus === 'completed'
+                ? (currentDayLog.completedHabitIds?.includes(habitId) ? currentDayLog.completedHabitIds : [...(currentDayLog.completedHabitIds || []), habitId])
+                : (currentDayLog.completedHabitIds || []).filter(id => id !== habitId);
+
+            return {
+                ...prev,
+                [today]: {
+                    ...currentDayLog,
+                    completedHabitIds: nextCompleted,
+                    habitOutcomes: nextOutcomes,
+                },
+            };
+        });
 
         if (outcomeStatus === 'completed') {
             setTodayLog(prev => prev.includes(habitId) ? prev : [...prev, habitId]);

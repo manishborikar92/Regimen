@@ -5,6 +5,7 @@ import { Plus, Compass, BookOpen } from 'lucide-react';
 import { useData, useToast, useSound } from '@/contexts';
 import { ConfirmDialog, HabitsSkeleton } from '@/components/ui';
 import { HabitModal, HabitManagerCard, TemplateBrowserModal } from '@/components/habits';
+import { getSafeSaveErrorMessage, logDiagnosticError } from '@/lib/utils/error-helpers';
 
 export default function HabitsPage() {
   const { habits, loading, addHabit, updateHabit, deleteHabit, seedHabits } = useData();
@@ -30,13 +31,8 @@ export default function HabitsPage() {
       addToast(`Routine ${editingHabit?.id ? 'updated' : 'created'} successfully`, 'success');
       playActionSuccessCue?.();
     } catch (err) {
-      console.error('Error saving routine:', err);
-      const detail = err?.message || '';
-      const displayMessage = detail.includes('Unsupported field value: undefined')
-        ? 'Failed to save routine: Invalid undefined property in habit data'
-        : detail.includes('permission-denied')
-        ? 'Permission denied: Please ensure you are logged in'
-        : detail ? `Failed to save routine: ${detail}` : 'Failed to save routine. Please try again.';
+      logDiagnosticError('[RoutinePersistenceError] Failed to save routine:', err);
+      const displayMessage = getSafeSaveErrorMessage(err);
       addToast(displayMessage, 'error');
     }
   };

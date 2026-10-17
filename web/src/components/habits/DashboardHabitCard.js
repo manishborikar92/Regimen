@@ -6,11 +6,7 @@ import {
   Clock,
   Moon,
   ChevronDown,
-  MoreVertical,
-  SkipForward,
-  XCircle,
-  RotateCcw,
-  BookOpen,
+  Coffee,
 } from 'lucide-react';
 import { getCategoryConfig } from '@/lib/constants/categories';
 import {
@@ -19,7 +15,8 @@ import {
   deriveCompletedProgressForHabit,
   deriveUncompletedProgressForHabit,
 } from '@/lib/constants/habit-models';
-import { getTimingDisplay } from '@/utils/date-helpers';
+import { getTimingDisplay, getDayOfWeek } from '@/utils/date-helpers';
+import { isHabitRestDay } from '@/utils/analytics-helpers';
 import { useSound } from '@/contexts';
 import {
   SlotTimer,
@@ -31,38 +28,39 @@ import {
 } from './slots';
 
 /**
- * DashboardHabitCard — Unified Composable Habit Card for the Vritta Dashboard.
- * Phase 3: Universal Habit Card System
+ * DashboardHabitCard — Simplified Composable Habit Card for the Vritta Dashboard.
+ * Phase 4 Revision: Simplified Completion Contract
  *
  * Implements:
  * - Feature-driven architecture rendering atomic slots dynamically based on `habit.features`.
  * - Strictly NO title sniffing, account hardcoding, or category substring matching.
- * - Category styling tokens derived from authoritative 9 canonical categories.
- * - WCAG 2.2 AA/AAA compliant touch targets (min 44x44px) for all primary actions.
- * - Collapsible instructions accordion addressing Gate 0 mobile card density.
- * - "Skip / Rest Today" and "Mark Missed" action menu for outcome tracking.
+ * - Primary circular completion checkbox (WCAG min 44x44px touch target) is the single
+ *   user-facing mechanism for recording completion or correcting an erroneous completion.
+ * - Eliminates manual Rest / Skip / Missed / Reset outcome action buttons.
+ * - Planned rest days (e.g. Sunday movement) are gracefully recognized from the schedule.
  * - Seamless preservation of Osho listening, reading timers, workbook steppers, and conditioning plans.
  */
 function DashboardHabitCard({
   habit,
   isCompleted = false,
   progress = {},
-  outcome = null,
   onToggle,
   onUpdateProgress,
-  onSetOutcome,
   userProfile = {},
   onUpdateProfile,
 }) {
   const { playStepToggleCue, playHabitCompleteCue } = useSound();
   const [showInstructions, setShowInstructions] = useState(false);
-  const [showActionMenu, setShowActionMenu] = useState(false);
 
   if (!habit) return null;
 
   const config = getCategoryConfig(habit.category, habit.customCategory);
   const timingText = getTimingDisplay(habit);
   const isNightTiming = timingText.toLowerCase().includes('bed') || timingText.toLowerCase().includes('night');
+
+  // Check if today is a recurring planned rest day for this routine
+  const todayDow = getDayOfWeek(new Date());
+  const isPlannedRest = isHabitRestDay(habit, todayDow);
 
   // Normalize features from canonical composable habit model or backward-compatible feature inference
   const features = habit.features || {};
@@ -107,51 +105,28 @@ function DashboardHabitCard({
     habit.stableKey === 'canonical_exercise_plan'
   );
 
-  // Resolved outcome status: 'completed' | 'skipped' | 'missed'
-  const isSkipped = outcome === 'skipped';
-  const isMissed = outcome === 'missed';
-
-  // Card effective completion state
-  const isEffectivelyCompleted = isCompleted && !isSkipped && !isMissed;
-
   // Instructions text
   const instructionsText = habit.instructions || habit.description || '';
   const hasLongInstructions = instructionsText.length > 60;
 
-  // Primary completion button toggle
+  // Primary circular completion checkbox handler
   const handlePrimaryToggle = (e) => {
     e.stopPropagation();
-    setShowActionMenu(false);
 
-    if (isEffectivelyCompleted) {
+    if (isCompleted) {
       playStepToggleCue?.(false);
       const nextProgress = deriveUncompletedProgressForHabit(habit, progress);
       onUpdateProgress?.(habit.id, nextProgress, false);
-      if (outcome) {
-        onSetOutcome?.(habit.id, null);
-      } else {
-        onToggle?.(habit.id);
-      }
+      onToggle?.(habit.id);
     } else {
       playHabitCompleteCue?.();
       const nextProgress = deriveCompletedProgressForHabit(habit, progress);
       onUpdateProgress?.(habit.id, nextProgress, true);
-      if (outcome) {
-        onSetOutcome?.(habit.id, 'completed');
-      } else {
-        onToggle?.(habit.id);
-      }
+      onToggle?.(habit.id);
     }
   };
 
-  // Outcome setters
-  const handleSetOutcome = (newOutcome, e) => {
-    e.stopPropagation();
-    setShowActionMenu(false);
-    onSetOutcome?.(habit.id, newOutcome);
-  };
-
-  // Slot update handlers with strict completion boundaries
+  // Slot update handlers with strict feature-driven completion evaluation
   const handleCounterChange = (newCount) => {
     const clampedCount = clampCounterProgress(habit, newCount);
     const nextProgress = {
@@ -160,9 +135,7 @@ function DashboardHabitCard({
       count: clampedCount,
     };
     const allFeaturesSatisfied = evaluateHabitCompletion(habit, nextProgress);
-    // Invariant: Skipped/missed parent outcomes must NOT be silently overwritten by item updates
-    const completionFlag = (isSkipped || isMissed) ? undefined : allFeaturesSatisfied;
-    onUpdateProgress?.(habit.id, nextProgress, completionFlag);
+    onUpdateProgress?.(habit.id, nextProgress, allFeaturesSatisfied);
   };
 
   const handleTimerComplete = ({ durationMinutes }) => {
@@ -172,8 +145,7 @@ function DashboardHabitCard({
       timerCompleted: true,
     };
     const allFeaturesSatisfied = evaluateHabitCompletion(habit, nextProgress);
-    const completionFlag = (isSkipped || isMissed) ? undefined : allFeaturesSatisfied;
-    onUpdateProgress?.(habit.id, nextProgress, completionFlag);
+    onUpdateProgress?.(habit.id, nextProgress, allFeaturesSatisfied);
   };
 
   const handleChecklistChange = (nextSteps, allDone) => {
@@ -183,8 +155,7 @@ function DashboardHabitCard({
       reviewDone: allDone,
     };
     const allFeaturesSatisfied = evaluateHabitCompletion(habit, nextProgress);
-    const completionFlag = (isSkipped || isMissed) ? undefined : allFeaturesSatisfied;
-    onUpdateProgress?.(habit.id, nextProgress, completionFlag);
+    onUpdateProgress?.(habit.id, nextProgress, allFeaturesSatisfied);
   };
 
   const handleDayScheduleChange = (updatedItemIds, allDone) => {
@@ -195,8 +166,7 @@ function DashboardHabitCard({
       walkCompleted: allDone,
     };
     const allFeaturesSatisfied = evaluateHabitCompletion(habit, nextProgress);
-    const completionFlag = (isSkipped || isMissed) ? undefined : allFeaturesSatisfied;
-    onUpdateProgress?.(habit.id, nextProgress, completionFlag);
+    onUpdateProgress?.(habit.id, nextProgress, allFeaturesSatisfied);
   };
 
   const handleCatalogChange = (catalogUpdates) => {
@@ -205,12 +175,11 @@ function DashboardHabitCard({
       ...catalogUpdates,
     };
     const allFeaturesSatisfied = evaluateHabitCompletion(habit, nextProgress);
-    const completionFlag = (isSkipped || isMissed) ? undefined : allFeaturesSatisfied;
-    onUpdateProgress?.(habit.id, nextProgress, completionFlag);
+    onUpdateProgress?.(habit.id, nextProgress, allFeaturesSatisfied);
   };
 
   const handleNotesSave = (notesText) => {
-    // Notes is an expressive journal feature; it NEVER alters habit completion state
+    // Notes is an expressive journal feature; it never alters habit completion state
     onUpdateProgress?.(habit.id, {
       ...progress,
       notes: notesText,
@@ -223,17 +192,15 @@ function DashboardHabitCard({
       className={`relative rounded-2xl border border-t-[3px] bg-surface shadow-2xs transition-all duration-200 hover:shadow-xs ${
         config.borderTopColor || 'border-t-teal-600 dark:border-t-teal-400'
       } ${
-        isEffectivelyCompleted
+        isCompleted
           ? 'bg-teal-50/20 dark:bg-teal-950/20 border-teal-200/80 dark:border-teal-900/60'
-          : isSkipped
-          ? 'bg-slate-50/50 dark:bg-stone-900/40 border-dashed border-subtle opacity-75'
-          : isMissed
-          ? 'bg-rose-50/30 dark:bg-rose-950/20 border-rose-200/70 dark:border-rose-900/50'
+          : isPlannedRest
+          ? 'bg-amber-50/15 dark:bg-amber-950/15 border-amber-200/50 dark:border-amber-900/40'
           : 'border-subtle'
       }`}
     >
       <div className="p-4 sm:p-5 space-y-3.5">
-        {/* Header Row: Category Badge & Timing on Left, Action Menu & Checkbox on Right */}
+        {/* Header Row: Category Badge & Timing on Left, Primary Completion Checkbox on Right */}
         <div className="flex items-start justify-between gap-3">
           {/* Left Metadata */}
           <div className="flex-1 min-w-0">
@@ -253,15 +220,10 @@ function DashboardHabitCard({
                 </span>
               )}
 
-              {isSkipped && (
-                <span className="text-2xs font-semibold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
-                  Skipped / Rest
-                </span>
-              )}
-
-              {isMissed && (
-                <span className="text-2xs font-semibold px-2 py-0.5 rounded-md bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60">
-                  Missed
+              {isPlannedRest && !isCompleted && (
+                <span className="inline-flex items-center gap-1 text-2xs font-semibold px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60">
+                  <Coffee className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                  <span>Planned Rest</span>
                 </span>
               )}
             </div>
@@ -271,7 +233,7 @@ function DashboardHabitCard({
               {habit.title}
             </h3>
 
-            {/* Collapsible Instructions (Addresses Gate 0 Density finding) */}
+            {/* Collapsible Instructions */}
             {instructionsText && (
               <div className="mt-1">
                 {hasLongInstructions ? (
@@ -303,68 +265,20 @@ function DashboardHabitCard({
             )}
           </div>
 
-          {/* Right Action Controls: Action Menu & Primary Circular Completion Checkmark */}
+          {/* Right Action Control: Single Primary Circular Completion Button (WCAG min 44x44px touch target) */}
           <div className="flex items-center gap-1.5 flex-shrink-0 pt-0.5">
-            {/* Outcome Action Menu (Skip / Missed) */}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setShowActionMenu(prev => !prev)}
-                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl text-slate-400 hover:text-main hover:bg-surface-subtle flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600"
-                aria-label="More actions"
-                title="Habit options"
-              >
-                <MoreVertical className="w-4 h-4" />
-              </button>
-
-              {showActionMenu && (
-                <div
-                  className="absolute right-0 top-11 z-30 w-44 bg-surface rounded-xl border border-subtle shadow-lg py-1 text-xs animate-fade-in"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <button
-                    type="button"
-                    onClick={(e) => handleSetOutcome('skipped', e)}
-                    className="w-full px-3 py-2 text-left hover:bg-surface-subtle flex items-center gap-2 text-main"
-                  >
-                    <SkipForward className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Skip / Rest Today</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => handleSetOutcome('missed', e)}
-                    className="w-full px-3 py-2 text-left hover:bg-surface-subtle flex items-center gap-2 text-rose-600 dark:text-rose-400"
-                  >
-                    <XCircle className="w-3.5 h-3.5" />
-                    <span>Mark as Missed</span>
-                  </button>
-                  {(isSkipped || isMissed) && (
-                    <button
-                      type="button"
-                      onClick={(e) => handleSetOutcome(null, e)}
-                      className="w-full px-3 py-2 text-left hover:bg-surface-subtle flex items-center gap-2 text-sub border-t border-subtle"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      <span>Clear Outcome</span>
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Primary Circular Completion Button (WCAG min 44x44px touch target) */}
             <button
               type="button"
               onClick={handlePrimaryToggle}
               className={`w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border-2 flex items-center justify-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 active:scale-95 ${
-                isEffectivelyCompleted
+                isCompleted
                   ? 'bg-teal-700 dark:bg-teal-600 border-teal-700 dark:border-teal-600 text-white shadow-teal-700/20 shadow-xs'
                   : 'border-slate-300 dark:border-stone-600 hover:border-teal-500 bg-surface'
               }`}
-              aria-label={isEffectivelyCompleted ? `Mark ${habit.title} incomplete` : `Mark ${habit.title} complete`}
-              title={isEffectivelyCompleted ? 'Completed' : 'Mark completed'}
+              aria-label={isCompleted ? `Mark ${habit.title} incomplete` : `Mark ${habit.title} complete`}
+              title={isCompleted ? 'Completed' : 'Mark completed'}
             >
-              {isEffectivelyCompleted && <Check className="w-5 h-5 text-white stroke-[3]" />}
+              {isCompleted && <Check className="w-5 h-5 text-white stroke-[3]" />}
             </button>
           </div>
         </div>
@@ -377,8 +291,7 @@ function DashboardHabitCard({
               feature={features.counter || { targetCount: 2, unit: 'sessions', step: 1, minCount: 0 }}
               progress={progress}
               onChange={handleCounterChange}
-              disabled={isSkipped || isMissed}
-              isHabitComplete={isEffectivelyCompleted}
+              isHabitComplete={isCompleted}
             />
           )}
 
@@ -388,7 +301,7 @@ function DashboardHabitCard({
               habitId={habit.id}
               feature={features.timer || { targetDurationMinutes: habit.targetMinutes || 30 }}
               habit={habit}
-              isCompleted={isEffectivelyCompleted}
+              isCompleted={isCompleted}
               onComplete={handleTimerComplete}
             />
           )}
@@ -400,8 +313,7 @@ function DashboardHabitCard({
               habit={habit}
               progress={progress}
               onChange={handleChecklistChange}
-              disabled={isSkipped || isMissed}
-              isHabitComplete={isEffectivelyCompleted}
+              isHabitComplete={isCompleted}
             />
           )}
 
@@ -414,8 +326,7 @@ function DashboardHabitCard({
               onChange={handleDayScheduleChange}
               userProfile={userProfile}
               onUpdateProfile={onUpdateProfile}
-              disabled={isSkipped || isMissed}
-              isHabitComplete={isEffectivelyCompleted}
+              isHabitComplete={isCompleted}
             />
           )}
 
@@ -428,7 +339,6 @@ function DashboardHabitCard({
               onChange={handleCatalogChange}
               userProfile={userProfile}
               onUpdateProfile={onUpdateProfile}
-              disabled={isSkipped || isMissed}
             />
           )}
 
@@ -439,7 +349,6 @@ function DashboardHabitCard({
               feature={features.notes || { isPrivateDiary: habit.completionMethod === 'diary_entry' }}
               progress={progress}
               onSave={handleNotesSave}
-              disabled={isSkipped || isMissed}
             />
           )}
         </div>

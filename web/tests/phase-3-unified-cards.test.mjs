@@ -223,17 +223,21 @@ describe('Phase 3: Unified Habit Card Architecture & Behavioral Integrity', () =
     });
   });
 
-  describe('7. Action Outcomes Menu (Skip & Missed)', () => {
-    it('should verify DashboardHabitCard implements Skip and Missed action options', () => {
+  describe('7. Action Outcomes Menu Elimination & Simplified Contract', () => {
+    it('should verify DashboardHabitCard establishes primary circular checkbox as sole toggle without action menu', () => {
       const dashboardCardContent = readWebFile('src/components/habits/DashboardHabitCard.js');
 
       assert.ok(
-        dashboardCardContent.includes('Skip / Rest Today'),
-        'DashboardHabitCard must support "Skip / Rest Today"'
+        !dashboardCardContent.includes('Skip Today') && !dashboardCardContent.includes('Skip / Rest Today'),
+        'DashboardHabitCard must eliminate manual Skip Today action'
       );
       assert.ok(
-        dashboardCardContent.includes('Mark as Missed'),
-        'DashboardHabitCard must support "Mark as Missed"'
+        !dashboardCardContent.includes('Mark as Missed'),
+        'DashboardHabitCard must eliminate manual Mark as Missed action'
+      );
+      assert.ok(
+        dashboardCardContent.includes('handlePrimaryToggle'),
+        'DashboardHabitCard must use primary circular toggle as single mechanism'
       );
     });
   });
