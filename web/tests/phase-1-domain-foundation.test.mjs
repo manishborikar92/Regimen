@@ -28,7 +28,7 @@ import {
   serializeDailyLogForFirestore,
 } from '../src/lib/firebase/firestore.js';
 
-import { MANISH_PERSONAL_ROUTINES } from '../src/lib/server/personal-schedule.js';
+import { MANISH_PERSONAL_ROUTINES } from '../src/lib/server/schedule-templates.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

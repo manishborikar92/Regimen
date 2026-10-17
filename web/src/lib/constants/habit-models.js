@@ -11,6 +11,8 @@
  */
 
 import { CATEGORIES, CANONICAL_CATEGORIES, isValidCategory, isValidCustomCategory } from './categories.js';
+import { WORKOUT_EXERCISES, WALK_DAY_ROUTINE } from '../fixtures/exercise-plan.js';
+import { getDayOfWeek } from '../../utils/date-helpers.js';
 
 export { CATEGORIES, CANONICAL_CATEGORIES, isValidCategory, isValidCustomCategory };
 
@@ -675,7 +677,7 @@ export function validateDailyLogDoc(logDoc) {
  * @param {Object} progress - Daily log progress for this habit
  * @returns {boolean} Whether this specific feature is satisfied
  */
-export function isFeatureSatisfied(featureKey, featureConfig = {}, progress = {}) {
+export function isFeatureSatisfied(featureKey, featureConfig = {}, progress = {}, dayOfWeek = null) {
   if (!featureConfig || !featureConfig.enabled) return true;
 
   switch (featureKey) {
@@ -708,10 +710,28 @@ export function isFeatureSatisfied(featureKey, featureConfig = {}, progress = {}
       );
     }
     case 'daySchedule': {
-      return Boolean(
-        progress.workoutCompleted ||
-        (Array.isArray(progress.completedItemIds) && progress.completedItemIds.length > 0)
+      if (progress.workoutCompleted || progress.walkCompleted) {
+        return true;
+      }
+      const currentDay = dayOfWeek || getDayOfWeek();
+      const dayVar = featureConfig.dayVariations?.[currentDay];
+      if (dayVar?.type === 'rest' || currentDay === 'Sun') {
+        return Boolean(progress.workoutCompleted || progress.walkCompleted);
+      }
+      const currentItems = Array.isArray(dayVar?.exercises) && dayVar.exercises.length > 0
+        ? dayVar.exercises
+        : (dayVar?.type === 'walk' || currentDay === 'Tue' || currentDay === 'Thu' || currentDay === 'Sat')
+        ? WALK_DAY_ROUTINE
+        : WORKOUT_EXERCISES;
+
+      const requiredItems = currentItems.filter(
+        item => item.isRequired !== false && item.isRequiredForCompletion !== false
       );
+      if (requiredItems.length === 0) {
+        return Boolean(progress.workoutCompleted || progress.walkCompleted);
+      }
+      const completedIds = Array.isArray(progress.completedItemIds) ? progress.completedItemIds : [];
+      return requiredItems.every(reqItem => completedIds.includes(reqItem.id));
     }
     case 'notes': {
       // Notes is an expressive / reflection annotation; does not gate completion
@@ -759,7 +779,7 @@ export function clampCounterProgress(habit, count) {
  * @param {Object} [existingProgress] - Current progress object
  * @returns {Object} Next progress object
  */
-export function deriveCompletedProgressForHabit(habit, existingProgress = {}) {
+export function deriveCompletedProgressForHabit(habit, existingProgress = {}, dayOfWeek = null) {
   if (!habit || !habit.features) return { ...existingProgress };
   const f = habit.features;
   const next = { ...existingProgress };
@@ -795,6 +815,18 @@ export function deriveCompletedProgressForHabit(habit, existingProgress = {}) {
   if (f.daySchedule?.enabled) {
     next.workoutCompleted = true;
     next.walkCompleted = true;
+    const currentDay = dayOfWeek || getDayOfWeek();
+    const dayVar = f.daySchedule.dayVariations?.[currentDay];
+    const currentItems = Array.isArray(dayVar?.exercises) && dayVar.exercises.length > 0
+      ? dayVar.exercises
+      : (dayVar?.type === 'walk' || currentDay === 'Tue' || currentDay === 'Thu' || currentDay === 'Sat')
+      ? WALK_DAY_ROUTINE
+      : (dayVar?.type === 'rest' || currentDay === 'Sun')
+      ? []
+      : WORKOUT_EXERCISES;
+    const applicableIds = currentItems.map(item => item.id);
+    const existingIds = Array.isArray(next.completedItemIds) ? next.completedItemIds : [];
+    next.completedItemIds = Array.from(new Set([...existingIds, ...applicableIds]));
   }
 
   // Notes invariant: strictly preserve existing notes and diaryEntry text
@@ -856,9 +888,10 @@ export function deriveUncompletedProgressForHabit(habit, existingProgress = {}) 
  *
  * @param {Object} habit - Habit document with features
  * @param {Object} progress - Progress state
+ * @param {string|null} [dayOfWeek=null] - Day of week (e.g. 'Mon')
  * @returns {boolean}
  */
-export function evaluateHabitCompletion(habit, progress = {}) {
+export function evaluateHabitCompletion(habit, progress = {}, dayOfWeek = null) {
   if (!habit || !habit.features) return false;
 
   const f = habit.features;
@@ -878,5 +911,5 @@ export function evaluateHabitCompletion(habit, progress = {}) {
   }
 
   // ALL active features must be satisfied
-  return activeFeatures.every(({ key, config }) => isFeatureSatisfied(key, config, progress));
+  return activeFeatures.every(({ key, config }) => isFeatureSatisfied(key, config, progress, dayOfWeek));
 }

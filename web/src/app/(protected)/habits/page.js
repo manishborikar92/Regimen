@@ -104,7 +104,7 @@ export default function HabitsPage() {
                 className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-surface border border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-300 rounded-xl text-xs sm:text-sm font-semibold hover:bg-teal-50 dark:hover:bg-teal-950/40 transition-colors shadow-2xs min-h-[44px]"
               >
                 <BookOpen className="w-4 h-4" />
-                <span>Browse Blueprints</span>
+                <span>Browse Templates</span>
               </button>
               <button
                 type="button"
@@ -130,7 +130,7 @@ export default function HabitsPage() {
                 title="Browse schedule blueprints and templates"
               >
                 <BookOpen className="w-4 h-4 text-teal-700 dark:text-teal-400" />
-                <span>Browse Blueprints</span>
+                <span>Templates</span>
               </button>
             </div>
 

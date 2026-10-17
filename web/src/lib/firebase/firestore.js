@@ -452,7 +452,7 @@ export function normalizeHabitFromFirestore(data, id) {
             items: [],
         };
         features.timer = {
-            enabled: true,
+            enabled: data.features?.timer ? Boolean(data.features.timer.enabled) : Boolean(data.targetMinutes),
             targetDurationMinutes: data.targetMinutes || 30,
             mode: 'countdown',
             soundOnComplete: false,

@@ -8,7 +8,7 @@ import {
   READING_DURATION_PRESETS,
   DEFAULT_READING_DURATION,
 } from '../src/utils/reading-helpers.js';
-import { MANISH_PERSONAL_ROUTINES } from '../src/lib/server/personal-schedule.js';
+import { MANISH_PERSONAL_ROUTINES } from '../src/lib/server/schedule-templates.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -210,7 +210,7 @@ describe('Phase 3: Specialized Reading Duration Timer Subsystem', () => {
       assert.equal(updatedTarget * 60, 900, 'Subsequent timer countdown starts at 900 seconds');
     });
 
-    it('should verify personal-schedule seed defines root targetMinutes and clean metadata', () => {
+    it('should verify schedule-templates seed defines root targetMinutes and clean metadata', () => {
       const readBooksRoutine = MANISH_PERSONAL_ROUTINES.find(r => r.stableKey === 'canonical_read_books');
       assert.ok(readBooksRoutine, 'MANISH_PERSONAL_ROUTINES must define canonical_read_books');
       assert.equal(readBooksRoutine.targetMinutes, 30, 'canonical_read_books must define canonical targetMinutes: 30 at root');
@@ -218,15 +218,10 @@ describe('Phase 3: Specialized Reading Duration Timer Subsystem', () => {
       assert.equal(readBooksRoutine.metadata?.context, 'Before going to sleep', 'canonical_read_books must preserve metadata.context');
     });
 
-    it('should verify sync-service cleans metadata.targetMinutes and reconciles root targetMinutes', () => {
-      const syncServiceContent = readWebFile('src/lib/server/sync-service.js');
+    it('should verify obsolete sync-service is retired and reconciliation cleans metadata.targetMinutes', () => {
       assert.ok(
-        syncServiceContent.includes('delete cleanMetadata.targetMinutes'),
-        'sync-service must strip metadata.targetMinutes'
-      );
-      assert.ok(
-        syncServiceContent.includes('updatedData.targetMinutes = Number.isFinite(existingMinutes)'),
-        'sync-service must preserve custom user targetMinutes over seed default'
+        !fs.existsSync(path.join(webRoot, 'src/lib/server/sync-service.js')),
+        'sync-service.js must be removed in favor of schedule-templates.js'
       );
 
       // Simulate sync reconciliation algorithm on custom user duration

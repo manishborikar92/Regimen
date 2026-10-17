@@ -74,10 +74,10 @@ function DashboardHabitCard({
   );
 
   const hasTimer = Boolean(
-    features.timer?.enabled ||
-    habit.completionMethod === 'reading_duration' ||
-    (habit.targetMinutes && habit.targetMinutes > 0) ||
-    habit.stableKey === 'canonical_read_books'
+    features.timer?.enabled ?? (
+      habit.completionMethod === 'reading_duration' ||
+      habit.stableKey === 'canonical_read_books'
+    )
   );
 
   const hasChecklist = Boolean(
@@ -192,6 +192,7 @@ function DashboardHabitCard({
       ...progress,
       completedItemIds: updatedItemIds,
       workoutCompleted: allDone,
+      walkCompleted: allDone,
     };
     const allFeaturesSatisfied = evaluateHabitCompletion(habit, nextProgress);
     const completionFlag = (isSkipped || isMissed) ? undefined : allFeaturesSatisfied;

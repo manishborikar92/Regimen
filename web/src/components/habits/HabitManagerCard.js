@@ -52,7 +52,13 @@ function HabitManagerCard({ habit, onEdit, onDelete }) {
     });
   }
 
-  if (features.timer?.enabled || habit.completionMethod === 'reading_duration' || (habit.targetMinutes && habit.targetMinutes > 0)) {
+  const hasTimer = Boolean(
+    features.timer?.enabled ?? (
+      habit.completionMethod === 'reading_duration' ||
+      habit.stableKey === 'canonical_read_books'
+    )
+  );
+  if (hasTimer) {
     activeFeatures.push({
       key: 'timer',
       label: `Timer: ${features.timer?.targetDurationMinutes || habit.targetMinutes || 30}m`,

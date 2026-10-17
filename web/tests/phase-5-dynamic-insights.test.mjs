@@ -13,7 +13,7 @@ import {
   calculateDynamicAnalytics,
 } from '../src/utils/analytics-helpers.js';
 import { getDateString, getDaysAgo } from '../src/utils/date-helpers.js';
-import { CANONICAL_ROUTINES } from '../src/lib/server/personal-schedule.js';
+import { CANONICAL_ROUTINES } from '../src/lib/server/schedule-templates.js';
 import { CATEGORY_CONFIG, getCategoryConfig } from '../src/lib/constants/categories.js';
 
 const __filename = fileURLToPath(import.meta.url);

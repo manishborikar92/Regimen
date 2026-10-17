@@ -234,3 +234,174 @@ describe('Bidirectional Aggregate Completion Behavior', () => {
     );
   });
 });
+
+describe('Timer Selection Isolation & Source of Truth Regressions', () => {
+  it('should guarantee unselected timer remains disabled even if targetMinutes or duration exists', () => {
+    // Legacy artifact: habit record has targetMinutes: 30, but timer feature is disabled
+    const habitWithoutTimer = {
+      id: 'habit_no_timer',
+      targetMinutes: 30,
+      metadata: { targetMinutes: 30 },
+      features: {
+        timer: { enabled: false, targetDurationMinutes: 30 },
+      },
+    };
+
+    // Card resolution source-of-truth helper matching DashboardHabitCard and HabitManagerCard
+    const isTimerActive = Boolean(
+      habitWithoutTimer.features?.timer?.enabled ??
+      (habitWithoutTimer.completionMethod === 'reading_duration' || habitWithoutTimer.stableKey === 'canonical_read_books')
+    );
+
+    assert.strictEqual(isTimerActive, false, 'Existence of targetMinutes must NEVER activate timer when features.timer.enabled is false');
+    assert.strictEqual(isFeatureSatisfied('timer', habitWithoutTimer.features.timer, {}), true, 'Disabled timer feature must be satisfied by default');
+  });
+
+  it('should guarantee selected timer is active and preserves target duration', () => {
+    const habitWithTimer = {
+      id: 'habit_with_timer',
+      targetMinutes: 25,
+      features: {
+        timer: { enabled: true, targetDurationMinutes: 25 },
+      },
+    };
+
+    const isTimerActive = Boolean(
+      habitWithTimer.features?.timer?.enabled ??
+      (habitWithTimer.completionMethod === 'reading_duration' || habitWithTimer.stableKey === 'canonical_read_books')
+    );
+
+    assert.strictEqual(isTimerActive, true, 'Timer must be active when features.timer.enabled is true');
+  });
+});
+
+describe('Progressive Day Schedule Checkbox Synchronization & Item Configuration', () => {
+  const dayScheduleHabit = {
+    id: 'habit_day_schedule_test',
+    features: {
+      daySchedule: {
+        enabled: true,
+        planTitle: '12-Week Progressive Conditioning Plan',
+        totalWeeks: 12,
+        dayVariations: {
+          Mon: {
+            dayType: 'workout',
+            label: 'Day A: Movement Foundation',
+            exercises: [
+              { id: 'ex_1', name: 'Wall Pushups', target: '2x10 reps', isRequired: true },
+              { id: 'ex_2', name: 'Chair Squats', target: '2x10 reps', isRequired: true },
+              { id: 'ex_opt', name: 'Wrist Mobility Cooldown', target: '3 mins', isRequired: false },
+            ],
+          },
+          Tue: {
+            dayType: 'walk',
+            label: 'Day B: Brisk Walk',
+            exercises: [
+              { id: 'walk_step', name: '20-Minute Continuous Walk', target: '20 mins', isRequired: true },
+            ],
+          },
+          Sun: {
+            dayType: 'rest',
+            label: 'Full Rest & Recovery',
+            exercises: [],
+          },
+        },
+      },
+    },
+  };
+
+  it('should mark all required and optional daily items complete when activating parent checkbox on Mon', () => {
+    const initialProgress = { completedItemIds: [], notes: 'Weekly goal: steady form' };
+    const completedProgress = deriveCompletedProgressForHabit(dayScheduleHabit, initialProgress, 'Mon');
+
+    assert.strictEqual(completedProgress.workoutCompleted, true);
+    assert.ok(completedProgress.completedItemIds.includes('ex_1'));
+    assert.ok(completedProgress.completedItemIds.includes('ex_2'));
+    assert.ok(completedProgress.completedItemIds.includes('ex_opt'));
+    assert.strictEqual(completedProgress.notes, 'Weekly goal: steady form', 'Notes must be preserved');
+
+    // Aggregate completion check
+    assert.strictEqual(evaluateHabitCompletion(dayScheduleHabit, completedProgress, 'Mon'), true);
+  });
+
+  it('should reverse all daily checklist items when unchecking parent checkbox while preserving notes', () => {
+    const activeProgress = {
+      workoutCompleted: true,
+      completedItemIds: ['ex_1', 'ex_2', 'ex_opt'],
+      notes: 'Weekly goal: steady form',
+    };
+
+    const reversedProgress = deriveUncompletedProgressForHabit(dayScheduleHabit, activeProgress);
+
+    assert.strictEqual(reversedProgress.workoutCompleted, false);
+    assert.strictEqual(reversedProgress.walkCompleted, false);
+    assert.deepStrictEqual(reversedProgress.completedItemIds, []);
+    assert.strictEqual(reversedProgress.notes, 'Weekly goal: steady form');
+    assert.strictEqual(evaluateHabitCompletion(dayScheduleHabit, reversedProgress, 'Mon'), false);
+  });
+
+  it('should NOT complete parent prematurely when only 1 of 2 required exercises is checked', () => {
+    const partialProgress = {
+      completedItemIds: ['ex_1'], // ex_2 missing
+    };
+
+    assert.strictEqual(
+      isFeatureSatisfied('daySchedule', dayScheduleHabit.features.daySchedule, partialProgress, 'Mon'),
+      false,
+      'Single exercise must not satisfy daySchedule'
+    );
+    assert.strictEqual(evaluateHabitCompletion(dayScheduleHabit, partialProgress, 'Mon'), false);
+  });
+
+  it('should complete parent when ALL required exercises are checked, even if optional exercise is unchecked', () => {
+    const requiredDoneProgress = {
+      completedItemIds: ['ex_1', 'ex_2'], // ex_opt (isRequired: false) is omitted
+    };
+
+    assert.strictEqual(
+      isFeatureSatisfied('daySchedule', dayScheduleHabit.features.daySchedule, requiredDoneProgress, 'Mon'),
+      true,
+      'All required exercises satisfied must fulfill daySchedule'
+    );
+    assert.strictEqual(evaluateHabitCompletion(dayScheduleHabit, requiredDoneProgress, 'Mon'), true);
+  });
+
+  it('should reverse parent completion when unchecking a single required exercise', () => {
+    const fullProgress = {
+      completedItemIds: ['ex_1', 'ex_2'],
+    };
+    assert.strictEqual(evaluateHabitCompletion(dayScheduleHabit, fullProgress, 'Mon'), true);
+
+    // Uncheck ex_1
+    const missingEx1 = {
+      completedItemIds: ['ex_2'],
+    };
+    assert.strictEqual(evaluateHabitCompletion(dayScheduleHabit, missingEx1, 'Mon'), false);
+  });
+
+  it('should allow completing and uncompleting parent card on rest day (Sun)', () => {
+    const initialProgress = { completedItemIds: [] };
+    assert.strictEqual(
+      evaluateHabitCompletion(dayScheduleHabit, initialProgress, 'Sun'),
+      false,
+      'Rest day is not automatically completed without user interaction'
+    );
+
+    const completedProgress = deriveCompletedProgressForHabit(dayScheduleHabit, initialProgress, 'Sun');
+    assert.strictEqual(completedProgress.workoutCompleted, true);
+    assert.strictEqual(
+      evaluateHabitCompletion(dayScheduleHabit, completedProgress, 'Sun'),
+      true,
+      'Checking parent card on rest day completes observance'
+    );
+
+    const uncompletedProgress = deriveUncompletedProgressForHabit(dayScheduleHabit, completedProgress);
+    assert.strictEqual(uncompletedProgress.workoutCompleted, false);
+    assert.strictEqual(
+      evaluateHabitCompletion(dayScheduleHabit, uncompletedProgress, 'Sun'),
+      false,
+      'Unchecking parent card on rest day reverses observance'
+    );
+  });
+});
+

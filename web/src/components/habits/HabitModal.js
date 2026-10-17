@@ -29,9 +29,52 @@ import {
   DEFAULT_READING_DURATION,
   getReadingTargetMinutes,
 } from '@/utils/reading-helpers';
+import {
+  MOVEMENT_SCHEDULE,
+  WORKOUT_EXERCISES,
+  WALK_DAY_ROUTINE,
+} from '@/lib/fixtures/exercise-plan';
 import TemplateBrowserModal from './TemplateBrowserModal';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+export function buildDefaultDayVariations(existingVariations = {}) {
+  const result = {};
+  for (const day of DAYS) {
+    const existing = existingVariations?.[day];
+    if (existing && Array.isArray(existing.exercises)) {
+      result[day] = {
+        type: existing.type || (day === 'Sun' ? 'rest' : (day === 'Tue' || day === 'Thu' || day === 'Sat') ? 'walk' : 'workout'),
+        label: existing.label || MOVEMENT_SCHEDULE[day]?.label || `${day} Routine`,
+        target: existing.target || MOVEMENT_SCHEDULE[day]?.target || '',
+        exercises: existing.exercises.map((ex, idx) => ({
+          id: ex.id || `ex_${day.toLowerCase()}_${idx + 1}`,
+          name: ex.name || ex.label || '',
+          label: ex.name || ex.label || '',
+          target: ex.target || ex.reps || '',
+          reps: ex.reps || ex.target || '',
+          cues: ex.cues || '',
+          isRequired: Boolean(ex.isRequired ?? ex.isRequiredForCompletion ?? true),
+          isRequiredForCompletion: Boolean(ex.isRequired ?? ex.isRequiredForCompletion ?? true),
+        })),
+      };
+    } else {
+      const defaultSched = MOVEMENT_SCHEDULE[day] || MOVEMENT_SCHEDULE.Mon;
+      const exercises = defaultSched.type === 'rest' || day === 'Sun'
+        ? []
+        : defaultSched.type === 'walk'
+        ? WALK_DAY_ROUTINE.map(ex => ({ ...ex, isRequired: true, isRequiredForCompletion: true }))
+        : WORKOUT_EXERCISES.map(ex => ({ ...ex, isRequired: true, isRequiredForCompletion: true }));
+      result[day] = {
+        type: defaultSched.type || 'workout',
+        label: defaultSched.label || `${day} Routine`,
+        target: defaultSched.target || '',
+        exercises,
+      };
+    }
+  }
+  return result;
+}
 
 const TIMING_TYPES = [
   { id: 'anytime', label: 'Anytime', description: 'Flexible rhythm', icon: Sparkles },
@@ -72,7 +115,7 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
     frequency: [...DAYS],
     restDays: [],
     checklistItems: [],
-    targetMinutes: getReadingTargetMinutes(habit),
+    targetMinutes: habit?.features?.timer?.enabled ? getReadingTargetMinutes(habit) : null,
     order: habit?.order || 99,
     stableKey: null,
     seedOrigin: habit?.seedOrigin || 'custom',
@@ -83,7 +126,7 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
       checklist: { enabled: false, items: [] },
       notes: { enabled: false, isPrivateDiary: false, placeholder: '', reflectionPrompts: [] },
       catalog: { enabled: false, catalogId: 'custom_catalog', catalogTitle: 'Catalog Items', totalItems: 0, items: [] },
-      daySchedule: { enabled: false, planTitle: '', totalWeeks: 12, dayVariations: {} },
+      daySchedule: { enabled: false, planTitle: '12-Week Progressive Movement Plan', totalWeeks: 12, dayVariations: buildDefaultDayVariations() },
     },
   });
 
@@ -94,6 +137,10 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
   const [newCatalogItemTitle, setNewCatalogItemTitle] = useState('');
   const [newCatalogItemUrl, setNewCatalogItemUrl] = useState('');
   const [newCatalogItemDesc, setNewCatalogItemDesc] = useState('');
+  const [selectedDayScheduleWeekday, setSelectedDayScheduleWeekday] = useState('Mon');
+  const [newDayExerciseName, setNewDayExerciseName] = useState('');
+  const [newDayExerciseTarget, setNewDayExerciseTarget] = useState('');
+  const [newDayExerciseRequired, setNewDayExerciseRequired] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -106,19 +153,28 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
         checklist: { enabled: false, items: [] },
         notes: { enabled: false, isPrivateDiary: false, placeholder: '', reflectionPrompts: [] },
         catalog: { enabled: false, catalogId: 'custom_catalog', catalogTitle: 'Catalog Items', totalItems: 0, items: [] },
-        daySchedule: { enabled: false, planTitle: '', totalWeeks: 12, dayVariations: {} },
+        daySchedule: { enabled: false, planTitle: '12-Week Progressive Movement Plan', totalWeeks: 12, dayVariations: buildDefaultDayVariations() },
       };
 
       if (habit.features && typeof habit.features === 'object') {
         features = {
           counter: habit.features.counter ? { ...features.counter, ...habit.features.counter } : features.counter,
-          timer: habit.features.timer ? { ...features.timer, ...habit.features.timer } : features.timer,
+          timer: habit.features.timer
+            ? { ...features.timer, ...habit.features.timer, enabled: Boolean(habit.features.timer.enabled) }
+            : features.timer,
           checklist: habit.features.checklist
             ? { ...features.checklist, enabled: Boolean(habit.features.checklist.enabled), items: Array.isArray(habit.features.checklist.items) ? [...habit.features.checklist.items] : [] }
             : features.checklist,
           notes: habit.features.notes ? { ...features.notes, ...habit.features.notes } : features.notes,
           catalog: habit.features.catalog ? { ...features.catalog, ...habit.features.catalog } : features.catalog,
-          daySchedule: habit.features.daySchedule ? { ...features.daySchedule, ...habit.features.daySchedule } : features.daySchedule,
+          daySchedule: habit.features.daySchedule
+            ? {
+                ...features.daySchedule,
+                ...habit.features.daySchedule,
+                enabled: Boolean(habit.features.daySchedule.enabled),
+                dayVariations: buildDefaultDayVariations(habit.features.daySchedule.dayVariations),
+              }
+            : features.daySchedule,
         };
       } else {
         const cm = habit.completionMethod;
@@ -139,10 +195,15 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
             placeholder: 'Write in your personal diary...',
           };
         } else if (cm === 'exercise_plan') {
-          features.daySchedule = { enabled: true, planTitle: '12-Week Progressive Movement Plan', totalWeeks: 12, dayVariations: {} };
+          features.daySchedule = {
+            enabled: true,
+            planTitle: '12-Week Progressive Movement Plan',
+            totalWeeks: 12,
+            dayVariations: buildDefaultDayVariations(),
+          };
         } else if (cm === 'osho_listening') {
           features.catalog = { enabled: true, catalogId: 'osho_discourses', catalogTitle: 'Osho Discourses', totalItems: 30, items: [] };
-          features.timer = { enabled: true, targetDurationMinutes: habit.targetMinutes || 30, mode: 'countdown', soundOnComplete: false };
+          features.timer = { enabled: false, targetDurationMinutes: habit.targetMinutes || 30, mode: 'countdown', soundOnComplete: false };
         } else if (Array.isArray(habit.checklistItems) && habit.checklistItems.length > 0) {
           features.checklist = { enabled: true, items: normalizeChecklistItems(habit.checklistItems) };
         }
@@ -161,7 +222,9 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
           ? habit.metadata.restDays
           : [];
 
-      const targetMinutes = getReadingTargetMinutes(habit);
+      const targetMinutes = features.timer.enabled
+        ? (Number(features.timer.targetDurationMinutes) || Number(habit.targetMinutes) || 30)
+        : null;
 
       setFormData({
         title: habit.title || '',
@@ -204,6 +267,22 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
         newErrors.customCategory = 'Custom category label must be 40 characters or less';
       }
     }
+    if (formData.features.daySchedule.enabled) {
+      if (!formData.features.daySchedule.planTitle.trim()) {
+        newErrors.dayScheduleTitle = 'Plan title is required';
+      }
+      const dayVars = formData.features.daySchedule.dayVariations || {};
+      for (const [dayKey, dayVar] of Object.entries(dayVars)) {
+        if (dayVar.type !== 'rest' && Array.isArray(dayVar.exercises)) {
+          for (let i = 0; i < dayVar.exercises.length; i++) {
+            const ex = dayVar.exercises[i];
+            if (!ex.name?.trim() && !ex.label?.trim()) {
+              newErrors[`daySchedule_${dayKey}_${i}`] = `Exercise #${i + 1} on ${dayKey} requires a name`;
+            }
+          }
+        }
+      }
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -222,8 +301,8 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
     }
 
     const targetMinutes = formData.features.timer.enabled
-      ? (Number(formData.features.timer.targetDurationMinutes) || 30)
-      : (parseInt(formData.targetMinutes, 10) || DEFAULT_READING_DURATION);
+      ? (Number(formData.features.timer.targetDurationMinutes) || parseInt(formData.targetMinutes, 10) || 30)
+      : null;
     const cleanMetadata = { ...(habit?.metadata || {}) };
     delete cleanMetadata.targetMinutes;
 
@@ -278,9 +357,35 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
       daySchedule: formData.features.daySchedule.enabled
         ? {
             enabled: true,
-            planTitle: formData.features.daySchedule.planTitle || 'Weekly Plan',
+            planTitle: (formData.features.daySchedule.planTitle || 'Weekly Plan').trim(),
             totalWeeks: Number(formData.features.daySchedule.totalWeeks) || 12,
-            dayVariations: formData.features.daySchedule.dayVariations || {},
+            dayVariations: Object.fromEntries(
+              DAYS.map(dayKey => {
+                const variation = formData.features.daySchedule.dayVariations?.[dayKey] || {};
+                return [
+                  dayKey,
+                  {
+                    type: variation.type || (dayKey === 'Sun' ? 'rest' : 'workout'),
+                    label: (variation.label || '').trim(),
+                    target: (variation.target || '').trim(),
+                    exercises: Array.isArray(variation.exercises)
+                      ? variation.exercises
+                          .filter(ex => ex && (ex.name || ex.label)?.trim())
+                          .map((ex, idx) => ({
+                            id: ex.id || `ex_${dayKey.toLowerCase()}_${idx + 1}`,
+                            name: (ex.name || ex.label || '').trim(),
+                            label: (ex.name || ex.label || '').trim(),
+                            target: (ex.target || ex.reps || '').trim(),
+                            reps: (ex.reps || ex.target || '').trim(),
+                            cues: (ex.cues || '').trim(),
+                            isRequired: Boolean(ex.isRequired ?? ex.isRequiredForCompletion ?? true),
+                            isRequiredForCompletion: Boolean(ex.isRequired ?? ex.isRequiredForCompletion ?? true),
+                          }))
+                      : [],
+                  },
+                ];
+              })
+            ),
           }
         : { enabled: false },
     };
@@ -555,6 +660,247 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
         notes: {
           ...prev.features.notes,
           reflectionPrompts: prev.features.notes.reflectionPrompts.filter((_, i) => i !== idx),
+        },
+      },
+    }));
+  };
+
+  const handleSelectDayScheduleWeekday = (day) => {
+    setSelectedDayScheduleWeekday(day);
+  };
+
+  const handleChangeDayVariationType = (day, newType) => {
+    setFormData(prev => {
+      const currentVars = prev.features.daySchedule.dayVariations || {};
+      const currentVar = currentVars[day] || {};
+      let updatedExercises = currentVar.exercises || [];
+      let label = currentVar.label;
+      let target = currentVar.target;
+
+      if (newType === 'rest') {
+        label = 'Planned Rest & Recovery';
+        target = 'No workout required';
+        updatedExercises = [];
+      } else if (newType === 'walk') {
+        label = 'Easy Walk & Stretches';
+        target = 'Walk 10–20 minutes, then 3 stretches';
+        if (updatedExercises.length === 0) {
+          updatedExercises = WALK_DAY_ROUTINE.map(ex => ({ ...ex, isRequired: true, isRequiredForCompletion: true }));
+        }
+      } else if (newType === 'workout') {
+        label = 'Strength and Posture Workout';
+        target = 'About 30 minutes';
+        if (updatedExercises.length === 0) {
+          updatedExercises = WORKOUT_EXERCISES.map(ex => ({ ...ex, isRequired: true, isRequiredForCompletion: true }));
+        }
+      } else if (newType === 'custom') {
+        label = label || `${day} Custom Routine`;
+        target = target || '20–30 minutes';
+      }
+
+      return {
+        ...prev,
+        features: {
+          ...prev.features,
+          daySchedule: {
+            ...prev.features.daySchedule,
+            dayVariations: {
+              ...currentVars,
+              [day]: {
+                ...currentVar,
+                type: newType,
+                label,
+                target,
+                exercises: updatedExercises,
+              },
+            },
+          },
+        },
+      };
+    });
+  };
+
+  const handleUpdateDayVariationMeta = (day, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      features: {
+        ...prev.features,
+        daySchedule: {
+          ...prev.features.daySchedule,
+          dayVariations: {
+            ...prev.features.daySchedule.dayVariations,
+            [day]: {
+              ...prev.features.daySchedule.dayVariations?.[day],
+              [field]: value,
+            },
+          },
+        },
+      },
+    }));
+  };
+
+  const handleAddDayScheduleExercise = (day) => {
+    if (!newDayExerciseName.trim()) return;
+    const newEx = {
+      id: `ex_${day.toLowerCase()}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      name: newDayExerciseName.trim(),
+      label: newDayExerciseName.trim(),
+      target: newDayExerciseTarget.trim(),
+      reps: newDayExerciseTarget.trim(),
+      isRequired: Boolean(newDayExerciseRequired),
+      isRequiredForCompletion: Boolean(newDayExerciseRequired),
+    };
+
+    setFormData(prev => {
+      const currentVars = prev.features.daySchedule.dayVariations || {};
+      const currentDayVar = currentVars[day] || { type: 'workout', label: `${day} Routine`, exercises: [] };
+      const currentExs = Array.isArray(currentDayVar.exercises) ? currentDayVar.exercises : [];
+      return {
+        ...prev,
+        features: {
+          ...prev.features,
+          daySchedule: {
+            ...prev.features.daySchedule,
+            dayVariations: {
+              ...currentVars,
+              [day]: {
+                ...currentDayVar,
+                exercises: [...currentExs, newEx],
+              },
+            },
+          },
+        },
+      };
+    });
+
+    setNewDayExerciseName('');
+    setNewDayExerciseTarget('');
+    setNewDayExerciseRequired(true);
+  };
+
+  const handleUpdateDayScheduleExercise = (day, index, field, value) => {
+    setFormData(prev => {
+      const currentVars = prev.features.daySchedule.dayVariations || {};
+      const currentDayVar = currentVars[day] || {};
+      const currentExs = [...(currentDayVar.exercises || [])];
+      if (!currentExs[index]) return prev;
+      currentExs[index] = {
+        ...currentExs[index],
+        [field]: value,
+        ...(field === 'name' ? { label: value } : {}),
+      };
+      return {
+        ...prev,
+        features: {
+          ...prev.features,
+          daySchedule: {
+            ...prev.features.daySchedule,
+            dayVariations: {
+              ...currentVars,
+              [day]: {
+                ...currentDayVar,
+                exercises: currentExs,
+              },
+            },
+          },
+        },
+      };
+    });
+  };
+
+  const handleToggleDayScheduleExerciseRequired = (day, index) => {
+    setFormData(prev => {
+      const currentVars = prev.features.daySchedule.dayVariations || {};
+      const currentDayVar = currentVars[day] || {};
+      const currentExs = [...(currentDayVar.exercises || [])];
+      if (!currentExs[index]) return prev;
+      const nextRequired = !Boolean(currentExs[index].isRequired ?? currentExs[index].isRequiredForCompletion ?? true);
+      currentExs[index] = {
+        ...currentExs[index],
+        isRequired: nextRequired,
+        isRequiredForCompletion: nextRequired,
+      };
+      return {
+        ...prev,
+        features: {
+          ...prev.features,
+          daySchedule: {
+            ...prev.features.daySchedule,
+            dayVariations: {
+              ...currentVars,
+              [day]: {
+                ...currentDayVar,
+                exercises: currentExs,
+              },
+            },
+          },
+        },
+      };
+    });
+  };
+
+  const handleRemoveDayScheduleExercise = (day, index) => {
+    setFormData(prev => {
+      const currentVars = prev.features.daySchedule.dayVariations || {};
+      const currentDayVar = currentVars[day] || {};
+      const currentExs = (currentDayVar.exercises || []).filter((_, i) => i !== index);
+      return {
+        ...prev,
+        features: {
+          ...prev.features,
+          daySchedule: {
+            ...prev.features.daySchedule,
+            dayVariations: {
+              ...currentVars,
+              [day]: {
+                ...currentDayVar,
+                exercises: currentExs,
+              },
+            },
+          },
+        },
+      };
+    });
+  };
+
+  const handleMoveDayScheduleExercise = (day, index, direction) => {
+    setFormData(prev => {
+      const currentVars = prev.features.daySchedule.dayVariations || {};
+      const currentDayVar = currentVars[day] || {};
+      const currentExs = [...(currentDayVar.exercises || [])];
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= currentExs.length) return prev;
+      const [moved] = currentExs.splice(index, 1);
+      currentExs.splice(targetIndex, 0, moved);
+      return {
+        ...prev,
+        features: {
+          ...prev.features,
+          daySchedule: {
+            ...prev.features.daySchedule,
+            dayVariations: {
+              ...currentVars,
+              [day]: {
+                ...currentDayVar,
+                exercises: currentExs,
+              },
+            },
+          },
+        },
+      };
+    });
+  };
+
+  const handleLoad12WeekMovementDefaults = () => {
+    setFormData(prev => ({
+      ...prev,
+      features: {
+        ...prev.features,
+        daySchedule: {
+          enabled: true,
+          planTitle: '12-Week Progressive Movement Plan',
+          totalWeeks: 12,
+          dayVariations: buildDefaultDayVariations(),
         },
       },
     }));
@@ -1454,23 +1800,303 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
                     </div>
 
                     {formData.features.daySchedule.enabled && (
-                      <div className="mt-3 pt-3 border-t border-rose-200/60 dark:border-rose-900/40 space-y-2">
-                        <div>
-                          <label className="block text-2xs font-semibold text-main mb-1">Plan Title</label>
-                          <input
-                            type="text"
-                            value={formData.features.daySchedule.planTitle}
-                            onChange={(e) => setFormData(prev => ({
-                              ...prev,
-                              features: {
-                                ...prev.features,
-                                daySchedule: { ...prev.features.daySchedule, planTitle: e.target.value },
-                              },
-                            }))}
-                            placeholder="e.g. 12-Week Progressive Movement Plan"
-                            className="w-full px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-surface text-main"
-                          />
+                      <div className="mt-3 pt-3 border-t border-rose-200/60 dark:border-rose-900/40 space-y-3.5">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                          <div className="sm:col-span-2">
+                            <label className="block text-2xs font-semibold text-main mb-1">Plan Title *</label>
+                            <input
+                              type="text"
+                              value={formData.features.daySchedule.planTitle}
+                              onChange={(e) => setFormData(prev => ({
+                                ...prev,
+                                features: {
+                                  ...prev.features,
+                                  daySchedule: { ...prev.features.daySchedule, planTitle: e.target.value },
+                                },
+                              }))}
+                              placeholder="e.g. 12-Week Progressive Movement Plan"
+                              className="w-full px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-surface text-main"
+                            />
+                            {errors.dayScheduleTitle && (
+                              <p className="text-rose-500 text-2xs mt-0.5">{errors.dayScheduleTitle}</p>
+                            )}
+                          </div>
+                          <div>
+                            <label className="block text-2xs font-semibold text-main mb-1">Total Duration</label>
+                            <div className="flex items-center gap-1.5">
+                              <input
+                                type="number"
+                                min="1"
+                                max="52"
+                                value={formData.features.daySchedule.totalWeeks || 12}
+                                onChange={(e) => setFormData(prev => ({
+                                  ...prev,
+                                  features: {
+                                    ...prev.features,
+                                    daySchedule: { ...prev.features.daySchedule, totalWeeks: parseInt(e.target.value, 10) || 12 },
+                                  },
+                                }))}
+                                className="w-full px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-surface text-main"
+                              />
+                              <span className="text-2xs text-muted flex-shrink-0">Weeks</span>
+                            </div>
+                          </div>
                         </div>
+
+                        {/* Presets & Actions */}
+                        <div className="flex items-center justify-between pt-1">
+                          <span className="text-2xs font-semibold text-main">Weekday Variations</span>
+                          <button
+                            type="button"
+                            onClick={handleLoad12WeekMovementDefaults}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 text-2xs font-medium rounded-lg bg-rose-100/80 dark:bg-rose-950/60 text-rose-800 dark:text-rose-200 border border-rose-200 dark:border-rose-900/60 hover:bg-rose-200/80 transition-colors"
+                          >
+                            <Sparkles className="w-3 h-3 text-rose-600 dark:text-rose-400" />
+                            <span>Reset 12-Week Defaults</span>
+                          </button>
+                        </div>
+
+                        {/* Weekday Selector Tabs */}
+                        <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
+                          {DAYS.map(day => {
+                            const variation = formData.features.daySchedule.dayVariations?.[day] || {};
+                            const isSelected = selectedDayScheduleWeekday === day;
+                            const isRest = variation.type === 'rest' || day === 'Sun';
+                            const isWalk = variation.type === 'walk';
+                            return (
+                              <button
+                                key={day}
+                                type="button"
+                                onClick={() => handleSelectDayScheduleWeekday(day)}
+                                className={`h-11 min-h-[44px] flex flex-col items-center justify-center rounded-xl text-xs font-bold transition-all relative ${
+                                  isSelected
+                                    ? 'bg-rose-600 text-white shadow-2xs'
+                                    : 'bg-surface border border-subtle text-slate-700 dark:text-slate-300 hover:bg-surface-subtle'
+                                }`}
+                              >
+                                <span>{day}</span>
+                                <span className={`text-[9px] font-medium leading-none mt-0.5 ${
+                                  isSelected
+                                    ? 'text-rose-100'
+                                    : isRest
+                                    ? 'text-emerald-600 dark:text-emerald-400'
+                                    : isWalk
+                                    ? 'text-sky-600 dark:text-sky-400'
+                                    : 'text-amber-600 dark:text-amber-400'
+                                }`}>
+                                  {isRest ? 'Rest' : isWalk ? 'Walk' : 'Wkout'}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Active Day Detail & Exercises Configuration */}
+                        {(() => {
+                          const activeDay = selectedDayScheduleWeekday;
+                          const activeVar = formData.features.daySchedule.dayVariations?.[activeDay] || { type: 'workout', label: '', target: '', exercises: [] };
+                          const exercises = activeVar.exercises || [];
+                          const isRest = activeVar.type === 'rest';
+
+                          return (
+                            <div className="p-3 bg-surface rounded-xl border border-subtle space-y-3">
+                              {/* Day Meta Header */}
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                <div>
+                                  <label className="block text-2xs font-semibold text-main mb-1">{activeDay} Type</label>
+                                  <select
+                                    value={activeVar.type || 'workout'}
+                                    onChange={(e) => handleChangeDayVariationType(activeDay, e.target.value)}
+                                    className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-surface text-main"
+                                  >
+                                    <option value="workout">Workout / Strength</option>
+                                    <option value="walk">Easy Walk & Stretches</option>
+                                    <option value="rest">Planned Rest Day</option>
+                                    <option value="custom">Custom Routine</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label className="block text-2xs font-semibold text-main mb-1">Routine Label</label>
+                                  <input
+                                    type="text"
+                                    value={activeVar.label || ''}
+                                    onChange={(e) => handleUpdateDayVariationMeta(activeDay, 'label', e.target.value)}
+                                    placeholder="e.g. Strength & Posture"
+                                    className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-surface text-main"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-2xs font-semibold text-main mb-1">Target / Duration</label>
+                                  <input
+                                    type="text"
+                                    value={activeVar.target || ''}
+                                    onChange={(e) => handleUpdateDayVariationMeta(activeDay, 'target', e.target.value)}
+                                    placeholder="e.g. About 30 minutes"
+                                    className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-surface text-main"
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Exercises / Checklist for this day */}
+                              {isRest ? (
+                                <div className="p-3 bg-teal-50/60 dark:bg-teal-950/30 rounded-lg border border-teal-200 dark:border-teal-900/60 text-2xs text-teal-800 dark:text-teal-200">
+                                  <strong>Rest & Recovery Day:</strong> No daily exercises or workouts required. This day automatically preserves consistency and will never break streaks.
+                                </div>
+                              ) : (
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between text-2xs font-semibold text-main">
+                                    <span>{activeDay} Exercises & Steps ({exercises.length})</span>
+                                    <span className="text-muted">Required items gate completion</span>
+                                  </div>
+
+                                  {/* List of exercises */}
+                                  <div className="space-y-1.5 max-h-56 overflow-y-auto">
+                                    {exercises.map((ex, idx) => {
+                                      const isRequired = ex.isRequired !== false && ex.isRequiredForCompletion !== false;
+                                      const hasError = errors[`daySchedule_${activeDay}_${idx}`];
+                                      return (
+                                        <div
+                                          key={ex.id || idx}
+                                          className={`p-2 rounded-lg bg-surface border space-y-1.5 text-xs ${
+                                            hasError ? 'border-rose-400 bg-rose-50/20' : 'border-subtle'
+                                          }`}
+                                        >
+                                          <div className="flex items-center gap-1.5">
+                                            <span className="text-2xs font-bold text-muted w-4 text-center select-none flex-shrink-0">
+                                              {idx + 1}.
+                                            </span>
+                                            <input
+                                              type="text"
+                                              value={ex.name || ex.label || ''}
+                                              onChange={(e) => handleUpdateDayScheduleExercise(activeDay, idx, 'name', e.target.value)}
+                                              placeholder="Exercise or step name *"
+                                              className={`flex-1 min-w-0 px-2 py-1 border rounded text-xs bg-surface text-main ${
+                                                hasError ? 'border-rose-400' : 'border-slate-200 dark:border-slate-700'
+                                              }`}
+                                            />
+                                            <input
+                                              type="text"
+                                              value={ex.target || ex.reps || ''}
+                                              onChange={(e) => handleUpdateDayScheduleExercise(activeDay, idx, 'target', e.target.value)}
+                                              placeholder="Target / reps"
+                                              className="w-24 sm:w-32 px-2 py-1 border border-slate-200 dark:border-slate-700 rounded text-xs bg-surface text-main"
+                                            />
+
+                                            {/* Required / Optional Toggle */}
+                                            <button
+                                              type="button"
+                                              onClick={() => handleToggleDayScheduleExerciseRequired(activeDay, idx)}
+                                              className={`px-2 py-1 rounded text-2xs font-semibold transition-colors flex-shrink-0 min-h-[32px] ${
+                                                isRequired
+                                                  ? 'bg-teal-100 dark:bg-teal-900/60 text-teal-800 dark:text-teal-200 border border-teal-300 dark:border-teal-700'
+                                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+                                              }`}
+                                              title="Toggle Required / Optional for habit completion"
+                                            >
+                                              {isRequired ? 'Required' : 'Optional'}
+                                            </button>
+
+                                            {/* Reorder Buttons */}
+                                            <div className="flex items-center gap-0.5 flex-shrink-0">
+                                              <button
+                                                type="button"
+                                                disabled={idx === 0}
+                                                onClick={() => handleMoveDayScheduleExercise(activeDay, idx, -1)}
+                                                className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 disabled:opacity-20"
+                                                title="Move up"
+                                              >
+                                                <ChevronUp className="w-3.5 h-3.5" />
+                                              </button>
+                                              <button
+                                                type="button"
+                                                disabled={idx === exercises.length - 1}
+                                                onClick={() => handleMoveDayScheduleExercise(activeDay, idx, 1)}
+                                                className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 disabled:opacity-20"
+                                                title="Move down"
+                                              >
+                                                <ChevronDown className="w-3.5 h-3.5" />
+                                              </button>
+                                            </div>
+
+                                            {/* Remove Button */}
+                                            <button
+                                              type="button"
+                                              onClick={() => handleRemoveDayScheduleExercise(activeDay, idx)}
+                                              className="p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors flex-shrink-0"
+                                              title="Remove exercise"
+                                            >
+                                              <Trash2 className="w-3.5 h-3.5" />
+                                            </button>
+                                          </div>
+                                          {hasError && (
+                                            <p className="text-rose-500 text-2xs pl-6">{hasError}</p>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+
+                                  {/* Add new exercise row */}
+                                  <div className="pt-2 border-t border-subtle/80 space-y-2">
+                                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                                      <div className="sm:col-span-6">
+                                        <input
+                                          type="text"
+                                          value={newDayExerciseName}
+                                          onChange={(e) => setNewDayExerciseName(e.target.value)}
+                                          onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                              e.preventDefault();
+                                              handleAddDayScheduleExercise(activeDay);
+                                            }
+                                          }}
+                                          placeholder="New exercise or step name *"
+                                          className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-surface text-main"
+                                        />
+                                      </div>
+                                      <div className="sm:col-span-4">
+                                        <input
+                                          type="text"
+                                          value={newDayExerciseTarget}
+                                          onChange={(e) => setNewDayExerciseTarget(e.target.value)}
+                                          onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                              e.preventDefault();
+                                              handleAddDayScheduleExercise(activeDay);
+                                            }
+                                          }}
+                                          placeholder="Target (e.g. 10 reps, 20m)"
+                                          className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-surface text-main"
+                                        />
+                                      </div>
+                                      <div className="sm:col-span-2 flex items-center justify-end gap-1.5">
+                                        <button
+                                          type="button"
+                                          onClick={() => handleAddDayScheduleExercise(activeDay)}
+                                          disabled={!newDayExerciseName.trim()}
+                                          className="w-full min-h-[34px] px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold disabled:opacity-40 flex items-center justify-center gap-1 transition-colors"
+                                        >
+                                          <Plus className="w-3.5 h-3.5" />
+                                          <span>Add</span>
+                                        </button>
+                                      </div>
+                                    </div>
+                                    <label className="flex items-center gap-1.5 text-2xs text-muted cursor-pointer">
+                                      <input
+                                        type="checkbox"
+                                        checked={newDayExerciseRequired}
+                                        onChange={(e) => setNewDayExerciseRequired(e.target.checked)}
+                                        className="rounded text-rose-600 focus:ring-rose-500 w-3.5 h-3.5"
+                                      />
+                                      <span>Mark as required for day completion</span>
+                                    </label>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+
                         <p className="text-2xs text-muted">
                           Structured weekday-specific routines with integrated Sunday rest day support. Mutually exclusive with Multi-Item Catalog.
                         </p>

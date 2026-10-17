@@ -4,8 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getTimingSortWeight, sortHabitsByTiming } from '../src/utils/date-helpers.js';
-import { MANISH_PERSONAL_ROUTINES } from '../src/lib/server/personal-schedule.js';
-import { DEFAULT_ROUTINES } from '../src/lib/seed-data.js';
+import { MANISH_PERSONAL_ROUTINES, DEFAULT_ROUTINES } from '../src/lib/server/schedule-templates.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

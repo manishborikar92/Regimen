@@ -1,6 +1,6 @@
 import { test, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { CANONICAL_ROUTINES } from '../src/lib/server/personal-schedule.js';
+import { CANONICAL_ROUTINES } from '../src/lib/server/schedule-templates.js';
 
 describe('Diary Privacy & Scoping Integrity', () => {
   it('should verify diary routine is flagged as a private journal', () => {

@@ -69,8 +69,14 @@ function SlotDaySchedule({
     ? WALK_DAY_ROUTINE
     : [];
 
-  const allItemsChecked = currentItems.length > 0 && currentItems.every(item => completedItemIds.includes(item.id));
-  const isComplete = Boolean(isHabitComplete || progress.workoutCompleted || allItemsChecked);
+  const requiredItems = currentItems.filter(
+    item => item.isRequired !== false && item.isRequiredForCompletion !== false
+  );
+
+  const allRequiredChecked = requiredItems.length > 0
+    ? requiredItems.every(item => completedItemIds.includes(item.id))
+    : Boolean(progress.workoutCompleted || progress.walkCompleted);
+  const isComplete = Boolean(isHabitComplete || progress.workoutCompleted || allRequiredChecked);
 
   const handleToggleItem = (itemId, e) => {
     e.stopPropagation();
@@ -81,15 +87,20 @@ function SlotDaySchedule({
       ? completedItemIds.filter(id => id !== itemId)
       : [...completedItemIds, itemId];
 
-    const nextAllChecked = currentItems.length > 0 && currentItems.every(item => updatedIds.includes(item.id));
+    const nextAllRequiredChecked = requiredItems.length > 0
+      ? requiredItems.every(item => updatedIds.includes(item.id))
+      : true;
 
-    if (nextAllChecked && !isComplete) {
+    // Requirement 3: When the last required checklist item is checked and completes parent,
+    // trigger the exact same completion sound (playHabitCompleteCue) used by main checkbox;
+    // ensure it plays once, no duplicates, no replay on reload/render.
+    if (!isCurrentlyChecked && nextAllRequiredChecked && !isComplete) {
       playHabitCompleteCue?.();
     } else {
       playStepToggleCue?.(!isCurrentlyChecked);
     }
 
-    onChange?.(updatedIds, nextAllChecked);
+    onChange?.(updatedIds, nextAllRequiredChecked);
   };
 
   // If Rest Day (e.g. Sunday)
@@ -199,7 +210,10 @@ function SlotDaySchedule({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-1">
                     <span className={`text-xs sm:text-sm font-semibold truncate ${isItemDone ? 'line-through text-muted' : 'text-main'}`}>
-                      {item.name}
+                      {item.name || item.label}
+                      {(item.isRequired === false || item.isRequiredForCompletion === false) && (
+                        <span className="ml-1.5 text-2xs font-normal text-muted italic">(Optional)</span>
+                      )}
                     </span>
                     {item.target && (
                       <span className="text-2xs text-muted flex-shrink-0 font-medium">
