@@ -2,9 +2,45 @@
  * Centralized Category Configuration for Vritta.
  * Single source of truth for all habit categories, styling tokens, and display labels.
  *
- * All supported category keys and form options derive directly from CATEGORY_CONFIG.
- * Aligns 1:1 with Cloud Firestore security rules (isValidCategory).
+ * Implements an authoritative, duplicate-free 9-category canonical life-area taxonomy:
+ * 1. English Learning   — Vocabulary acquisition, reading practice, and workbook study
+ * 2. Movement & Strength — Bodyweight conditioning, posture correction, and physical routines
+ * 3. Listening & Awareness — Contemplative listening, awareness exercises, and audio exploration
+ * 4. Reading             — Focused reading, study sessions, and bedtime transition
+ * 5. Communication       — Conversational practice, writing, and expressive clarity
+ * 6. Reflection          — Private journaling, learning notes, and daily introspection
+ * 7. Nutrition           — Hydration, balanced meals, and mindful eating habits
+ * 8. Recovery            — Rest, sleep hygiene, and evening wind-down
+ * 9. Schedule            — Daily planning, focus blocks, and time management
+ *
+ * Strict Canonical Model:
+ * - No runtime legacy aliases or compatibility fallbacks are permitted.
+ * - Non-canonical category values are invalid across schemas, forms, and Firestore rules.
+ * - All persisted habits have been migrated to canonical category values.
  */
+
+export const CATEGORIES = [
+  'English Learning',
+  'Movement & Strength',
+  'Listening & Awareness',
+  'Reading',
+  'Communication',
+  'Reflection',
+  'Nutrition',
+  'Recovery',
+  'Schedule',
+];
+
+export const CANONICAL_CATEGORIES = CATEGORIES;
+
+/**
+ * Validates whether a category is one of the 9 canonical categories.
+ * @param {*} category
+ * @returns {boolean}
+ */
+export function isValidCategory(category) {
+  return typeof category === 'string' && CATEGORIES.includes(category);
+}
 
 export const CATEGORY_CONFIG = {
   'English Learning': {
@@ -79,18 +115,6 @@ export const CATEGORY_CONFIG = {
     iconName: 'PenTool',
     description: 'Private journaling, learning notes, and daily introspection',
   },
-  'Movement': {
-    label: 'Movement',
-    borderColor: 'border-l-teal-500 dark:border-l-teal-400',
-    borderTopColor: 'border-t-teal-500 dark:border-t-teal-400',
-    bgColor: 'bg-teal-50/70 dark:bg-teal-950/40',
-    bgColorDone: 'bg-teal-100/60 dark:bg-teal-900/40',
-    badgeClasses: 'bg-teal-100 text-teal-800 border-teal-200 dark:bg-teal-950/60 dark:text-teal-300 dark:border-teal-800/60',
-    textColor: 'text-teal-700 dark:text-teal-400',
-    dotColor: 'bg-teal-500 dark:bg-teal-400',
-    iconName: 'Activity',
-    description: 'General physical movement, daily walking, and mobility',
-  },
   'Nutrition': {
     label: 'Nutrition',
     borderColor: 'border-l-green-500 dark:border-l-green-400',
@@ -128,12 +152,6 @@ export const CATEGORY_CONFIG = {
     description: 'Daily planning, focus blocks, and time management',
   },
 };
-
-/**
- * Authoritative array of all supported category keys.
- * Derived directly from CATEGORY_CONFIG (single source of truth).
- */
-export const CATEGORIES = Object.keys(CATEGORY_CONFIG);
 
 /**
  * Retrieve styling and label configuration for a category with safe fallback.

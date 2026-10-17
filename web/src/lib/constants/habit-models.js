@@ -10,7 +10,9 @@
  * - Strict validation and habit-specific historical date provenance
  */
 
-import { CATEGORIES } from './categories.js';
+import { CATEGORIES, CANONICAL_CATEGORIES, isValidCategory } from './categories.js';
+
+export { CATEGORIES, CANONICAL_CATEGORIES, isValidCategory };
 
 // ============================================================================
 // Enums & Domain Constants
@@ -460,7 +462,7 @@ export function validateComposableHabit(habit) {
     errors.push('Habit title cannot exceed 200 characters.');
   }
 
-  if (!habit.category || !CATEGORIES.includes(habit.category)) {
+  if (!habit.category || !isValidCategory(habit.category)) {
     errors.push(`Habit category '${habit.category}' is invalid. Allowed: ${CATEGORIES.join(', ')}`);
   }
 

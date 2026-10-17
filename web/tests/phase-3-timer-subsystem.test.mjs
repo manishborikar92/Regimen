@@ -56,20 +56,20 @@ describe('Phase 3: Specialized Reading Duration Timer Subsystem', () => {
       );
     });
 
-    it('should provide reading duration selector exclusively for reading_duration in HabitModal', () => {
+    it('should provide duration selector via the Timer feature slot in HabitModal', () => {
       const content = readWebFile('src/components/habits/HabitModal.js');
       assert.ok(
-        content.includes("formData.completionMethod === 'reading_duration'"),
-        'Duration selector must trigger on reading_duration'
+        content.includes('formData.features.timer.enabled'),
+        'Duration selector must be configured via the composable Timer feature slot'
       );
       assert.ok(
-        content.includes('READING_DURATION_PRESETS'),
-        'HabitModal must render canonical READING_DURATION_PRESETS'
+        content.includes('targetDurationMinutes'),
+        'HabitModal must configure targetDurationMinutes for the timer'
       );
       assert.deepEqual(
         READING_DURATION_PRESETS,
         [15, 20, 30, 45, 60],
-        'HabitModal presets must provide [15, 20, 30, 45, 60] minute options'
+        'Canonical presets helper provides [15, 20, 30, 45, 60] minute options'
       );
     });
 

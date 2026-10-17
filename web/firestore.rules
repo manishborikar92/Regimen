@@ -17,7 +17,7 @@ service cloud.firestore {
     // =============================================
     match /habits/{habitId} {
 
-      // Allowed categories include canonical life-area categories and legacy categories
+      // Allowed categories are strictly the 9 canonical life-area categories
       function isValidCategory(cat) {
         return cat in [
           'English Learning',
@@ -26,10 +26,9 @@ service cloud.firestore {
           'Reading',
           'Communication',
           'Reflection',
-          'Schedule',
-          'Movement',
           'Nutrition',
-          'Recovery'
+          'Recovery',
+          'Schedule'
         ];
       }
 

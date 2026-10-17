@@ -22,7 +22,6 @@ import { CATEGORIES } from '@/lib/constants/categories';
 import { WEEKDAYS, APPROVED_FEATURE_SLOTS, validateComposableHabit } from '@/lib/constants/habit-models';
 import { normalizeChecklistItems } from '@/utils/checklist-helpers';
 import {
-  READING_DURATION_PRESETS,
   DEFAULT_READING_DURATION,
   getReadingTargetMinutes,
 } from '@/utils/reading-helpers';
@@ -56,9 +55,9 @@ export const SPECIALIZED_COMPLETION_STYLES = {
  */
 export default function HabitModal({ habit, onSave, onClose, onDelete }) {
   const [formData, setFormData] = useState({
-    title: '',
-    category: 'English Learning',
-    completionMethod: 'simple',
+    title: habit?.title || '',
+    category: habit?.category || 'English Learning',
+    completionMethod: habit?.completionMethod || 'simple',
     timingType: 'anytime',
     preferredPeriod: 'Afternoon',
     relativeTiming: 'Before bed',
@@ -82,23 +81,11 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
     },
   });
 
-  const [activeTab, setActiveTab] = useState('features'); // 'features' | 'schedule' | 'details'
+  const [activeTab, setActiveTab] = useState('details'); // 'details' | 'features' | 'schedule'
   const [newChecklistItem, setNewChecklistItem] = useState('');
   const [newPromptChip, setNewPromptChip] = useState('');
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
-
-  const availableMethods = useMemo(() => {
-    const list = [...GENERIC_COMPLETION_STYLES];
-    const currentMethod = habit?.completionMethod;
-    if (currentMethod && SPECIALIZED_COMPLETION_STYLES[currentMethod]) {
-      list.unshift({
-        id: currentMethod,
-        ...SPECIALIZED_COMPLETION_STYLES[currentMethod],
-      });
-    }
-    return list;
-  }, [habit?.completionMethod]);
 
   useEffect(() => {
     if (habit) {
@@ -215,7 +202,9 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
       displayTime = formData.time || '08:00 AM';
     }
 
-    const targetMinutes = parseInt(formData.targetMinutes, 10) || DEFAULT_READING_DURATION;
+    const targetMinutes = formData.features.timer.enabled
+      ? (Number(formData.features.timer.targetDurationMinutes) || 30)
+      : (parseInt(formData.targetMinutes, 10) || DEFAULT_READING_DURATION);
     const cleanMetadata = { ...(habit?.metadata || {}) };
     delete cleanMetadata.targetMinutes;
 
@@ -230,7 +219,7 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
             minCount: Number(formData.features.counter.minCount) || 0,
           }
         : { enabled: false },
-      timer: (formData.features.timer.enabled || formData.completionMethod === 'reading_duration')
+      timer: formData.features.timer.enabled
         ? {
             enabled: true,
             targetDurationMinutes: targetMinutes,
@@ -490,6 +479,17 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
           <div className="px-5 bg-surface border-b border-subtle flex items-center gap-4 flex-shrink-0">
             <button
               type="button"
+              onClick={() => setActiveTab('details')}
+              className={`py-2.5 text-xs font-semibold border-b-2 transition-all ${
+                activeTab === 'details'
+                  ? 'border-teal-600 text-teal-700 dark:text-teal-400'
+                  : 'border-transparent text-muted hover:text-main'
+              }`}
+            >
+              Basics & Category
+            </button>
+            <button
+              type="button"
               onClick={() => setActiveTab('features')}
               className={`py-2.5 text-xs font-semibold border-b-2 transition-all flex items-center gap-1.5 ${
                 activeTab === 'features'
@@ -499,17 +499,6 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
             >
               <Sliders className="w-3.5 h-3.5" />
               <span>Features ({Object.values(formData.features).filter(f => f.enabled).length})</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('details')}
-              className={`py-2.5 text-xs font-semibold border-b-2 transition-all ${
-                activeTab === 'details'
-                  ? 'border-teal-600 text-teal-700 dark:text-teal-400'
-                  : 'border-transparent text-muted hover:text-main'
-              }`}
-            >
-              Basics & Category
             </button>
             <button
               type="button"
@@ -560,54 +549,6 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
                       ))}
                     </select>
                   </div>
-
-                  {/* Completion Method Selector (Preserved for compatibility) */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      How to Complete
-                    </label>
-                    <select
-                      value={formData.completionMethod}
-                      onChange={(e) => setFormData(prev => ({ ...prev, completionMethod: e.target.value }))}
-                      className="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl text-base sm:text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-                    >
-                      {availableMethods.map(m => (
-                        <option key={m.id} value={m.id}>{m.label}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Reading Duration Selector for reading_duration method */}
-                  {formData.completionMethod === 'reading_duration' && (
-                    <div className="p-3 sm:p-3.5 bg-surface-subtle dark:bg-slate-800/40 rounded-xl border border-subtle dark:border-slate-700/80 space-y-2">
-                      <label className="block text-xs font-semibold text-main">
-                        Target Reading Duration
-                      </label>
-                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                        {READING_DURATION_PRESETS.map((mins) => (
-                          <button
-                            key={mins}
-                            type="button"
-                            onClick={() => setFormData(prev => ({
-                              ...prev,
-                              targetMinutes: mins,
-                              features: {
-                                ...prev.features,
-                                timer: { ...prev.features.timer, enabled: true, targetDurationMinutes: mins },
-                              },
-                            }))}
-                            className={`min-h-[38px] px-2.5 py-1 text-xs rounded-lg font-medium border transition-colors ${
-                              Number(formData.targetMinutes) === mins
-                                ? 'bg-teal-700 dark:bg-teal-600 text-white border-teal-700 dark:border-teal-600 font-semibold shadow-2xs'
-                                : 'bg-surface dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-subtle dark:border-slate-700 hover:bg-surface-subtle'
-                            }`}
-                          >
-                            {mins} min
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
 
                   {/* Instructions & Notes */}
                   <div>
