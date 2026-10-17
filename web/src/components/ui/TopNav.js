@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { BRAND } from '@/lib/constants/brand';
+import { formatDate } from '@/utils/date-helpers';
 import { useScrolled } from '@/hooks/useScrolled';
 import { cn } from '@/lib/utils/cn';
 import Logo from './Logo';
@@ -18,7 +19,7 @@ import ThemeToggle from './ThemeToggle';
  * - Profile menu trigger defines accessible aria-label="Profile menu" with comfortable p-1 sm:p-1.5 touch padding
  * - ChevronDown indicator is hidden on mobile viewports (hidden sm:block)
  */
-export default function TopNav({ title, subtitle }) {
+export default function TopNav() {
   const { user } = useAuth();
   const scrolled = useScrolled();
   // Profile menu & sign out dialog flow (setShowProfileMenu / setShowLogoutModal / ConfirmDialog)
@@ -26,8 +27,8 @@ export default function TopNav({ title, subtitle }) {
   const signOutOpen = showLogoutModal;
   const setSignOutOpen = setShowLogoutModal;
 
-  const displayTitle = title || BRAND.name;
-  const showBrandBadge = Boolean(title) && title !== BRAND.name;
+  const displayTitle = BRAND.name;
+  const subtitle = formatDate();
 
   return (
     <>
@@ -49,11 +50,6 @@ export default function TopNav({ title, subtitle }) {
                 <h1 className="text-base sm:text-lg lg:text-xl font-bold text-main truncate leading-tight tracking-tight">
                   {displayTitle}
                 </h1>
-                {showBrandBadge && (
-                  <span className="hidden shrink-0 rounded-full border border-subtle bg-accent-subtle/40 px-2 py-0.5 text-2xs font-semibold text-accent sm:inline-block">
-                    {BRAND.name}
-                  </span>
-                )}
               </div>
               {subtitle && (
                 <p className="text-2xs sm:text-xs text-sub mt-0.5 truncate leading-tight font-medium">
