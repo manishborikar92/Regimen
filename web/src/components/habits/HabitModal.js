@@ -29,6 +29,7 @@ import {
   DEFAULT_READING_DURATION,
   getReadingTargetMinutes,
 } from '@/utils/reading-helpers';
+import TemplateBrowserModal from './TemplateBrowserModal';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -87,6 +88,7 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
   });
 
   const [activeTab, setActiveTab] = useState('details'); // 'details' | 'features' | 'schedule'
+  const [showTemplateBrowser, setShowTemplateBrowser] = useState(false);
   const [newChecklistItem, setNewChecklistItem] = useState('');
   const [newPromptChip, setNewPromptChip] = useState('');
   const [newCatalogItemTitle, setNewCatalogItemTitle] = useState('');
@@ -570,9 +572,22 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
           {/* Header */}
           <div className="bg-surface border-b border-subtle px-5 py-3.5 sm:py-4 flex items-center justify-between flex-shrink-0 z-10">
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-main leading-tight">
-                {habit ? 'Edit Routine' : 'Create New Routine'}
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base sm:text-lg font-bold text-main leading-tight">
+                  {habit?.id ? 'Edit Routine' : 'Create New Routine'}
+                </h2>
+                {!habit?.id && (
+                  <button
+                    type="button"
+                    onClick={() => setShowTemplateBrowser(true)}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 text-2xs font-semibold hover:bg-teal-100 dark:hover:bg-teal-900/60 transition-colors shadow-2xs"
+                    title="Choose from schedule templates"
+                  >
+                    <BookOpen className="w-3 h-3" />
+                    <span>Choose Template</span>
+                  </button>
+                )}
+              </div>
               <p className="text-2xs text-sub">
                 Configure features, scheduling, and observance rhythm
               </p>
@@ -1496,6 +1511,34 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
           </form>
         </div>
       </div>
+
+      {showTemplateBrowser && (
+        <TemplateBrowserModal
+          isOpen={showTemplateBrowser}
+          onClose={() => setShowTemplateBrowser(false)}
+          onSelectTemplate={(templateHabit) => {
+            setFormData(prev => ({
+              ...prev,
+              title: templateHabit.title || '',
+              category: templateHabit.category || 'Health & Fitness',
+              customCategory: templateHabit.customCategory || '',
+              description: templateHabit.description || '',
+              instructions: templateHabit.instructions || templateHabit.description || '',
+              frequency: templateHabit.schedule?.frequency || [...DAYS],
+              restDays: templateHabit.schedule?.restDays || [],
+              timingType: templateHabit.schedule?.timingType || 'anytime',
+              preferredPeriod: templateHabit.schedule?.preferredPeriod || 'Morning',
+              relativeTiming: templateHabit.schedule?.relativeTiming || 'Before bed',
+              time: templateHabit.schedule?.exactTime || 'Flexible',
+              features: { ...templateHabit.features },
+              checklistItems: normalizeChecklistItems(templateHabit.features?.checklist?.items || []),
+              seedOrigin: 'template',
+              templateReference: templateHabit.templateReference || null,
+            }));
+            setShowTemplateBrowser(false);
+          }}
+        />
+      )}
     </>
   );
 }

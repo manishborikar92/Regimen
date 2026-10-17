@@ -692,7 +692,10 @@ export function isFeatureSatisfied(featureKey, featureConfig = {}, progress = {}
     }
     case 'checklist': {
       const items = Array.isArray(featureConfig.items) ? featureConfig.items : [];
-      const requiredItems = items.filter(item => item.isRequiredForCompletion !== false);
+      // An item is required unless explicitly marked optional via isRequired: false or isRequiredForCompletion: false
+      const requiredItems = items.filter(
+        item => item.isRequiredForCompletion !== false && item.isRequired !== false
+      );
       if (requiredItems.length === 0) return true;
       const completedSteps = Array.isArray(progress.completedSteps) ? progress.completedSteps : [];
       return requiredItems.every(reqItem => completedSteps.includes(reqItem.id || reqItem.label));
@@ -717,6 +720,130 @@ export function isFeatureSatisfied(featureKey, featureConfig = {}, progress = {}
     default:
       return true;
   }
+}
+
+/**
+ * Clamp a counter value within [minCount, maxCount].
+ * Max bound defaults to `targetCount` unless `maxCount` is explicitly configured.
+ *
+ * @param {Object} habit - Habit document
+ * @param {number} count - Candidate count
+ * @returns {number} Clamped count
+ */
+export function clampCounterProgress(habit, count) {
+  const counterConfig = habit?.features?.counter;
+  if (!counterConfig) return count;
+  const minCount = typeof counterConfig.minCount === 'number' ? counterConfig.minCount : 0;
+  const targetCount = Number(counterConfig.targetCount) > 0 ? Number(counterConfig.targetCount) : 1;
+  const maxCount = typeof counterConfig.maxCount === 'number' && counterConfig.maxCount >= targetCount
+    ? counterConfig.maxCount
+    : targetCount;
+  const num = typeof count === 'number' && !isNaN(count) ? count : minCount;
+  return Math.min(maxCount, Math.max(minCount, num));
+}
+
+/**
+ * Derive daily log progress when the user activates the main habit checkbox.
+ * Marks all required items/features for that observance day complete.
+ *
+ * Specific feature invariants:
+ * - Counter: sets sessionsCompleted / count to targetCount (or maxCount)
+ * - Timer: sets timerCompleted to true, durationMinutes to targetDurationMinutes
+ * - Checklist: checks all required items (optional items do not block)
+ * - Catalog: marks daily observance complete (catalogItemCompleted / talkCompleted) WITHOUT
+ *   touching seriesProgress or marking all 30 discourses listened (Osho disclosure promise)
+ * - Day Schedule: marks daily workout/walk complete
+ * - Notes: notes text is strictly preserved, NEVER cleared or overwritten
+ *
+ * @param {Object} habit - Composable habit document
+ * @param {Object} [existingProgress] - Current progress object
+ * @returns {Object} Next progress object
+ */
+export function deriveCompletedProgressForHabit(habit, existingProgress = {}) {
+  if (!habit || !habit.features) return { ...existingProgress };
+  const f = habit.features;
+  const next = { ...existingProgress };
+
+  if (f.counter?.enabled) {
+    const target = Number(f.counter.targetCount) > 0 ? Number(f.counter.targetCount) : 1;
+    next.sessionsCompleted = target;
+    next.count = target;
+  }
+
+  if (f.timer?.enabled) {
+    const targetMin = Number(f.timer.targetDurationMinutes) > 0 ? Number(f.timer.targetDurationMinutes) : 1;
+    next.timerCompleted = true;
+    next.durationMinutes = targetMin;
+  }
+
+  if (f.checklist?.enabled) {
+    const items = Array.isArray(f.checklist.items) ? f.checklist.items : [];
+    const requiredKeys = items
+      .filter(item => item.isRequired !== false && item.isRequiredForCompletion !== false)
+      .map(item => item.id || item.label);
+    const existingSteps = Array.isArray(next.completedSteps) ? next.completedSteps : [];
+    next.completedSteps = Array.from(new Set([...existingSteps, ...requiredKeys]));
+    next.reviewDone = true;
+  }
+
+  if (f.catalog?.enabled) {
+    next.catalogItemCompleted = true;
+    next.talkCompleted = true;
+    // Osho disclosure invariant: Strictly leave seriesProgress untouched
+  }
+
+  if (f.daySchedule?.enabled) {
+    next.workoutCompleted = true;
+    next.walkCompleted = true;
+  }
+
+  // Notes invariant: strictly preserve existing notes and diaryEntry text
+  return next;
+}
+
+/**
+ * Derive daily log progress when the user unchecks the main habit checkbox.
+ * Reverses daily completion requirements without erasing history or notes.
+ *
+ * @param {Object} habit - Composable habit document
+ * @param {Object} [existingProgress] - Current progress object
+ * @returns {Object} Next progress object
+ */
+export function deriveUncompletedProgressForHabit(habit, existingProgress = {}) {
+  if (!habit || !habit.features) return { ...existingProgress };
+  const f = habit.features;
+  const next = { ...existingProgress };
+
+  if (f.counter?.enabled) {
+    const minCount = typeof f.counter.minCount === 'number' ? f.counter.minCount : 0;
+    next.sessionsCompleted = minCount;
+    next.count = minCount;
+  }
+
+  if (f.timer?.enabled) {
+    next.timerCompleted = false;
+    next.durationMinutes = 0;
+  }
+
+  if (f.checklist?.enabled) {
+    next.completedSteps = [];
+    next.reviewDone = false;
+  }
+
+  if (f.catalog?.enabled) {
+    next.catalogItemCompleted = false;
+    next.talkCompleted = false;
+    // Series progress remains untouched
+  }
+
+  if (f.daySchedule?.enabled) {
+    next.workoutCompleted = false;
+    next.walkCompleted = false;
+    next.completedItemIds = [];
+  }
+
+  // Notes invariant: strictly preserve existing notes and diaryEntry text
+  return next;
 }
 
 /**

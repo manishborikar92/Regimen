@@ -130,6 +130,15 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // =============================================
+    // ScheduleTemplates: Shared reusable routine blueprints
+    // Client write is disabled; authenticated users can read templates
+    // =============================================
+    match /scheduleTemplates/{templateId} {
+      allow read: if isAuthenticated();
+      allow write: if false;
+    }
+
     // Deny all other access by default
   }
 }

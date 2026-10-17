@@ -25,6 +25,9 @@ function SlotStepper({
   const { playStepToggleCue, playHabitCompleteCue } = useSound();
 
   const targetCount = Number(feature.targetCount) > 0 ? Number(feature.targetCount) : 1;
+  const maxCount = typeof feature.maxCount === 'number' && feature.maxCount >= targetCount
+    ? feature.maxCount
+    : targetCount;
   const unit = feature.unit || 'sessions';
   const step = Number(feature.step) > 0 ? Number(feature.step) : 1;
   const minCount = typeof feature.minCount === 'number' ? feature.minCount : 0;
@@ -37,6 +40,7 @@ function SlotStepper({
     : minCount;
 
   const isTargetReached = currentCount >= targetCount;
+  const isMaxReached = currentCount >= maxCount;
 
   const handleDecrement = (e) => {
     e.stopPropagation();
@@ -48,8 +52,8 @@ function SlotStepper({
 
   const handleIncrement = (e) => {
     e.stopPropagation();
-    if (disabled) return;
-    const next = currentCount + step;
+    if (disabled || isMaxReached) return;
+    const next = Math.min(maxCount, currentCount + step);
     if (next >= targetCount && !isTargetReached) {
       playHabitCompleteCue?.();
     } else {
@@ -100,10 +104,11 @@ function SlotStepper({
         <button
           type="button"
           onClick={handleIncrement}
-          disabled={disabled}
-          className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-950/70 text-teal-800 dark:text-teal-300 hover:bg-teal-100 dark:hover:bg-teal-900/60 disabled:opacity-30 flex items-center justify-center transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 active:scale-95"
+          disabled={disabled || isMaxReached}
+          aria-disabled={disabled || isMaxReached}
+          className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-950/70 text-teal-800 dark:text-teal-300 hover:bg-teal-100 dark:hover:bg-teal-900/60 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 active:scale-95"
           aria-label={`Increment ${unit}`}
-          title={`Increase ${unit}`}
+          title={isMaxReached ? `Maximum ${unit} reached` : `Increase ${unit}`}
         >
           <Plus className="w-4 h-4" />
         </button>

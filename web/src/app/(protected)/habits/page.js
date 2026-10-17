@@ -1,16 +1,17 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Plus, Compass } from 'lucide-react';
+import { Plus, Compass, BookOpen } from 'lucide-react';
 import { useData, useToast, useSound } from '@/contexts';
 import { ConfirmDialog, HabitsSkeleton } from '@/components/ui';
-import { HabitModal, HabitManagerCard } from '@/components/habits';
+import { HabitModal, HabitManagerCard, TemplateBrowserModal } from '@/components/habits';
 
 export default function HabitsPage() {
   const { habits, loading, addHabit, updateHabit, deleteHabit, seedHabits } = useData();
   const { addToast } = useToast();
   const { playActionSuccessCue, playActionDeleteCue } = useSound();
   const [showModal, setShowModal] = useState(false);
+  const [showTemplateBrowser, setShowTemplateBrowser] = useState(false);
   const [editingHabit, setEditingHabit] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -19,14 +20,14 @@ export default function HabitsPage() {
 
   const handleSave = async (formData) => {
     try {
-      if (editingHabit) {
+      if (editingHabit && editingHabit.id) {
         await updateHabit(editingHabit.id, formData);
       } else {
         await addHabit(formData);
       }
       setShowModal(false);
       setEditingHabit(null);
-      addToast(`Routine ${editingHabit ? 'updated' : 'created'} successfully`, 'success');
+      addToast(`Routine ${editingHabit?.id ? 'updated' : 'created'} successfully`, 'success');
       playActionSuccessCue?.();
     } catch (err) {
       console.error('Error saving routine:', err);
@@ -88,19 +89,27 @@ export default function HabitsPage() {
                 Load recommended foundation routines or create your own custom habit.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-2.5 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-2.5 justify-center items-center flex-wrap">
               <button
                 type="button"
                 onClick={handleSeedHabits}
                 disabled={seeding}
-                className="px-5 py-2.5 bg-teal-700 dark:bg-teal-600 text-white rounded-xl text-xs sm:text-sm font-semibold hover:bg-teal-800 dark:hover:bg-teal-500 transition-colors disabled:opacity-50 shadow-2xs"
+                className="px-5 py-2.5 bg-teal-700 dark:bg-teal-600 text-white rounded-xl text-xs sm:text-sm font-semibold hover:bg-teal-800 dark:hover:bg-teal-500 transition-colors disabled:opacity-50 shadow-2xs min-h-[44px]"
               >
                 {seeding ? 'Loading Routines...' : 'Load Recommended Routines'}
               </button>
               <button
                 type="button"
+                onClick={() => setShowTemplateBrowser(true)}
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-surface border border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-300 rounded-xl text-xs sm:text-sm font-semibold hover:bg-teal-50 dark:hover:bg-teal-950/40 transition-colors shadow-2xs min-h-[44px]"
+              >
+                <BookOpen className="w-4 h-4" />
+                <span>Browse Blueprints</span>
+              </button>
+              <button
+                type="button"
                 onClick={() => { setEditingHabit(null); setShowModal(true); }}
-                className="px-5 py-2.5 bg-surface border border-subtle dark:border-stone-700 text-main rounded-xl text-xs sm:text-sm font-semibold hover:bg-surface-subtle transition-colors shadow-2xs"
+                className="px-5 py-2.5 bg-surface border border-subtle dark:border-stone-700 text-main rounded-xl text-xs sm:text-sm font-semibold hover:bg-surface-subtle transition-colors shadow-2xs min-h-[44px]"
               >
                 Create Custom Routine
               </button>
@@ -109,9 +118,20 @@ export default function HabitsPage() {
         ) : (
           <div className="space-y-4">
             {/* Page Header */}
-            <div className="px-1">
-              <h1 className="text-base sm:text-lg font-bold text-main">Routines & Observance</h1>
-              <p className="text-2xs text-muted">Manage your daily rhythms and feature slots</p>
+            <div className="flex items-center justify-between px-1">
+              <div>
+                <h1 className="text-base sm:text-lg font-bold text-main">Routines & Observance</h1>
+                <p className="text-2xs text-muted">Manage your daily rhythms and feature slots</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowTemplateBrowser(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-subtle bg-surface text-xs font-semibold text-main hover:bg-surface-subtle transition-colors shadow-2xs min-h-[44px]"
+                title="Browse schedule blueprints and templates"
+              >
+                <BookOpen className="w-4 h-4 text-teal-700 dark:text-teal-400" />
+                <span>Browse Blueprints</span>
+              </button>
             </div>
 
             <div className="space-y-3">
@@ -150,6 +170,15 @@ export default function HabitsPage() {
           onDelete={editingHabit ? handleDelete : null}
         />
       )}
+
+      <TemplateBrowserModal
+        isOpen={showTemplateBrowser}
+        onClose={() => setShowTemplateBrowser(false)}
+        onSelectTemplate={(templateHabit) => {
+          setEditingHabit(templateHabit);
+          setShowModal(true);
+        }}
+      />
 
       {/* Floating Add Routine Button — elevated above BottomNav with zero card collision */}
       <div className="fixed bottom-22 sm:bottom-24 left-0 right-0 pointer-events-none z-40">

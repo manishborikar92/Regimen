@@ -13,7 +13,12 @@ import {
   BookOpen,
 } from 'lucide-react';
 import { getCategoryConfig } from '@/lib/constants/categories';
-import { evaluateHabitCompletion } from '@/lib/constants/habit-models';
+import {
+  evaluateHabitCompletion,
+  clampCounterProgress,
+  deriveCompletedProgressForHabit,
+  deriveUncompletedProgressForHabit,
+} from '@/lib/constants/habit-models';
 import { getTimingDisplay } from '@/utils/date-helpers';
 import { useSound } from '@/contexts';
 import {
@@ -120,10 +125,22 @@ function DashboardHabitCard({
 
     if (isEffectivelyCompleted) {
       playStepToggleCue?.(false);
-      onToggle?.(habit.id);
+      const nextProgress = deriveUncompletedProgressForHabit(habit, progress);
+      onUpdateProgress?.(habit.id, nextProgress, false);
+      if (outcome) {
+        onSetOutcome?.(habit.id, null);
+      } else {
+        onToggle?.(habit.id);
+      }
     } else {
       playHabitCompleteCue?.();
-      onToggle?.(habit.id);
+      const nextProgress = deriveCompletedProgressForHabit(habit, progress);
+      onUpdateProgress?.(habit.id, nextProgress, true);
+      if (outcome) {
+        onSetOutcome?.(habit.id, 'completed');
+      } else {
+        onToggle?.(habit.id);
+      }
     }
   };
 
@@ -136,13 +153,16 @@ function DashboardHabitCard({
 
   // Slot update handlers with strict completion boundaries
   const handleCounterChange = (newCount) => {
+    const clampedCount = clampCounterProgress(habit, newCount);
     const nextProgress = {
       ...progress,
-      sessionsCompleted: newCount,
-      count: newCount,
+      sessionsCompleted: clampedCount,
+      count: clampedCount,
     };
     const allFeaturesSatisfied = evaluateHabitCompletion(habit, nextProgress);
-    onUpdateProgress?.(habit.id, nextProgress, allFeaturesSatisfied);
+    // Invariant: Skipped/missed parent outcomes must NOT be silently overwritten by item updates
+    const completionFlag = (isSkipped || isMissed) ? undefined : allFeaturesSatisfied;
+    onUpdateProgress?.(habit.id, nextProgress, completionFlag);
   };
 
   const handleTimerComplete = ({ durationMinutes }) => {
@@ -152,7 +172,8 @@ function DashboardHabitCard({
       timerCompleted: true,
     };
     const allFeaturesSatisfied = evaluateHabitCompletion(habit, nextProgress);
-    onUpdateProgress?.(habit.id, nextProgress, allFeaturesSatisfied);
+    const completionFlag = (isSkipped || isMissed) ? undefined : allFeaturesSatisfied;
+    onUpdateProgress?.(habit.id, nextProgress, completionFlag);
   };
 
   const handleChecklistChange = (nextSteps, allDone) => {
@@ -162,7 +183,8 @@ function DashboardHabitCard({
       reviewDone: allDone,
     };
     const allFeaturesSatisfied = evaluateHabitCompletion(habit, nextProgress);
-    onUpdateProgress?.(habit.id, nextProgress, allFeaturesSatisfied);
+    const completionFlag = (isSkipped || isMissed) ? undefined : allFeaturesSatisfied;
+    onUpdateProgress?.(habit.id, nextProgress, completionFlag);
   };
 
   const handleDayScheduleChange = (updatedItemIds, allDone) => {
@@ -172,7 +194,8 @@ function DashboardHabitCard({
       workoutCompleted: allDone,
     };
     const allFeaturesSatisfied = evaluateHabitCompletion(habit, nextProgress);
-    onUpdateProgress?.(habit.id, nextProgress, allFeaturesSatisfied);
+    const completionFlag = (isSkipped || isMissed) ? undefined : allFeaturesSatisfied;
+    onUpdateProgress?.(habit.id, nextProgress, completionFlag);
   };
 
   const handleCatalogChange = (catalogUpdates) => {
@@ -181,7 +204,8 @@ function DashboardHabitCard({
       ...catalogUpdates,
     };
     const allFeaturesSatisfied = evaluateHabitCompletion(habit, nextProgress);
-    onUpdateProgress?.(habit.id, nextProgress, allFeaturesSatisfied);
+    const completionFlag = (isSkipped || isMissed) ? undefined : allFeaturesSatisfied;
+    onUpdateProgress?.(habit.id, nextProgress, completionFlag);
   };
 
   const handleNotesSave = (notesText) => {

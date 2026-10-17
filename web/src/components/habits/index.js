@@ -19,6 +19,7 @@ export * from './slots';
  */
 export { default as HabitModal } from './HabitModal';
 export { default as OshoLibraryModal } from './OshoLibraryModal';
+export { default as TemplateBrowserModal } from './TemplateBrowserModal';
 
 /**
  * Backward compatibility exports

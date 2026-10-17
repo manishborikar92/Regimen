@@ -23,6 +23,7 @@ import {
     createScheduleHistoryEntry,
     ValidationError,
     PERSISTED_OUTCOME_STATUSES,
+    clampCounterProgress,
 } from '../constants/habit-models.js';
 
 /**
@@ -195,7 +196,15 @@ export async function updateDailyHabitProgress(userId, dateStr, habitId, progres
     };
 
     if (typeof isFullyCompleted === 'boolean') {
-        updatePayload.completedHabitIds = isFullyCompleted ? arrayUnion(habitId) : arrayRemove(habitId);
+        if (isFullyCompleted) {
+            updatePayload.completedHabitIds = arrayUnion(habitId);
+            updatePayload[`habitOutcomes.${habitId}`] = {
+                status: 'completed',
+                recordedAt: new Date().toISOString(),
+            };
+        } else {
+            updatePayload.completedHabitIds = arrayRemove(habitId);
+        }
     }
 
     return setDoc(dailyLogRef, updatePayload, { merge: true });
@@ -690,3 +699,56 @@ export function serializeDailyLogForFirestore(logData) {
         ...(logData.dayFinalizedAt ? { dayFinalizedAt: logData.dayFinalizedAt } : {}),
     };
 }
+
+/**
+ * Fetch all shared schedule templates from Cloud Firestore.
+ * Templates are read-only for authenticated users and contain reusable routine blueprints.
+ * 
+ * @returns {Promise<Array<Object>>}
+ */
+export async function fetchScheduleTemplates() {
+    try {
+        const templatesRef = collection(db, 'scheduleTemplates');
+        const snap = await getDocs(templatesRef);
+        if (snap.empty) {
+            return [];
+        }
+        const templates = snap.docs.map(docSnap => ({
+            id: docSnap.id,
+            ...docSnap.data(),
+        }));
+        // Sort by schedule.order then title
+        return templates.sort((a, b) => {
+            const orderA = a.schedule?.order ?? 999;
+            const orderB = b.schedule?.order ?? 999;
+            if (orderA !== orderB) return orderA - orderB;
+            return (a.title || '').localeCompare(b.title || '');
+        });
+    } catch (err) {
+        console.error('Error fetching schedule templates:', err);
+        return [];
+    }
+}
+
+/**
+ * Fetch a single schedule template by its stable ID.
+ * 
+ * @param {string} templateId
+ * @returns {Promise<Object|null>}
+ */
+export async function fetchScheduleTemplateById(templateId) {
+    if (!templateId) return null;
+    try {
+        const docRef = doc(db, 'scheduleTemplates', templateId);
+        const snap = await getDoc(docRef);
+        if (!snap.exists()) return null;
+        return {
+            id: snap.id,
+            ...snap.data(),
+        };
+    } catch (err) {
+        console.error(`Error fetching schedule template "${templateId}":`, err);
+        return null;
+    }
+}
+
