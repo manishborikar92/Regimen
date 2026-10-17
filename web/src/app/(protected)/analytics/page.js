@@ -177,19 +177,19 @@ export default function AnalyticsPage() {
         {/* Counts Breakdown */}
         <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-1 border-t border-subtle text-center text-xs">
           <div className="p-1.5 sm:p-2 rounded-xl bg-surface-subtle min-w-0">
-            <span className="text-3xs sm:text-2xs text-muted block font-medium truncate">Completed</span>
+            <span className="text-2xs text-muted block font-medium truncate">Completed</span>
             <span className="text-sm sm:text-base font-bold text-emerald-700 dark:text-emerald-400">
               {summary.totalCompletedOccurrences}
             </span>
           </div>
           <div className="p-1.5 sm:p-2 rounded-xl bg-surface-subtle min-w-0">
-            <span className="text-3xs sm:text-2xs text-muted block font-medium truncate">Missed</span>
+            <span className="text-2xs text-muted block font-medium truncate">Missed</span>
             <span className="text-sm sm:text-base font-bold text-rose-700 dark:text-rose-400">
               {summary.totalMissedOccurrences}
             </span>
           </div>
           <div className="p-1.5 sm:p-2 rounded-xl bg-surface-subtle min-w-0">
-            <span className="text-3xs sm:text-2xs text-muted block font-medium truncate">Planned Rest</span>
+            <span className="text-2xs text-muted block font-medium truncate">Planned Rest</span>
             <span className="text-sm sm:text-base font-bold text-amber-700 dark:text-amber-400">
               {summary.totalRestOccurrences}
             </span>
@@ -243,7 +243,7 @@ export default function AnalyticsPage() {
         {/* Calendar Grid Container */}
         <div className="w-full">
           {/* Mon-Sun Day Headers */}
-          <div className="grid grid-cols-7 gap-1 sm:gap-1.5 text-center text-3xs sm:text-2xs font-bold text-muted py-1.5 mb-1 border-b border-subtle">
+          <div className="grid grid-cols-7 gap-1 sm:gap-1.5 text-center text-2xs font-bold text-muted py-1.5 mb-1 border-b border-subtle">
             {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => (
               <div key={d} className="min-h-[18px] flex items-center justify-center truncate">
                 {d}
@@ -353,7 +353,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* 3. Compact Plain-Language Legend */}
-        <div className="flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-4 gap-y-1.5 pt-2.5 sm:pt-3 border-t border-subtle text-3xs sm:text-2xs text-sub">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-4 gap-y-1.5 pt-2.5 sm:pt-3 border-t border-subtle text-2xs text-sub">
           <div className="flex items-center gap-1.5">
             <span className="w-3.5 h-3.5 rounded-full bg-emerald-600 flex items-center justify-center text-white">
               <Check className="w-2 h-2 stroke-[3]" />
