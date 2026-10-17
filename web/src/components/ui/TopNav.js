@@ -39,9 +39,9 @@ export default function TopNav() {
           scrolled ? 'border-subtle shadow-xs' : 'border-transparent'
         )}
       >
-        <div className="mx-auto flex min-h-14 max-w-2xl items-center justify-between gap-3 px-4 sm:min-h-16">
+        <div className="mx-auto flex min-h-15 max-w-2xl items-center justify-between gap-3 px-4 sm:min-h-16">
           <div className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3">
-            <div className="flex flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 size-8 sm:size-9 items-center justify-center rounded-xl border border-subtle bg-surface p-1 shadow-2xs sm:p-1.5">
+            <div className="flex flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 size-9 sm:size-10 items-center justify-center rounded-xl border border-subtle bg-surface p-1 shadow-2xs sm:p-1.5">
               <Logo className="size-full" />
             </div>
 
