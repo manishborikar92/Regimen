@@ -31,8 +31,11 @@ function SlotCatalog({
 
   const isOshoCatalog = feature.catalogId === 'osho_discourses' ||
     habit.stableKey === 'canonical_listen_osho' ||
-    habit.completionMethod === 'osho_listening' ||
-    (!feature.catalogId && habit.title?.toLowerCase().includes('osho'));
+    habit.id?.includes('canonical_listen_osho') ||
+    (feature.catalogId !== 'custom_catalog' && (
+      (habit.completionMethod === 'osho_listening' && habit.title?.toLowerCase().includes('osho')) ||
+      habit.title?.toLowerCase().includes('osho')
+    ));
 
   // If Osho catalog, synchronize with profile state
   const activeSeriesId = userProfile?.activeOshoSeriesId || 'osho_01';

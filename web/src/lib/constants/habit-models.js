@@ -703,6 +703,12 @@ export function isFeatureSatisfied(featureKey, featureConfig = {}, progress = {}
       return requiredItems.every(reqItem => completedSteps.includes(reqItem.id || reqItem.label));
     }
     case 'catalog': {
+      const isOsho = featureConfig.catalogId === 'osho_discourses';
+      if (!isOsho && Array.isArray(featureConfig.items) && featureConfig.items.length > 0) {
+        if (progress.catalogItemCompleted) return true;
+        const completedIds = Array.isArray(progress.completedCatalogItemIds) ? progress.completedCatalogItemIds : [];
+        return featureConfig.items.every(item => completedIds.includes(item.id || item.title));
+      }
       return Boolean(
         progress.catalogItemCompleted ||
         progress.talkCompleted ||
@@ -809,6 +815,14 @@ export function deriveCompletedProgressForHabit(habit, existingProgress = {}, da
   if (f.catalog?.enabled) {
     next.catalogItemCompleted = true;
     next.talkCompleted = true;
+    const isOsho = f.catalog.catalogId === 'osho_discourses' ||
+      habit.stableKey === 'canonical_listen_osho' ||
+      habit.completionMethod === 'osho_listening' ||
+      (!f.catalog.catalogId && habit.title?.toLowerCase().includes('osho'));
+    if (!isOsho && Array.isArray(f.catalog.items)) {
+      const allItemIds = f.catalog.items.map((item, idx) => item.id || item.title || `item_${idx}`);
+      next.completedCatalogItemIds = allItemIds;
+    }
     // Osho disclosure invariant: Strictly leave seriesProgress untouched
   }
 
@@ -865,6 +879,13 @@ export function deriveUncompletedProgressForHabit(habit, existingProgress = {}) 
   if (f.catalog?.enabled) {
     next.catalogItemCompleted = false;
     next.talkCompleted = false;
+    const isOsho = f.catalog.catalogId === 'osho_discourses' ||
+      habit.stableKey === 'canonical_listen_osho' ||
+      habit.completionMethod === 'osho_listening' ||
+      (!f.catalog.catalogId && habit.title?.toLowerCase().includes('osho'));
+    if (!isOsho) {
+      next.completedCatalogItemIds = [];
+    }
     // Series progress remains untouched
   }
 

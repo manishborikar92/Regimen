@@ -56,13 +56,46 @@ export function getUserRef(userId) {
 }
 
 /**
+ * Recursively sanitizes data before writing to Firestore, stripping `undefined` fields
+ * which cause Firestore SDK write operations to reject with Unsupported field value errors.
+ * Preserves Date, FieldValue, and Firestore sentinel instances.
+ * 
+ * @param {*} val
+ * @returns {*}
+ */
+export function sanitizeForFirestore(val) {
+    if (val === undefined) {
+        return null;
+    }
+    if (val === null || typeof val !== 'object') {
+        return val;
+    }
+    if (Array.isArray(val)) {
+        return val
+            .filter(item => item !== undefined)
+            .map(item => sanitizeForFirestore(item));
+    }
+    if (val instanceof Date || (val.constructor && val.constructor.name !== 'Object')) {
+        return val;
+    }
+    const clean = {};
+    for (const [k, v] of Object.entries(val)) {
+        if (v !== undefined) {
+            clean[k] = sanitizeForFirestore(v);
+        }
+    }
+    return clean;
+}
+
+/**
  * Create a new habit document.
  * @param {string} userId
  * @param {Object} habitData
  */
 export async function createHabit(userId, habitData) {
+    const cleanHabitData = sanitizeForFirestore(habitData);
     return addDoc(collection(db, 'habits'), {
-        ...habitData,
+        ...cleanHabitData,
         userId,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
@@ -75,8 +108,9 @@ export async function createHabit(userId, habitData) {
  * @param {Object} habitData
  */
 export async function updateHabitDoc(habitId, habitData) {
+    const cleanHabitData = sanitizeForFirestore(habitData);
     return updateDoc(doc(db, 'habits', habitId), {
-        ...habitData,
+        ...cleanHabitData,
         updatedAt: serverTimestamp(),
     });
 }

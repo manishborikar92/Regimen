@@ -31,7 +31,13 @@ export default function HabitsPage() {
       playActionSuccessCue?.();
     } catch (err) {
       console.error('Error saving routine:', err);
-      addToast('Failed to save routine. Please try again.', 'error');
+      const detail = err?.message || '';
+      const displayMessage = detail.includes('Unsupported field value: undefined')
+        ? 'Failed to save routine: Invalid undefined property in habit data'
+        : detail.includes('permission-denied')
+        ? 'Permission denied: Please ensure you are logged in'
+        : detail ? `Failed to save routine: ${detail}` : 'Failed to save routine. Please try again.';
+      addToast(displayMessage, 'error');
     }
   };
 
@@ -104,7 +110,7 @@ export default function HabitsPage() {
                 className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-surface border border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-300 rounded-xl text-xs sm:text-sm font-semibold hover:bg-teal-50 dark:hover:bg-teal-950/40 transition-colors shadow-2xs min-h-[44px]"
               >
                 <BookOpen className="w-4 h-4" />
-                <span>Browse Templates</span>
+                <span>Schedule Blueprints</span>
               </button>
               <button
                 type="button"
@@ -130,7 +136,7 @@ export default function HabitsPage() {
                 title="Browse schedule blueprints and templates"
               >
                 <BookOpen className="w-4 h-4 text-teal-700 dark:text-teal-400" />
-                <span>Templates</span>
+                <span>Blueprints</span>
               </button>
             </div>
 

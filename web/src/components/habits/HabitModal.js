@@ -263,6 +263,22 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
         newErrors.customCategory = 'Custom category label must be 40 characters or less';
       }
     }
+    if (formData.features.catalog.enabled) {
+      if (!formData.features.catalog.catalogTitle?.trim()) {
+        newErrors.catalogTitle = 'Catalog title is required';
+      }
+      const items = formData.features.catalog.items || [];
+      if (items.length === 0) {
+        newErrors.catalogItems = 'Add at least one catalog item';
+      } else {
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          if (!item?.title?.trim() && !item?.label?.trim()) {
+            newErrors[`catalogItem_${i}`] = `Item #${i + 1} requires a title`;
+          }
+        }
+      }
+    }
     if (formData.features.daySchedule.enabled) {
       if (!formData.features.daySchedule.planTitle.trim()) {
         newErrors.dayScheduleTitle = 'Plan title is required';
@@ -345,9 +361,17 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
         ? {
             enabled: true,
             catalogId: formData.features.catalog.catalogId || 'custom_catalog',
-            catalogTitle: formData.features.catalog.catalogTitle || 'Library',
-            totalItems: formData.features.catalog.items?.length || formData.features.catalog.totalItems || 0,
-            items: formData.features.catalog.items || [],
+            catalogTitle: (formData.features.catalog.catalogTitle || 'Library').trim(),
+            totalItems: (formData.features.catalog.items || []).filter(item => item && (item.title || item.label)?.trim()).length,
+            items: (formData.features.catalog.items || [])
+              .filter(item => item && (item.title || item.label)?.trim())
+              .map((item, idx) => ({
+                id: item.id || `item_${idx + 1}`,
+                title: (item.title || item.label || '').trim(),
+                order: idx + 1,
+                ...(item.description?.trim() ? { description: item.description.trim() } : {}),
+                ...(item.url?.trim() ? { url: item.url.trim() } : {}),
+              })),
           }
         : { enabled: false },
       daySchedule: formData.features.daySchedule.enabled
@@ -402,7 +426,11 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
     } else if (cleanFeatures.daySchedule.enabled) {
       legacyCompletionMethod = 'exercise_plan';
     } else if (cleanFeatures.catalog.enabled) {
-      legacyCompletionMethod = 'osho_listening';
+      if (cleanFeatures.catalog.catalogId === 'osho_discourses' || formData.stableKey === 'canonical_listen_osho' || formData.title?.toLowerCase().includes('osho')) {
+        legacyCompletionMethod = 'osho_listening';
+      } else {
+        legacyCompletionMethod = 'catalog';
+      }
     } else if (cleanFeatures.timer.enabled) {
       legacyCompletionMethod = 'reading_duration';
     } else if (cleanFeatures.notes.enabled) {
@@ -478,11 +506,15 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
 
   const addCatalogItem = () => {
     if (!newCatalogItemTitle.trim()) return;
+    const title = newCatalogItemTitle.trim();
+    const url = newCatalogItemUrl.trim();
+    const desc = newCatalogItemDesc.trim();
     const newItem = {
       id: `item_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-      title: newCatalogItemTitle.trim(),
-      url: newCatalogItemUrl.trim() || undefined,
-      description: newCatalogItemDesc.trim() || undefined,
+      title,
+      order: (formData.features.catalog.items?.length || 0) + 1,
+      ...(url ? { url } : {}),
+      ...(desc ? { description: desc } : {}),
     };
     const currentItems = Array.isArray(formData.features.catalog.items) ? formData.features.catalog.items : [];
     const updatedItems = [...currentItems, newItem];
@@ -541,7 +573,8 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
       id: s.id,
       title: `${s.order}. ${s.title}`,
       description: `${s.theme} (${s.language})`,
-      url: s.driveUrl || undefined,
+      order: s.order,
+      ...(s.url ? { url: s.url } : {}),
     }));
     setFormData(prev => ({
       ...prev,
@@ -1622,8 +1655,13 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
                               },
                             }))}
                             placeholder="e.g., Contemplative Discourses"
-                            className="w-full px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-surface text-main"
+                            className={`w-full px-3 py-1.5 border rounded-lg text-xs bg-surface text-main ${
+                              errors.catalogTitle ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-700'
+                            }`}
                           />
+                          {errors.catalogTitle && (
+                            <p className="text-2xs text-rose-500 mt-1">{errors.catalogTitle}</p>
+                          )}
                         </div>
                         <div className="pt-4">
                           <button
@@ -1644,6 +1682,10 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
                           <span>Catalog Items ({formData.features.catalog.items?.length || 0})</span>
                           <span className="text-muted">Interactive curriculum items</span>
                         </div>
+
+                        {errors.catalogItems && (
+                          <p className="text-2xs text-rose-500 font-semibold">{errors.catalogItems}</p>
+                        )}
 
                         {/* Existing items list */}
                         <div className="space-y-1.5 max-h-48 overflow-y-auto">
@@ -1702,6 +1744,11 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
                                   </button>
                                 </div>
                               </div>
+                              {item.description && (
+                                <div className="pl-6 text-2xs text-sub truncate">
+                                  {item.description}
+                                </div>
+                              )}
                               {item.url && (
                                 <div className="pl-6 text-2xs text-muted truncate">
                                   Link: {item.url}
@@ -1728,6 +1775,13 @@ export default function HabitModal({ habit, onSave, onClose, onDelete }) {
                               onChange={(e) => setNewCatalogItemUrl(e.target.value)}
                               placeholder="Audio / video link (optional)"
                               className="px-2.5 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-surface text-main"
+                            />
+                            <input
+                              type="text"
+                              value={newCatalogItemDesc}
+                              onChange={(e) => setNewCatalogItemDesc(e.target.value)}
+                              placeholder="Brief description or focus area (optional)"
+                              className="px-2.5 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-surface text-main sm:col-span-2"
                             />
                           </div>
                           <div className="flex justify-end">
